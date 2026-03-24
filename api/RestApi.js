@@ -129,6 +129,22 @@ export default function RestApi(props) {
     });
   }, []);
 
+  /**
+   * Get description and keywords for a section image.
+   *
+   * @param pageId {number}
+   * @param pageSectionId {number}
+   * @returns {Promise<SummaryData>}
+   */
+  const describeSectionImage = async (pageId, pageSectionId) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.get(`${host}/api/v1/content/pages/${pageId}/sections/${pageSectionId}/image/describe`);
+        return response.data;
+      }
+    });
+  };
+
   const insertOrUpdatePage = useCallback(async (data) => {
     return await adminApiCall(() => {
       return async () => {
@@ -291,14 +307,23 @@ export default function RestApi(props) {
     });
   }, []);
 
-  const updatePhoto = useCallback(async (galleryId, photoId, data) => {
+  /**
+   * Update a gallery photo.
+   *
+   * @param galleryId {number}
+   * @param photoId {number}
+   * @param data {PhotoData}
+   *
+   * @returns {Promise<PhotoData>}
+   */
+  const updatePhoto = async (galleryId, photoId, data) => {
     return adminApiCall(() => {
       return async () => {
         const response = await axios.post(`${host}/api/v1/galleries/${galleryId}/photos/${photoId}`, data);
         return response.data;
       }
     });
-  }, []);
+  };
 
   const deletePhoto = useCallback(async (galleryId, photoId) => {
     return await adminApiCall(() => {
@@ -309,14 +334,21 @@ export default function RestApi(props) {
     });
   }, []);
 
-  const describeFile = useCallback(async (s3uri, prompt) => {
+  /**
+   * Describe a gallery photo.
+   *
+   * @param galleryId {number}
+   * @param photoId {number}
+   * @returns {Promise<SummaryData>}  Summary containing description and keywords.
+   */
+  const describePhoto = async (galleryId, photoId) => {
     return await adminApiCall(() => {
       return async () => {
-        const response = await axios.post(`${host}/api/v1/files/describe`, {s3uri: s3uri, prompt: prompt});
+        const response = await axios.get(`${host}/api/v1/galleries/${galleryId}/photos/${photoId}/describe`);
         return response.data;
       }
     });
-  }, []);
+  };
 
   const getPageExtras = useCallback(async (pageId) => {
     const response = await axios.get(`${host}/api/v1/content/pages/${pageId}/extras`);
@@ -378,6 +410,21 @@ export default function RestApi(props) {
       }
     });
   }, []);
+
+  /**
+   * Get description and keywords for an extra.
+   *
+   * @param extraId {number}
+   * @returns {Promise<SummaryData>}
+   */
+  const describeExtra = async (extraId) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.get(`${host}/api/v1/content/extras/${extraId}/describe`);
+        return response.data;
+      }
+    });
+  };
 
   const getUsers = useCallback(async () => {
     return await adminApiCall(() => {
@@ -517,7 +564,7 @@ export default function RestApi(props) {
         uploadSectionImage: uploadSectionImage,
         deleteSectionImage: deleteSectionImage,
         deletePageSection: deletePageSection,
-        insertOrUpdatePage: insertOrUpdatePage,
+        describeSectionImage: describeSectionImage,
       },
       GuestBooks: {
         getGuestBook: getGuestBook,
@@ -538,6 +585,7 @@ export default function RestApi(props) {
         uploadPhoto: uploadPhoto,
         updatePhoto: updatePhoto,
         deletePhoto: deletePhoto,
+        describePhoto: describePhoto
       },
       Extras: {
         getPageExtras: getPageExtras,
@@ -545,6 +593,7 @@ export default function RestApi(props) {
         deleteExtra: deleteExtra,
         moveUp: moveExtraUp,
         moveDown: moveExtraDown,
+        describeExtra: describeExtra,
       },
       Auth: {
         getAuthToken: getAuthToken,
@@ -559,9 +608,6 @@ export default function RestApi(props) {
         getUsers: getUsers,
         insertOrUpdateUser: insertOrUpdateUser,
         deleteUser: deleteUser,
-      },
-      Files: {
-        describeFile: describeFile,
       }
     }}>
       {props.children}

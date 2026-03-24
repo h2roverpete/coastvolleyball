@@ -1,11 +1,12 @@
-import {Button, Col, Form, Modal, Row} from "react-bootstrap";
+import {Button, Col, Form, Modal, OverlayTrigger, Row, Spinner, Tooltip} from "react-bootstrap";
 import {useFormData} from "./FormEditor";
 import {useEffect, useState} from "react";
 import {useSiteContext} from "../content/Site";
 import {useRestApi} from "../../api/RestApi";
 import {usePageContext} from "../content/Page";
+import {BsStars} from "react-icons/bs";
 
-export default function PageConfig({onPageUpdated, onPageDeleted}) {
+export default function PageConfig({onPageUpdated, onPageDeleted, modalRef}) {
 
   const {Pages} = useRestApi();
   const {Outline, outlineData, currentPage} = useSiteContext();
@@ -16,6 +17,7 @@ export default function PageConfig({onPageUpdated, onPageDeleted}) {
 
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [routes, setRoutes] = useState([]);
+  const [describing, setDescribing] = useState(false);
 
   // destructure update function to satisfy eslint
   const {update} = formData;
@@ -62,6 +64,29 @@ export default function PageConfig({onPageUpdated, onPageDeleted}) {
       })
       .catch(e => console.error(`Error deleting page.`, e));
     onPageDeleted?.();
+  }
+
+  function onDescribe() {
+    setDescribing(true);
+    formData.onDataChanged({
+      changes: [
+        {name: 'PageMetaTitle', value: ''},
+        {name: 'PageMetaDescription', value: ''},
+        {name: 'PageMetaKeywords', value: ''},
+      ]
+    })
+    Pages.describePage(currentPage.PageID)
+      .then(result => {
+        setDescribing(false);
+        formData.onDataChanged({
+          changes: [
+            {name: 'PageMetaTitle', value: result.title},
+            {name: 'PageMetaDescription', value: result.description},
+            {name: 'PageMetaKeywords', value: result.keywords},
+          ]
+        });
+      })
+      .catch(e => console.error(`Error describing page.`, e));
   }
 
   function isValidRoute(route) {
@@ -188,12 +213,29 @@ export default function PageConfig({onPageUpdated, onPageDeleted}) {
         )}
         <Button
           size={'sm'}
+          className="me-2"
           variant="secondary"
           onClick={() => formData.revert()}
           disabled={!formData.isDataChanged()}
         >
           Revert
         </Button>
+        <OverlayTrigger
+          delay={{show:1000}}
+          overlay={<Tooltip id={"tip"}>Generate meta title, description and keywords using AI.</Tooltip>}
+          container={modalRef}
+        >
+          <Button
+            size={'sm'}
+            style={{minWidth: '75px'}}
+            className="me-2"
+            variant="secondary"
+            onClick={() => onDescribe()}
+            disabled={describing}
+          >
+            {describing ? <Spinner size={'sm'}/> : <><BsStars size={15} className={'me-1'}/>Describe</>}
+          </Button>
+        </OverlayTrigger>
       </Col>
       <Col style={{textAlign: 'end'}} className={'ps-0'}>
         <Button

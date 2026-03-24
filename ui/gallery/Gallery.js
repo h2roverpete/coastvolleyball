@@ -13,7 +13,7 @@ import {useTouchContext} from "../../util/TouchProvider";
 import {Permission, Resource} from "../../auth/Permissions";
 import {useAuth} from "../../auth/AuthProvider";
 import {useExtrasContext} from "../extras/Extras";
-import DescribeImageModal from "../images/DescribeImageModal";
+import DescribePhotoModal from "./DescribePhotoModal";
 
 /**
  * Display a photo gallery
@@ -38,7 +38,7 @@ export default function Gallery({galleryId, extraData, sectionExtras}) {
   const [canEdit, setCanEdit] = useState(false);
   const [canAddPhotos, setCanAddPhotos] = useState(false);
   const [canAdmin, setCanAdmin] = useState(false);
-  const [showDescribeImageModal, setShowDescribeImageModal] = useState(false);
+  const [showDescribePhotoModal, setShowDescribePhotoModal] = useState(false);
 
   // refs
   const fileDropRef = useRef(null);
@@ -80,7 +80,6 @@ export default function Gallery({galleryId, extraData, sectionExtras}) {
   }, [galleryId, galleryConfig, showErrorAlert, Galleries, galleryPhotos.length]);
 
   function updateCurrentPhoto(data) {
-    setCurrentPhoto(data);
     setGalleryPhotos(
       galleryPhotos.map((photo) => {
         if (photo.PhotoID === data.PhotoID) {
@@ -90,6 +89,7 @@ export default function Gallery({galleryId, extraData, sectionExtras}) {
         }
       })
     );
+    setCurrentPhoto({...data});
   }
 
   function uploadFile(file) {
@@ -227,17 +227,11 @@ export default function Gallery({galleryId, extraData, sectionExtras}) {
     }
   }
 
-  function onSubmitDescription(result) {
-    console.debug(`Updating photo description.`);
-    const newData = {
-      ...currentPhoto,
-      PhotoDescription: result.description,
-      PhotoKeywords: result.keywords,
-    }
-    Galleries.updatePhoto(newData.GalleryID, newData.PhotoID, newData)
-      .then(() => console.debug(`Updated photo description.`))
-      .catch(error => showErrorAlert(`Error updating photo description.`, error));
-    setShowDescribeImageModal(false);
+  /**
+   * Receive result after photo update
+   * @param newData {PhotoData}
+   */
+  function handlePhotoUpdate(newData) {
     updateCurrentPhoto(newData);
   }
 
@@ -310,7 +304,7 @@ export default function Gallery({galleryId, extraData, sectionExtras}) {
         >
           {currentPhoto && canEdit && (<>
             <li>
-              <button className="dropdown-item" onClick={() => setShowDescribeImageModal(true)}>Describe Photo</button>
+              <button className="dropdown-item" onClick={() => setShowDescribePhotoModal(true)}>Describe Photo</button>
             </li>
             <li>
               <button className="dropdown-item" onClick={onDeletePhoto}>Delete Photo</button>
@@ -342,16 +336,12 @@ export default function Gallery({galleryId, extraData, sectionExtras}) {
             buttonRef={expandButtonRef}
           />
         </FormEditor>
-        <FormEditor>
-          <DescribeImageModal
-            show={showDescribeImageModal}
-            onHide={() => setShowDescribeImageModal(false)}
-            onSubmit={onSubmitDescription}
-            s3uri={`s3://${siteData?.SiteBucketName}/${currentPhoto?.PhotoFile}`}
-            description={currentPhoto?.PhotoDescription}
-            keywords={currentPhoto?.PhotoKeywords}
-          />
-        </FormEditor>
+        <DescribePhotoModal
+          show={showDescribePhotoModal}
+          onHide={() => setShowDescribePhotoModal(false)}
+          onUpdate={handlePhotoUpdate}
+          photoData={currentPhoto}
+        />
       </>)
     }
   </div>)

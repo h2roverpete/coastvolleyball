@@ -100,6 +100,7 @@ export default function FileExtra({extraData, sectionExtras, canEdit = false}) {
             href={fileUrl}
             rel="noopener noreferrer"
             target={extraData.ExtraDisplay === 'blank' ? '_blank' : '_self'}
+            title={extraData.ExtraDescription}
           >
             <div style={{paddingRight: '5px'}}><FileExtraIcon type={extraData.ExtraFileIcon}/></div>
             <div

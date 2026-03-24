@@ -1,4 +1,4 @@
-import {Button} from "react-bootstrap";
+import {Button, OverlayTrigger, Tooltip} from "react-bootstrap";
 import {BsPlus} from "react-icons/bs";
 import React, {lazy, Suspense, useEffect, useState} from "react";
 import FormEditor from "./FormEditor";
@@ -12,7 +12,7 @@ const NewPageModal = lazy(() => import("../editor/NewPageModal"));
 /**
  * Dropdown menu for adding a new page or page section.
  *
- * @param {RefObject<HTMLButtonElement>} [ref]  Receive a reference to the dropdown button div.
+ * @param {Ref<HTMLButtonElement>} [ref]  Receive a reference to the dropdown button div.
  *
  * @returns {Element}
  * @constructor
@@ -33,7 +33,12 @@ export default function AddPageButton({ref}) {
   }, [setCanEditSite, hasPermission]);
 
   return (<>
-    {canEditSite && (<>
+  {canEditSite && (<>
+    <OverlayTrigger
+      placement="bottom"
+      overlay={<Tooltip>Add a new page</Tooltip>}
+      delay={{show: 1000}}
+    >
       <Button
         className={`AddPageButton EditButton`}
         variant={siteData?.SiteTheme}
@@ -47,11 +52,14 @@ export default function AddPageButton({ref}) {
       >
         <BsPlus/>
       </Button>
-      {showNewPage && (<Suspense fallback={<></>}>
-        <FormEditor>
-          <NewPageModal show={showNewPage} setShow={setShowNewPage}/>
-        </FormEditor>
-      </Suspense>)}
-    </>)}
-  </>);
+    </OverlayTrigger>
+    {showNewPage && (<Suspense fallback={<></>}>
+      <FormEditor>
+        <NewPageModal show={showNewPage} setShow={setShowNewPage}/>
+      </FormEditor>
+    </Suspense>)
+    }
+  </>)}
+  </>)
+    ;
 }

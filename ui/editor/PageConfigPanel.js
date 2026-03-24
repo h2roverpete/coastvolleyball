@@ -16,6 +16,8 @@ export default function PageConfigPanel() {
   const buttonRef = useRef(null);
   const {supportsHover} = useTouchContext();
 
+  const panelRef = useRef(null);
+
   function collapsePanel() {
     buttonRef.current?.click();
   }
@@ -50,12 +52,14 @@ export default function PageConfigPanel() {
       onMouseLeave={() => {
         if (supportsHover) buttonRef.current.hidden = true;
       }}
+      ref={panelRef}
     >
       <FormEditor>
         <EditorPanel buttonRef={buttonRef} hideButtons={true}>
           <PageConfig
             onPageUpdated={onPageUpdated}
             onPageDeleted={onPageDeleted}
+            modalRef={panelRef}
           />
         </EditorPanel>
       </FormEditor>

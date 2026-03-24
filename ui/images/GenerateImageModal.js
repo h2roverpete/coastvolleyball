@@ -38,7 +38,10 @@ export default function GenerateImageModal(
           deleteImageResults();
         }
       })
-      .catch(error => showErrorAlert(error));
+      .catch(error => {
+        showErrorAlert(error);
+        setGenerating(false);
+      });
   }
 
   function deleteImageResults() {
@@ -111,11 +114,15 @@ export default function GenerateImageModal(
       </ModalHeader>
       <ModalBody>
         <>
-          <GenerateImageFields/>
+          <GenerateImageFields
+            siteId={siteData.SiteID}
+            pageId={pageData.PageID}
+            pageSectionId={pageSectionData.PageSectionID}
+          />
           {generating && (<>
             <Row className="mt-3">
-                <Spinner className="ms-3" />
-                <Form.Label column="sm">Generating images...</Form.Label>
+              <Spinner className="ms-3"/>
+              <Form.Label column="sm">Generating images...</Form.Label>
             </Row>
           </>)}
           {imageResults?.length > 0 && (<>

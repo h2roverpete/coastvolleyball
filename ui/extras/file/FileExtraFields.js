@@ -1,4 +1,4 @@
-import {Col, Form, Row, Spinner} from "react-bootstrap";
+import {Col, Form, Row} from "react-bootstrap";
 import {useFormData} from "../../editor/FormEditor";
 import {useEffect, useState} from "react";
 import FileExtraIcon, {IconList} from "./FileExtraIcon";
@@ -162,44 +162,35 @@ export default function FileExtraFields({fetchingDescription = false}) {
         />
       </Col>
     </Row>
-    {fetchingDescription ? (<>
-      <Row className="mt-4 mb-4">
-        <Spinner className="ms-3"/>
-        <Form.Label column="sm">Generating image description...</Form.Label>
+    {formData.edits.ExtraFile && (<>
+      <Row className="mt-0">
+        <Form.Label column="sm">Description</Form.Label>
       </Row>
-    </>) : (<>
-      {(formData.edits.ExtraDescription?.length > 0 || formData.edits.ExtraFile) && (<>
-        <Row className="mt-0">
-          <Form.Label column="sm">Description</Form.Label>
-        </Row>
-        <Row className="mt-2">
-          <Col>
-            <Form.Control
-              as="textarea"
-              rows={2}
-              size={"sm"}
-              value={formData.edits.ExtraDescription || ''}
-              onChange={e => formData.onDataChanged({name: 'ExtraDescription', value: e.target.value})}
-            />
-          </Col>
-        </Row>
-      </>)}
-      {(formData.edits.ExtraKeywords?.length > 0 || formData.edits.ExtraFile) && (<>
-        <Row className="mt-2">
-          <Form.Label column="sm">Keywords</Form.Label>
-        </Row>
-        <Row className="mt-2">
-          <Col>
-            <Form.Control
-              as="textarea"
-              rows={2}
-              size={"sm"}
-              value={formData.edits.ExtraKeywords}
-              onChange={e => formData.onDataChanged({name: 'ExtraKeywords', value: e.target.value})}
-            />
-          </Col>
-        </Row>
-      </>)}
+      <Row className="mt-2">
+        <Col>
+          <Form.Control
+            as="textarea"
+            rows={2}
+            size={"sm"}
+            value={formData.edits.ExtraDescription || ''}
+            onChange={e => formData.onDataChanged({name: 'ExtraDescription', value: e.target.value})}
+          />
+        </Col>
+      </Row>
+      <Row className="mt-2">
+        <Form.Label column="sm">Keywords</Form.Label>
+      </Row>
+      <Row className="mt-2">
+        <Col>
+          <Form.Control
+            as="textarea"
+            rows={2}
+            size={"sm"}
+            value={formData.edits.ExtraKeywords}
+            onChange={e => formData.onDataChanged({name: 'ExtraKeywords', value: e.target.value})}
+          />
+        </Col>
+      </Row>
     </>)}
   </>);
 }

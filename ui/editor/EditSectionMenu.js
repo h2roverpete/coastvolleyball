@@ -1,9 +1,9 @@
-import {Button, Modal, ModalBody, ModalFooter, ModalHeader} from "react-bootstrap";
+import {Button, Modal, ModalBody, ModalFooter, ModalHeader, OverlayTrigger, Tooltip} from "react-bootstrap";
 import {BsThreeDotsVertical} from "react-icons/bs";
 import {useSiteContext} from "../content/Site";
 import {usePageContext} from "../content/Page";
 import {useTouchContext} from "../../util/TouchProvider";
-import {useState} from "react";
+import React, {useState} from "react";
 import {loremIpsum} from "lorem-ipsum";
 import {useRestApi} from "../../api/RestApi";
 import GenerateImageModal from "../images/GenerateImageModal";
@@ -209,16 +209,22 @@ export default function EditSectionMenu(
 
   return (<>
     <div className="Editor EditSectionMenu dropdown">
-      <Button
-        variant={siteData?.SiteTheme}
-        size="sm"
-        className={`EditButton EditSectionButton`}
-        type="button"
-        data-bs-toggle="dropdown"
-        aria-expanded="false"
-        ref={editButtonRef}
-        hidden={supportsHover}
-      ><BsThreeDotsVertical/></Button>
+      <OverlayTrigger
+        placement="left"
+        overlay={<Tooltip>Edit section</Tooltip>}
+        delay={{show: 1000}}
+      >
+        <Button
+          variant={siteData?.SiteTheme}
+          size="sm"
+          className={`EditButton EditSectionButton`}
+          type="button"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+          ref={editButtonRef}
+          hidden={supportsHover}
+        ><BsThreeDotsVertical/></Button>
+      </OverlayTrigger>
       <ul className="dropdown-menu Editor" style={{cursor: 'pointer'}}>
         <li>
           <button className="dropdown-item"

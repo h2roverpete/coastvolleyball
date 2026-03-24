@@ -2,6 +2,15 @@ import {useFormData} from "../editor/FormEditor";
 import {Col, Form, Row} from "react-bootstrap";
 import {useEffect} from "react";
 
+/**
+ * @typedef ImageStyle
+ * @property {string} value
+ * @property {string} prompt
+ */
+
+/**
+ * @type {[ImageStyle]}
+ */
 const ImageStyles = [
   {value: "PHOTOREALISM", prompt: 'photo realism'},
   {value: "DESIGN_SKETCH", prompt: 'design sketch'},
@@ -13,6 +22,16 @@ const ImageStyles = [
   {value: "SOFT_DIGITAL_PAINTING", prompt: 'soft digital painting'},
 ]
 
+/**
+ * @typedef ImageSize
+ * @property {number} width
+ * @property {number} height
+ * @property {string} prompt
+ */
+
+/**
+ * @type {[ImageSize]}
+ */
 const ImageSizes = [
   {width: 1360, height: 1024, prompt: '4x3 horizontal'},
   {width: 1024, height: 1360, prompt: '4x3 vertical'},
@@ -23,21 +42,26 @@ const ImageSizes = [
   {width: 1024, height: 1024, prompt: 'square'},
 ]
 
-export default function GenerateImageFields({pageId, pageSectionId}) {
+export default function GenerateImageFields({siteId, pageId, pageSectionId}) {
 
   const formData = useFormData();
 
   useEffect(() => {
-    // set up query data
-    formData.setData({
-      ImageSize: '1360x1024',
-      ImagePrompt: '',
-      ImageNegativePrompt: '',
-      ImageStyle: 'PHOTOREALISM',
-      ImageCount: 3,
-      ImagePath: 'images/'
-    })
-  }, [formData]);
+    if (!formData.edits.SiteID) {
+      // set up query data
+      formData.setData({
+        SiteID: siteId,
+        PageID: pageId,
+        PageSectionID: pageSectionId,
+        ImageSize: '1360x1024',
+        ImagePrompt: '',
+        ImageNegativePrompt: '',
+        ImageStyle: 'PHOTOREALISM',
+        ImageCount: 3,
+        ImagePath: 'images/'
+      })
+    }
+  }, [formData, pageId, pageSectionId, siteId]);
 
   const labelCols = 3;
   return (<>

@@ -106,7 +106,7 @@ export default function PageSection({pageSectionData, canEdit = false}) {
         showErrorAlert(`Error uploading image.`, e);
         dropRef.current.setDropState(DropState.HIDDEN);
       });
-  }, [PageSections, pageSectionData, updatePageSection, showErrorAlert, siteData.SiteID]);
+  }, [PageSections, pageSectionData, updatePageSection, showErrorAlert, siteData]);
 
   const sectionTitle = useMemo(() => (
     <h2

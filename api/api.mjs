@@ -53,6 +53,8 @@ import axios from "axios";
  * @property {String} SectionTitle
  * @property {String} SectionText
  * @property {String} SectionImage
+ * @property {String} SectionImageDescription
+ * @property {String} SectionImageKeywords
  * @property {Boolean} SectionHidden
  * @property {Number} ImageWidth
  * @property {Number} ImageHeight
@@ -78,25 +80,21 @@ import axios from "axios";
  */
 
 /**
- * @typedef GenerateImageRequest
+ * @typedef GeneratedImageData
  *
+ * @property GeneratedImageID {number}      Generated Image ID
  * @property ImageSize {string}             Image width x height, i.e. '4096x4096'
  * @property ImagePrompt {string}           Prompt for generating image.
  * @property ImageNegativePrompt {string}   Negative prompt (things not to generate).
  * @property ImageStyle {string}            Style of image, i.e. 'PHOTOREALISM'.
  * @property ImageCount {number}            Number of images to return.
  * @property ImagePath {string}             Path to image relative to site root
- */
-
-/**
- * @property GeneratedImageData
- * @extends GenerateImageRequest
- *
- * @property GeneratedImageID {number}      Generated Image ID
  * @property PageSectionID {number}         Page Section ID
  * @property PageID {number}                Page ID
  * @property SiteID {number}                Site ID
  * @property Image {string}                 Path to image from site root.
+ * @property Created {string}               Creation date.
+ * @property Modified {string}              Modification date.
  */
 
 /**
@@ -256,6 +254,7 @@ import axios from "axios";
  * @property {number} GalleryPhotoSeq
  * @property {string} PhotoFile
  * @property {string} PhotoDescription
+ * @property {string} PhotoKeywords
  * @property {string} PhotoSmall
  * @property {string} PhotoMedium
  * @property {string} PhotoLarge

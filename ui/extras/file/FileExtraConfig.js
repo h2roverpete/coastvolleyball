@@ -5,19 +5,19 @@ import {useFormData} from "../../editor/FormEditor";
 import {useEffect, useState} from "react";
 import FileExtraFields from "./FileExtraFields";
 import {useSiteContext} from "../../content/Site";
-import {Button} from "react-bootstrap";
+import {Button, Spinner} from "react-bootstrap";
+import {BsStars} from "react-icons/bs";
 
 export default function FileExtraConfig({extraData, buttonRef}) {
 
-  const {Extras, Files} = useRestApi();
+  const {Extras} = useRestApi();
   const {updateExtra, removeExtraFromPage} = usePageContext();
-  const {showErrorAlert, siteData} = useSiteContext();
+  const {showErrorAlert} = useSiteContext();
 
   /** @type FormDataAPI<ExtraData> */
   const formData = useFormData();
 
-  const [fetchingDescription, setFetchingDescription] = useState();
-  const [fetchingKeywords, setFetchingKeywords] = useState();
+  const [describing, setDescribing] = useState(false);
 
   useEffect(() => {
     formData.setData(extraData);
@@ -45,26 +45,27 @@ export default function FileExtraConfig({extraData, buttonRef}) {
   }
 
   function onDescribe() {
-    formData.onDataChanged([
-      {name: 'ExtraDescription', value: 'description'},
-      {name: 'ExtraKeywords', value: ''},
-    ])
-    setFetchingDescription(true);
-    setFetchingKeywords(true);
-    Files.describeFile(
-      `s3://${siteData.SiteBucketName}/${extraData.ExtraFile}`,
-      `summarize the contents in one sentence`
-    ).then((result) => {
-      formData.onDataChanged({name: 'ExtraDescription', value: result.description});
-      setFetchingDescription(false);
-    }).catch((err) => showErrorAlert(`Error generating description.`, err));
-    Files.describeFile(
-      `s3://${siteData.SiteBucketName}/${extraData.ExtraFile}`,
-      `generate a comma delimited list of 10 keywords about the contents`
-    ).then((result) => {
-      formData.onDataChanged({name: 'ExtraKeywords', value: result.description});
-      setFetchingKeywords(false);
-    }).catch((err) => showErrorAlert(`Error generating keywords.`, err));
+    formData.onDataChanged({
+      changes: [
+        {name: 'ExtraDescription', value: ''},
+        {name: 'ExtraKeywords', value: ''},
+      ]
+    });
+    setDescribing(true);
+    Extras.describeExtra(extraData.ExtraID)
+      .then((summary) => {
+        formData.onDataChanged({
+          changes: [
+            {name: 'ExtraDescription', value: summary.description},
+            {name: 'ExtraKeywords', value: summary.keywords},
+          ]
+        });
+        setDescribing(false);
+      })
+      .catch((err) => {
+        showErrorAlert(`Error describing extra.`, err);
+        setDescribing(false);
+      });
   }
 
   const extraButtons = (
@@ -73,8 +74,9 @@ export default function FileExtraConfig({extraData, buttonRef}) {
       size={'sm'}
       className={'me-2'}
       onClick={onDescribe}
+      style={{minWidth: '80px'}}
     >
-      Describe
+      {describing ? <Spinner size={'sm'}/> : <div><BsStars size={15} className={'me-1'}/> Describe</div>}
     </Button>
   );
 
@@ -88,7 +90,7 @@ export default function FileExtraConfig({extraData, buttonRef}) {
     >
       <h5>File Properties</h5>
       <FileExtraFields
-        fetchingDescription={fetchingDescription || fetchingKeywords}
+        fetchingDescription={describing}
       />
     </EditorPanel>
   );

@@ -31,6 +31,7 @@ import {useTouchContext} from "../../util/TouchProvider";
  * @property {function()} onCancel          Called when editing is canceled.
  * @property {boolean} [allowEnterKey]      Allow user to press enter key while editing (instead of committing changes)
  * @property {boolean} [showEditButton]     Show edit button? (If false, parent needs to call startEditing() in API)
+ * @property {string} [editTooltip]         Tooltip text for the edit button
  * @property {boolean} [alwaysShow]         Always show the field, even if empty (reserves layout space)
  * @property {function(EditableAPI)} [api]  Function to receive editable API.
  *
@@ -45,6 +46,7 @@ export default function EditableField(
     onCancel,
     allowEnterKey,
     showEditButton,
+    editTooltip,
     alwaysShow,
     api,
     canEdit = false,
@@ -261,6 +263,7 @@ export default function EditableField(
             callback={editCallback}
             editing={isEditing}
             showEditButton={showEditButton}
+            tooltip={editTooltip}
             hidden={!isEditing && supportsHover && hideEditButtons}
           />
         </div>

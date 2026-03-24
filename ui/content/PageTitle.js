@@ -84,6 +84,7 @@ export default function PageTitle({text, alwaysShow}) {
         textContent={titleText}
         textAlign={pageData?.PageTitleAlign}
         showEditButton={true}
+        editTooltip={'Edit page title'}
         alwaysShow={alwaysShow === true}
         canEdit={canEdit}
       />

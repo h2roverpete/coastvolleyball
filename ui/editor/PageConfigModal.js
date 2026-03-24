@@ -5,6 +5,7 @@ import {useFormData} from "./FormEditor";
 import {useRestApi} from "../../api/RestApi";
 import {useSiteContext} from "../content/Site";
 import {isValidRoute} from "../../util/Validators";
+import {BsStars} from "react-icons/bs";
 
 export default function PageConfigModal({pageData, outlineData, show, onHide, onUpdated, onDeleted, onAdded}) {
 
@@ -58,6 +59,13 @@ export default function PageConfigModal({pageData, outlineData, show, onHide, on
   const handleDescribe = useCallback(() => {
     console.debug(`Describe page ${formData.edits?.PageID}...`);
     setDescribing(true);
+    formData.onDataChanged({
+      changes: [
+        {name: 'PageMetaTitle', value: ''},
+        {name: 'PageMetaDescription', value: ''},
+        {name: 'PageMetaKeywords', value: ''},
+      ]
+    });
     Pages.describePage(formData.edits?.PageID)
       .then(result => {
         console.debug(`Received page ${formData.edits?.PageID} description.`);
@@ -70,7 +78,10 @@ export default function PageConfigModal({pageData, outlineData, show, onHide, on
         });
         setDescribing(false);
       })
-      .catch(error => showErrorAlert(`Error describing page.`, error));
+      .catch(error => {
+        showErrorAlert(`Error describing page.`, error);
+        setDescribing(false);
+      });
   }, [formData, setDescribing, Pages, showErrorAlert]);
 
   return (
@@ -82,7 +93,7 @@ export default function PageConfigModal({pageData, outlineData, show, onHide, on
         <PageFields outlineData={outlineData}/>
       </Modal.Body>
       <Modal.Footer>
-        <Col>
+        <Col className={'d-flex flex-row align-items-center'}>
           <Button
             size="sm"
             variant="primary"
@@ -107,12 +118,12 @@ export default function PageConfigModal({pageData, outlineData, show, onHide, on
             onClick={() => handleDescribe()}
             hidden={!formData.edits.PageID > 0}
             className={'me-2'}
-
+            style={{minWidth: '100px'}}
           >
-            {describing ? <Spinner size="sm"/> : <>Describe</>}
+            {describing ? <Spinner size="sm"/> : <><BsStars size={'15'} className={'me-1'}/>Describe</>}
           </Button>
         </Col>
-        <Col className="text-end">
+        <Col className={'d-flex flex-row align-items-center justify-content-end'}>
           <Button
             size="sm"
             variant="secondary"

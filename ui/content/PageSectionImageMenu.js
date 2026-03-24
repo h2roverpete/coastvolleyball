@@ -1,12 +1,12 @@
-import {Button} from "react-bootstrap";
-import {BsArrowsMove} from "react-icons/bs";
+import {Button, OverlayTrigger, Tooltip} from "react-bootstrap";
+import {BsCamera} from "react-icons/bs";
 import {useRestApi} from "../../api/RestApi";
 import {usePageContext} from "./Page";
 import {useSiteContext} from "./Site";
 import {useTouchContext} from "../../util/TouchProvider";
-import DescribeImageModal from "../images/DescribeImageModal";
 import React, {useState} from "react";
 import FormEditor from "../editor/FormEditor";
+import DescribeSectionImageModal from "../editor/DescribeSectionImageModal";
 
 export default function PageSectionImageMenu({pageSectionData, buttonRef}) {
 
@@ -84,18 +84,8 @@ export default function PageSectionImageMenu({pageSectionData, buttonRef}) {
     }
   }
 
-  function onSubmitDescription(result) {
-    setShowDescribeImageModal(false);
-    const newData = {
-      ...pageSectionData,
-      SectionImageKeywords: result.keywords,
-      SectionImageDescription: result.description,
-    }
-    const {Extras, ...submitData} = newData;
-    PageSections.insertOrUpdatePageSection(submitData)
-      .then(() => console.debug(`Image description updated.`))
-      .catch(err => showErrorAlert(`Error updating image description.`, err));
-    updatePageSection(newData);
+  function handleUpdateImageDescription(data) {
+    updatePageSection({...data});
   }
 
   return (<>
@@ -104,14 +94,20 @@ export default function PageSectionImageMenu({pageSectionData, buttonRef}) {
       ref={buttonRef}
       hidden={supportsHover}
     >
-      <Button
-        variant={siteData?.SiteTheme}
-        size="sm"
-        className={`EditButton EditImageButton`}
-        type="button"
-        data-bs-toggle="dropdown"
-        aria-expanded="false"
-      ><BsArrowsMove/></Button>
+      <OverlayTrigger
+        placement="left"
+        overlay={<Tooltip>Edit image properties</Tooltip>}
+        delay={{show: 1000}}
+      >
+        <Button
+          variant={siteData?.SiteTheme}
+          size="sm"
+          className={`EditButton EditImageButton`}
+          type="button"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+        ><BsCamera/></Button>
+      </OverlayTrigger>
       <ul className="dropdown-menu Editor" style={{cursor: 'pointer', zIndex: 100}}>
         {pageSectionData.ImageAlign !== 'left' && (
           <li>
@@ -169,13 +165,11 @@ export default function PageSectionImageMenu({pageSectionData, buttonRef}) {
       </ul>
     </div>
     <FormEditor>
-      <DescribeImageModal
+      <DescribeSectionImageModal
         show={showDescribeImageModal}
         onHide={() => setShowDescribeImageModal(false)}
-        onSubmit={onSubmitDescription}
-        s3uri={`s3://${siteData?.SiteBucketName}/images/${pageSectionData.SectionImage}`}
-        description={pageSectionData.SectionImageDescription}
-        keywords={pageSectionData.SectionImageKeywords}
+        onUpdate={handleUpdateImageDescription}
+        data={pageSectionData}
       />
     </FormEditor>
   </>)
