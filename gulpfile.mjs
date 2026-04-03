@@ -32,6 +32,7 @@ gulp.task("buildIndex", async function () {
     process.env.REACT_APP_BACKEND_HOST,
     process.env.REACT_APP_API_KEY
   );
+  const site = await restApi.getSite();
   const outline = await restApi.getSiteOutline();
   const template = fs.readFileSync('src/framework/index_template.html', 'utf8');
   let index;
@@ -40,12 +41,15 @@ gulp.task("buildIndex", async function () {
     index = mustache.render(template, {
       ...page,
       title: page.PageMetaTitle ? page.PageMetaTitle : page.PageTitle,
+      SiteStyle: site.SiteStyle,
+      SiteTheme: site.SiteTheme,
     })
 
   } else {
-    const site = await restApi.getSite();
     index = mustache.render(template, {
       title: site.SiteName,
+      SiteStyle: site.SiteStyle,
+      SiteTheme: site.SiteTheme,
     })
   }
   fs.writeFileSync(`./public/index.html`, index);

@@ -209,8 +209,12 @@ export default function RestApi(props) {
   }, [siteId]);
 
   const getGuestBooks = useCallback(async () => {
-    const response = await axios.get(`${host}/api/v1/guestbooks`);
-    return response.data;
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.get(`${host}/api/v1/guestbooks`);
+        return response.data;
+      }
+    });
   }, []);
 
   const getGuestBook = useCallback(async (guestBookId) => {
@@ -228,8 +232,12 @@ export default function RestApi(props) {
   }, []);
 
   const deleteGuestBook = useCallback(async (guestBookId) => {
-    const response = await axios.delete(`${host}/api/v1/guestbook/${guestBookId}`);
-    return response.data;
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.delete(`${host}/api/v1/guestbook/${guestBookId}`);
+        return response.data;
+      }
+    });
   }, []);
 
   const getGuest = useCallback(async (guestId) => {
@@ -252,14 +260,37 @@ export default function RestApi(props) {
     return response.data;
   }, []);
 
+  const searchGuestBook = useCallback(async (guestBookId, searchText) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.post(`${host}/api/v1/guestbook/${guestBookId}/search`, {searchText: searchText});
+        return response.data;
+      }
+    });
+  }, []);
+
+  const deleteGuest = useCallback(async (guestBookId, guestId) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.delete(`${host}/api/v1/guestbooks/${guestBookId}/guests/${guestId}`);
+        return response.data;
+      }
+    });
+  }, []);
+
+
   const getGallery = useCallback(async (galleryId) => {
     const response = await axios.get(`${host}/api/v1/galleries/${galleryId}`);
     return response.data;
   }, []);
 
   const getGalleries = useCallback(async () => {
-    const response = await axios.get(`${host}/api/v1/galleries`);
-    return response.data;
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.get(`${host}/api/v1/galleries`);
+        return response.data;
+      }
+    });
   }, []);
 
   const insertOrUpdateGallery = useCallback(async (data) => {
@@ -354,6 +385,11 @@ export default function RestApi(props) {
     const response = await axios.get(`${host}/api/v1/content/pages/${pageId}/extras`);
     return response.data;
   }, []);
+
+  async function getSiteExtras(siteId) {
+    const response = await axios.get(`${host}/api/v1/content/sites/${siteId}/extras`);
+    return response.data;
+  }
 
   const insertOrUpdateExtra = useCallback(async (data) => {
     return await adminApiCall(() => {
@@ -575,6 +611,8 @@ export default function RestApi(props) {
         insertOrUpdateGuest: insertOrUpdateGuest,
         getGuestFeedback: getGuestFeedback,
         insertOrUpdateGuestFeedback: insertOrUpdateGuestFeedback,
+        searchGuestBook: searchGuestBook,
+        deleteGuest: deleteGuest,
       },
       Galleries: {
         getGallery: getGallery,
@@ -588,6 +626,7 @@ export default function RestApi(props) {
         describePhoto: describePhoto
       },
       Extras: {
+        getSiteExtras: getSiteExtras,
         getPageExtras: getPageExtras,
         insertOrUpdateExtra: insertOrUpdateExtra,
         deleteExtra: deleteExtra,

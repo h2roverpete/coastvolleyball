@@ -221,6 +221,8 @@ import axios from "axios";
  * @property {Number} NumberOfGuests
  * @property {Number} GuestID
  * @property {String} Created
+ * @property {String} Modified
+ * @property {number} GuestBookID
  * @property {Number} OldGuestID
  * @property {String} Custom1
  * @property {String} Custom2

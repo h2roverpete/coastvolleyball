@@ -29,6 +29,7 @@ const FormEditContext = createContext(null);
  * @property {function(string)} isTouched
  * @property {function()} isDataChanged
  * @property {function()} revert
+ * @property {function()} reset
  * @property {function(T)} update
  * @property {DataCallback} onDataChanged
  * @property {T} edits
@@ -117,12 +118,19 @@ export default function FormEditor({children}) {
     setTouched([]);
   }, [setEdits, setTouched, originalData]);
 
+  const reset = useCallback(() => {
+    setOriginalData(null);
+    setEdits({});
+    setTouched([]);
+  }, [setOriginalData, setEdits, setTouched]);
+
   /** @type FormDataAPI */
   const context = {
     setData: setData,
     isTouched: isTouched,
     isDataChanged: isDataChanged,
     revert: revert,
+    reset: reset,
     update: update,
     onDataChanged: onDataChanged,
     edits: edits,

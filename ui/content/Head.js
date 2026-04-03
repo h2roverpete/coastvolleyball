@@ -1,4 +1,5 @@
 import {useSiteContext} from "./Site";
+import {useEffect} from "react";
 
 /**
  * Element to display elements in page head.
@@ -10,6 +11,18 @@ import {useSiteContext} from "./Site";
 export default function Head() {
 
   const {siteData, error, currentPage} = useSiteContext();
+
+  useEffect(() => {
+    if (siteData?.SiteStyle) {
+      const elements = document.head.querySelectorAll('link[rel="stylesheet"]');
+      for (const element of elements) {
+        if (element.href.startsWith('https://resources.h2rover.net/css/') && element.href !== `https://resources.h2rover.net/css/${siteData.SiteStyle}`) {
+          // remove old style sheet from head
+          document.head.removeChild(element);
+        }
+      }
+    }
+  }, [siteData]);
 
   return (
     <>
