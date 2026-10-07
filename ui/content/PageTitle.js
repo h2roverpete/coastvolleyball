@@ -23,7 +23,7 @@ const EditableField = lazy(() => import("../editor/EditableField"));
 export default function PageTitle({text, alwaysShow}) {
 
   const {pageData} = usePageContext();
-  const {Outline, currentPage} = useSiteContext();
+  const {Outline} = useSiteContext();
   const {Pages} = useRestApi();
   const {hasPermission} = useAuth();
 
@@ -37,12 +37,10 @@ export default function PageTitle({text, alwaysShow}) {
   useEffect(() => {
     if (text) {
       setTitleText(text);
-    } else if (pageData) {
+    } else if (pageData?.PageTitle) {
       setTitleText(pageData.PageTitle);
-    } else if (currentPage) {
-      setTitleText(currentPage.PageTitle);
     }
-  }, [pageData, currentPage, setTitleText, text]);
+  }, [pageData, setTitleText, text]);
 
   function onTitleChanged({textContent, textAlign}) {
     if (pageData) {

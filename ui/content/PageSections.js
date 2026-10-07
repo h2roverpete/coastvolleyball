@@ -1,7 +1,6 @@
 import PageSection from './PageSection';
 import React, {Fragment, useEffect, useState} from "react";
 import {usePageContext} from "./Page";
-import Login from "../../auth/Login";
 import {useAuth} from "../../auth/AuthProvider";
 import {Permission, Resource} from "../../auth/Permissions";
 import {Spinner} from "react-bootstrap";
@@ -14,9 +13,9 @@ import {Spinner} from "react-bootstrap";
  * @param props {PageSectionProps}
  * @constructor
  */
-export default function PageSections({children, content}) {
+export default function PageSections({children}) {
 
-  const {sectionData, login, error} = usePageContext();
+  const {pageData, sectionData} = usePageContext();
   const {hasPermission} = useAuth();
 
   const [canEdit, setCanEdit] = useState(false);
@@ -38,7 +37,7 @@ export default function PageSections({children, content}) {
   }
 
   return <>
-    {content ? <>{content}</> : <>
+    {pageData?.PageContent ? <>{pageData.PageContent}</> : <>
       {sectionData !== null ? (<>
           {sectionData.map(section => (<Fragment key={section.PageSectionID + "_" + section.Modified}>
             <PageSection

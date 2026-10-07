@@ -1,6 +1,5 @@
 import {useAuth} from "./AuthProvider";
 import RestrictedContent from "./RestrictedContent";
-import PageTitle from "../ui/content/PageTitle";
 import FormEditor from "../ui/editor/FormEditor";
 import UserFields from "./UserFields";
 import EditorButtons from "../ui/editor/EditorButtons";

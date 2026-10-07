@@ -10,7 +10,7 @@ import {useAuth} from "../../auth/AuthProvider";
 import {Resource, Permission} from "../../auth/Permissions";
 import './PageSwiper.css';
 
-export default function PageSwiper(props) {
+export default function PageSwiper({children}) {
 
   // imports
   const {outlineData, currentPage} = useSiteContext();
@@ -55,8 +55,9 @@ export default function PageSwiper(props) {
     }
   };
 
-  return (<>{props.content ? (
-    <Page content={props.content}/>
+  return (<>{currentPage?.PageContent ? (
+    // meta page, replace swiper with a static page
+    <Page pageId={currentPage.PageID}>{children}</Page>
   ) : (
     <Swiper
       modules={[Virtual]}
@@ -71,7 +72,9 @@ export default function PageSwiper(props) {
       <>
         {swipePages?.map((page, index) =>
           <SwiperSlide key={page.PageID} virtualIndex={index}>
-            <Page {...props} pageId={page.PageID}/>
+            <Page pageId={page.PageID}>
+              {children}
+            </Page>
           </SwiperSlide>
         )}
       </>

@@ -1,4 +1,3 @@
-import PageTitle from "../ui/content/PageTitle";
 import {useEffect, useState} from "react";
 import {Permission, Resource} from "./Permissions";
 import {useAuth} from "./AuthProvider";

@@ -4,6 +4,7 @@ import PageConfig from "./PageConfig";
 import FormEditor from "./FormEditor";
 import {useTouchContext} from "../../util/TouchProvider";
 import EditorPanel from "./EditorPanel";
+import {useSiteContext} from "../content/Site";
 
 /**
  * Edit page metadata fields.
@@ -12,6 +13,7 @@ import EditorPanel from "./EditorPanel";
  */
 export default function PageConfigPanel() {
 
+  const {currentPage} = useSiteContext();
   const navigate = useNavigate();
   const buttonRef = useRef(null);
   const {supportsHover} = useTouchContext();
@@ -37,32 +39,34 @@ export default function PageConfigPanel() {
     }
   }, [supportsHover, buttonRef]);
 
-  return (
-    <div
-      className="Editor PageConfigPanel"
-      style={{
-        position: 'fixed',
-        top: -5,
-        width: '100vw',
-        zIndex: '1198',
-      }}
-      onMouseOver={() => {
-        if (supportsHover) buttonRef.current.hidden = false;
-      }}
-      onMouseLeave={() => {
-        if (supportsHover) buttonRef.current.hidden = true;
-      }}
-      ref={panelRef}
-    >
-      <FormEditor>
-        <EditorPanel buttonRef={buttonRef} hideButtons={true}>
-          <PageConfig
-            onPageUpdated={onPageUpdated}
-            onPageDeleted={onPageDeleted}
-            modalRef={panelRef}
-          />
-        </EditorPanel>
-      </FormEditor>
-    </div>
-  );
+  return <>
+    {currentPage.PageID > 0 &&
+      <div
+        className="Editor PageConfigPanel"
+        style={{
+          position: 'fixed',
+          top: -5,
+          width: '100vw',
+          zIndex: '1198',
+        }}
+        onMouseOver={() => {
+          if (supportsHover) buttonRef.current.hidden = false;
+        }}
+        onMouseLeave={() => {
+          if (supportsHover) buttonRef.current.hidden = true;
+        }}
+        ref={panelRef}
+      >
+        <FormEditor>
+          <EditorPanel buttonRef={buttonRef} hideButtons={true}>
+            <PageConfig
+              onPageUpdated={onPageUpdated}
+              onPageDeleted={onPageDeleted}
+              modalRef={panelRef}
+            />
+          </EditorPanel>
+        </FormEditor>
+      </div>
+    }
+  </>;
 }

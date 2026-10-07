@@ -1,7 +1,6 @@
 import {useSiteContext} from "./Site";
 import {lazy, useRef, Suspense} from "react";
 import {useTouchContext} from "../../util/TouchProvider";
-import {usePageContext} from "./Page";
 import './PageSectionImage.css';
 
 const FileDropTarget = lazy(() => import("../editor/FileDropTarget"));
@@ -35,8 +34,6 @@ export default function PageSectionImage(
   // imports
   const {supportsHover} = useTouchContext();
   const {siteData, showErrorAlert} = useSiteContext();
-  const {scrollRef} = usePageContext();
-
 
   // refs
   const editButtonRef = useRef(null);

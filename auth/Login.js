@@ -9,7 +9,6 @@ import {useCookies} from "react-cookie";
 import {useRestApi} from "../api/RestApi";
 import {Button, Col, Container, Form, Row} from "react-bootstrap";
 import {isValidEmail, isValidPassword} from "../util/Validators";
-import PageTitle from "../ui/content/PageTitle";
 
 /**
  * Login UI component.

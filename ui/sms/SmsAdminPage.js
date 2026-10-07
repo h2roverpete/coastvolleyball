@@ -1,7 +1,6 @@
 import {useLocation} from "react-router";
 import {useEffect, useState} from "react";
 import SmsCampaignPanel from "./SmsCampaignPanel";
-import {Container} from "react-bootstrap";
 import {useRestApi} from "../../api/RestApi";
 import {useSiteContext} from "../content/Site";
 import {Resource, Permission} from "../../auth/Permissions";

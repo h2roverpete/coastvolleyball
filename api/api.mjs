@@ -19,21 +19,21 @@ import axios from "axios";
 /**
  * @typedef PageData
  *
- * @property {Number} PageID                Unique page ID.
- * @property {Number} SiteID                Site ID the page belongs to.
- * @property {Number} ParentID              Parent page ID. (0 for root level pages.)
- * @property {Number} OutlineSeq            Sequence relative to sibling pages in the site outline/nav.
- * @property {String} PageTitle             Page title displayed on the page as h1.PageTitle.
- * @property {String} PageTitleAlign        Alignment of page title, 'left', 'right' or 'center'
- * @property {String} NavTitle              Page title used in navigation bars and menus.
- * @property {String} PageMetaTitle         Meta title for window title bar.
- * @property {String} PageMetaDescription   Meta description for search engines.
- * @property {String} PageMetaKeywords      Meta keywords for search engines.
- * @property {Boolean} PageHidden           Hide page from site navigation?
- * @property {string} PageRoute             Unique page route for navigating to page within site.
- * @property {Boolean} RequiresLogin        Page requires user login and BROWSE_PROTECTED permission to view.
- * @property {String} Created               Creation timestamp.
- * @property {String} Modified              Modification timestamp. Used when updating the sitemap XML.
+ * @property {Number} PageID                  Unique page ID.
+ * @property {Number} [SiteID]                Site ID the page belongs to.
+ * @property {Number} [ParentID]              Parent page ID. (0 for root level pages.)
+ * @property {Number} [OutlineSeq]            Sequence relative to sibling pages in the site outline/nav.
+ * @property {String} [PageTitle]             Page title displayed on the page as h1.PageTitle.
+ * @property {String} [PageTitleAlign]        Alignment of page title, 'left', 'right' or 'center'
+ * @property {String} [NavTitle]              Page title used in navigation bars and menus.
+ * @property {String} [PageMetaTitle]         Meta title for window title bar.
+ * @property {String} [PageMetaDescription]   Meta description for search engines.
+ * @property {String} [PageMetaKeywords]      Meta keywords for search engines.
+ * @property {Boolean} [PageHidden]           Hide page from site navigation?
+ * @property {string} [PageRoute]             Unique page route for navigating to page within site.
+ * @property {Boolean} [RequiresLogin]        Page requires user login and BROWSE_PROTECTED permission to view.
+ * @property {String} [Created]               Creation timestamp.
+ * @property {String} [Modified]              Modification timestamp. Used when updating the sitemap XML.
  */
 
 /**
