@@ -27,6 +27,10 @@
   transform: translate(-50%, -75%);
 }
 
+.alert {
+  z-index:101;
+}
+
 /* Next / previous page hover */
 .PageNavigation .nav-link:hover {
   color: var(--bs-light);

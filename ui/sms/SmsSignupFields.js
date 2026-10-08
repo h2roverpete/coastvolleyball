@@ -51,7 +51,7 @@ export default function SmsSignupFields({smsCampaignId}) {
     const number = formData.edits.SubscriberMobileNumber?.replaceAll(/[^0-9+]/g, "");
     return formData.edits.SubscriberName?.length > 0
       && (
-        (number?.length === 12 && number.startsWith('+1') && formData.edits.Accept && formData.edits.NotificationMethod !== 'email')
+        (number?.length === 12 && number.startsWith('+1') && formData.edits.AcceptAgreement && formData.edits.AcceptTermsAndConditions && formData.edits.NotificationMethod !== 'email')
         || (isValidEmail(formData.edits.SubscriberEmail) && formData.edits.NotificationMethod === 'email')
       )
       ;
@@ -188,15 +188,31 @@ export default function SmsSignupFields({smsCampaignId}) {
                 <Form.Check
                   type={'checkbox'}
                   role={'button'}
-                  name={`Accept`}
-                  checked={formData.edits?.Accept || 0}
-                  onChange={(e) => formData.onDataChanged({name: 'Accept', value: e.target.checked})}
+                  name={`AcceptAgreement`}
+                  checked={formData.edits?.AcceptAgreement || 0}
+                  onChange={(e) => formData.onDataChanged({name: 'AcceptAgreement', value: e.target.checked})}
                 />
               </Col>
               <Col>
                 <div className="SectionText" dangerouslySetInnerHTML={{__html: smsCampaignConfig?.CampaignAgreement}}/>
               </Col>
             </Row>
+            {smsCampaignConfig?.CampaignTermsAndConditions &&
+              <Row className={'mt-4'}>
+                <Col xs={1} className={'text-center'}>
+                  <Form.Check
+                    type={'checkbox'}
+                    role={'button'}
+                    name={`AcceptTermsAndConditions`}
+                    checked={formData.edits?.AcceptTermsAndConditions || 0}
+                    onChange={(e) => formData.onDataChanged({name: 'AcceptTermsAndConditions', value: e.target.checked})}
+                  />
+                </Col>
+                <Col>
+                  <div className="SectionText" dangerouslySetInnerHTML={{__html: smsCampaignConfig?.CampaignTermsAndConditions}}/>
+                </Col>
+              </Row>
+            }
           </>
         }
         {smsCampaignConfig?.EmailCampaign && formData.edits.NotificationMethod === 'email' &&

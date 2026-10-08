@@ -55,7 +55,7 @@ export default function UserMenu({buttonRef, onClose}) {
               <span className="dropdown-item" onClick={() => {
                 navigate(`/admin/sms?campaignId=${campaign.SMSCampaignID}`);
                 onClose?.();
-              }}>{campaign.CampaignName}</span>}
+              }}>{campaign.CampaignName} SMS</span>}
             </div>
           )}
         </>}

@@ -414,6 +414,27 @@ export default function SmsCampaignFields({campaign, onAdd, onUpdate, onDelete, 
           <Row className={'mt-2'}>
             <Form.Label
               column={'sm'}
+              sm={12}
+              htmlFor={'CampaignTermsAndConditions'}
+            >
+              Terms &amp; Conditions Checkbox
+            </Form.Label>
+            <Col>
+              <Form.Control
+                as='textarea'
+                rows={8}
+                size={'sm'}
+                name={'CampaignTermsAndConditions'}
+                isValid={formData.isTouched('CampaignTermsAndConditions') && formData.edits.CampaignTermsAndConditions?.length > 0}
+                isInvalid={formData.isTouched('CampaignTermsAndConditions') && !(formData.edits.CampaignTermsAndConditions?.length > 0)}
+                value={formData.edits?.CampaignTermsAndConditions || ''}
+                onChange={(e) => formData.onDataChanged({name: 'CampaignTermsAndConditions', value: e.target.value})}
+              />
+            </Col>
+          </Row>
+          <Row className={'mt-2'}>
+            <Form.Label
+              column={'sm'}
               sm={labelCols}
               htmlFor={'CampaignSubmitButton'}
             >
