@@ -1,0 +1,14 @@
+/* Breadcrumb indicator for navigation */
+ol.breadcrumb {
+  font-size: calc(0.8rem + 0.5dvw);
+}
+
+/* breadcrumb delimiters */
+li.breadcrumb-item::before {
+  content: var(--breadcrumb-delimiter) !important;
+}
+
+/* don't delimit first breadcrumb */
+li.breadcrumb-item:first-child::before {
+  content: "" !important;
+}

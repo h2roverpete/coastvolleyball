@@ -1,0 +1,8 @@
+/* Guest book container */
+div.GuestBook {
+  padding: 0; /* no additional padding */
+}
+
+/* Guest book field labels */
+.GuestBook label {
+}

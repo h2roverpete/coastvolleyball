@@ -1,0 +1,40 @@
+.email-preview {
+  position: relative;
+  background-color: #cccccc;
+  padding: 15px;
+  color: black;
+  font-size: 10pt;
+  line-height: 1.4;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+div.email-preview div.preview-image-row {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+div.email-preview div.preview-image-div {
+  position: relative;
+}
+
+div.email-preview img.preview-image {
+  max-height: 100px;
+}
+
+div.email-preview svg.preview-image-delete {
+  position: absolute;
+  top: 0;
+  right: 0;
+  color: black;
+  filter: drop-shadow(0 0 1px #ffffff);
+}
+
+/* bootstrap xs width */
+@media (max-width: 575px) {
+  .email-preview {
+    max-height:none;
+  }
+}

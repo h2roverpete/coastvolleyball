@@ -1,0 +1,7 @@
+/* Add a red asterisk after the label of a required input */
+label:has(+ input:required)::after,
+label.required::after {
+    content: " *";
+    color: red;
+    font-weight: bold;
+}

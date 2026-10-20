@@ -1,0 +1,53 @@
+/* Main title */
+h1, h1.PageTitle {
+  font-size: calc(1.2rem + 0.9dvw) !important;
+}
+
+div.PageSection {
+  margin-bottom: 20px;
+}
+
+/* Section titles */
+h2, h2.SectionTitle {
+  font-size: calc(1.0rem + 0.9dvw) !important;
+}
+
+h3 {
+  font-size: calc(0.9rem + 0.9dvw) !important;
+}
+
+h4 {
+  font-size: calc(0.8rem + 0.9dvw) !important;
+}
+
+h5 {
+  font-size: calc(0.7rem + 0.9dvw) !important;
+}
+
+/* Links in text */
+.FileExtra a,
+.SectionText a,
+.SectionText a:active,
+.SectionText a:visited {
+  text-decoration: none;
+}
+
+/* Hover over links in text */
+.FileExtra a:hover,
+.SectionText a:hover {
+  text-decoration: underline;
+}
+
+/* Text content */
+div.PageContent {
+  font-size: calc(0.75rem + min(0.8dvw,calc(var(--page-max-width) / 160)));
+}
+
+/* Top level list <li> needs margin correction */
+.SectionText li {
+}
+
+/* <ul> needs correction too */
+.SectionText ol,
+.SectionText ul {
+}

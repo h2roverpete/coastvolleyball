@@ -1,0 +1,58 @@
+/* Next / previous navigation panel */
+.PageNavigation {
+  width: 100%;
+  max-width: var(--page-max-width);
+  padding: 40px 20px 10px 20px;
+  margin-bottom: 0;
+  position: absolute;
+  bottom: 0;
+  background: linear-gradient(to bottom, #00000000, var(--page-background-color) 40%);
+  z-index: 100;
+  display: flex;
+  flex-direction: row;
+  align-items: end;
+}
+
+/* Next / previous page links */
+.PageNavigation .nav-link {
+  padding: 4px 8px;
+}
+
+/* Branding text centered in page navigation area */
+.PageNavigation .nav-text {
+  color: var(--bs-secondary);
+  position:absolute;
+  top: 75%;
+  left: 50%;
+  transform: translate(-50%, -75%);
+}
+
+.alert {
+  z-index:101;
+}
+
+/* Next / previous page hover */
+.PageNavigation .nav-link:hover {
+  color: var(--bs-light);
+  background-color: var(--bs-primary);
+}
+
+/* nav arrows for previous page */
+.PageNavigation div.nav.nav-item.nav-link.previous::before {
+  content: "« ";
+}
+
+/* nav arrows for next page */
+.PageNavigation div.nav.nav-item.nav-link.next::after {
+  content: " »";
+}
+/* bootstrap xs width */
+@media (max-width: 575px) {
+  div.PageNavigation .nav-text {
+    visibility: hidden;
+  }
+  div.PageNavigation {
+    padding: 30px 5px 5px 5px;
+    font-size: 11pt;
+  }
+}

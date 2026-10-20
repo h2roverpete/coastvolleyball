@@ -1,0 +1,14 @@
+/* outer page swipe container, fixed height, flex width up to page width */
+div.swiper {
+  width: 100vw;
+  max-width: var(--page-max-width);
+  flex: 1;
+  height: 100%;
+}
+
+/* inner swipe slides, fixed height, scrolling happens in Page */
+div.swiper-slide {
+  width: 100%;
+  height: 100%;
+  display: flex;
+}

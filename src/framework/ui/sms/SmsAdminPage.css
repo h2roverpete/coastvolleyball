@@ -1,0 +1,11 @@
+div.PageContent {
+  height: 100%;
+  display: flex;
+}
+
+div.SmsAdmin {
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}

@@ -1,0 +1,77 @@
+/* Navbar outer container, flex settings help nav items align */
+.NavBar.navbar {
+  width: 100vw;
+  padding: 0;
+  position: fixed;
+  top: 0;
+  z-index: 1030;
+}
+
+/* Navbar inner elements, allows for custom alignment/layout */
+.NavBarContents.container-fluid {
+  width: 100vw;
+  max-width: var(--page-max-width);
+}
+
+/* Navbar icon */
+.NavBarBrandIcon {
+  width: auto;
+  height: 40px;
+  margin: 5px 10px 5px 5px;
+}
+
+/* Navbar branding */
+.NavBarBrand {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Navbar dropdown menus */
+.navbar .dropdown-menu {
+  padding: 5px;
+}
+
+/* dropdown menus */
+div.dropdown-menu {
+  margin-bottom: 10px;
+}
+
+/* nested dropdown menu items */
+.dropdown-menu .dropdown-toggle.nav-link {
+  padding: 5px 16px 5px 16px !important;
+}
+
+/* Navbar toggle button */
+.navbar .navbar-toggler {
+}
+
+/* Navbar navigation links */
+.navbar .navbar-nav .nav-link,
+.navbar .navbar-nav .dropdown-menu .dropdown-item,
+.navbar .navbar-brand {
+}
+
+/* Current page in navigation links and dropdown items */
+.navbar-nav a.nav-link.active,
+.nav-item .dropdown-menu a.dropdown-item.active,
+#nav-dropdown-active {
+}
+
+/* Navbar link and dropdown item hover */
+.navbar-nav a.nav-link:hover,
+.nav-item .dropdown-menu a.dropdown-item:hover,
+#nav-dropdown-active:hover {
+}
+
+.AddPageButton {
+}
+
+/* bootstrap sm width */
+@media (max-width: 576px) {
+  .NavBarBrandIcon {
+    margin-left: 0;
+  }
+
+}

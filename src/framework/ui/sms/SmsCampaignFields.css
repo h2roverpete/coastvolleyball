@@ -1,0 +1,9 @@
+Button.accordion-button {
+  padding: 7px;
+  margin: 0
+}
+
+.accordion-header {
+  padding: 0;
+  border: none;
+}

@@ -1,0 +1,11 @@
+tr.EditableRow:hover svg.EditPencil {
+  visibility: visible;
+}
+
+tr.EditableRow svg.EditPencil {
+  visibility: hidden;
+}
+
+tr.EditableRow {
+  cursor: pointer;
+}

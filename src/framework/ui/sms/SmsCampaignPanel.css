@@ -1,0 +1,55 @@
+
+div.CampaignTabPanel {
+  height: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+div.CampaignTabPanel div.tab-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+div.tab-pane {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+div.CampaignTabPanel div.TabPaneContents {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+
+div.ScrollY{
+  overflow-y: auto !important;
+  overflow-x: hidden;
+}
+
+/* tab buttons */
+div.CampaignTabPanel button.nav-link {
+  padding: 5px 15px 5px 15px;
+  font-size: 11pt;
+}
+
+button.btn-close {
+  color: white !important;
+}
+
+/* bootstrap xs width */
+@media (max-width: 575px) {
+  /* tab buttons */
+  div.CampaignTabPanel button.nav-link {
+    padding: 4px 6px 4px 6px;
+    font-size: 11pt;
+  }
+}
