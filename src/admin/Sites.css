@@ -1,0 +1,11 @@
+tr.SiteRow:hover svg.EditPencil {
+  visibility: visible;
+}
+
+tr.SiteRow svg.EditPencil {
+  visibility: hidden;
+}
+
+tr.SiteRow {
+  cursor: pointer;
+}

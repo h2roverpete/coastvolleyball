@@ -1,0 +1,41 @@
+/*
+ * NOTE: modify index.css to style the appearance of the static
+ * <body> and <div id="root"> tags before JS loads
+ */
+
+:root {
+  --navbar-height: 60px; /* height of navigation bar, for positioning scrollable page content below */
+  --page-max-width: 768px; /* variable for max width of page content and navigation */
+  --breadcrumb-delimiter: "»"; /* Inserted between navigation levels in breadcrumb display */
+  --page-background-color: var(--bs-body-bg); /* page content background */
+}
+
+/* Navbar icon */
+.NavBarBrandIcon {
+  width: 40px !important;
+  height: 40px !important;
+}
+
+ol.breadcrumb {
+  border-color: var(--bs-border-color);
+}
+
+/* bootstrap sm width */
+@media (min-width: 576px) {
+
+}
+
+/* bootstrap md width */
+@media (min-width: 768px) {
+
+}
+
+/* bootstrap lg width */
+@media (min-width: 960px) {
+
+}
+
+/* bootstrap xl width */
+@media (min-width: 1140px) {
+
+}

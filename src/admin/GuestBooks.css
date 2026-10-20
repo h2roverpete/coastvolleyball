@@ -1,0 +1,11 @@
+.GuestBookRow:hover .EditPencil{
+  visibility: visible;
+}
+
+.GuestBookRow .EditPencil{
+  visibility: hidden;
+}
+
+tr a {
+  text-decoration: none;
+}

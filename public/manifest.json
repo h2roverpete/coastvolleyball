@@ -1,0 +1,15 @@
+{
+  "short_name": "H2Rover Framework Demo App",
+  "name": "H2Rover Framework Demo App",
+  "icons": [
+    {
+      "src": "images/favicon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}

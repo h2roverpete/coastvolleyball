@@ -1,0 +1,19 @@
+tr.PageRow:hover svg.EditPencil {
+  visibility: visible;
+}
+
+tr.PageRow svg.EditPencil {
+  visibility: hidden;
+}
+
+.Tooltip .TooltipContent {
+  margin: 5px;
+}
+
+.TooltipContent ul {
+  margin: 0;
+}
+
+.TooltipContent li {
+  margin: 0 0 0 -20px;
+}
