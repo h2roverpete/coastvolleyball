@@ -40,7 +40,7 @@ export default function PageConfigPanel() {
   }, [supportsHover, buttonRef]);
 
   return <>
-    {currentPage.PageID > 0 &&
+    {currentPage?.PageID > 0 &&
       <div
         className="Editor PageConfigPanel"
         style={{

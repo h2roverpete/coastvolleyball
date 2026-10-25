@@ -55,6 +55,16 @@ export default function RestApi(props) {
     return response.data;
   }, []);
 
+  const loginToPage = useCallback(async (pageId, password) => {
+    const response = await axios.post(`${host}/api/v1/content/pages/${pageId}/login`, {password: password});
+    return response.data;
+  }, []);
+
+  const refreshPageToken = useCallback(async (pageId, refreshToken) => {
+    const response = await axios.post(`${host}/api/v1/content/pages/${pageId}/token`, {refresh_token: refreshToken});
+    return response.data;
+  }, []);
+
   const getPageSections = useCallback(async (pageId) => {
     const response = await axios.get(`${host}/api/v1/content/pages/${pageId}/sections`);
     return response.data;
@@ -831,7 +841,10 @@ export default function RestApi(props) {
   const getSmsLogData = useCallback(async (campaignId, startKey, limit) => {
     return await adminApiCall(() => {
       return async () => {
-        const response = await axios.post(`${host}/api/v1/sms/campaigns/${campaignId}/log`,{startKey: startKey, limit:limit});
+        const response = await axios.post(`${host}/api/v1/sms/campaigns/${campaignId}/log`, {
+          startKey: startKey,
+          limit: limit
+        });
         return response.data;
       }
     });
@@ -909,6 +922,8 @@ export default function RestApi(props) {
         insertOrUpdatePage: insertOrUpdatePage,
         getPageSections: getPageSections,
         describePage: describePage,
+        loginToPage: loginToPage,
+        refreshPageToken: refreshPageToken,
       },
       PageSections: {
         insertOrUpdatePageSection: insertOrUpdatePageSection,

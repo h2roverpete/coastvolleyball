@@ -18,7 +18,7 @@ import PageNavigation from "framework/ui/content/PageNavigation";
 export default function MyPage() {
   const {siteData} = useSiteContext();
   return (<>
-    <NavBar brand={siteData?.SiteName} icon={<Logo/>} expand={'md'} showLogin/>
+    <NavBar brand={siteData?.SiteName} icon={'/images/volleyball.svg'} expand={'md'} showLogin/>
     <PageSwiper>
       <PageContent>
         <Breadcrumbs/>

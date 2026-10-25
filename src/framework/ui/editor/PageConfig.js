@@ -196,6 +196,29 @@ export default function PageConfig({onPageUpdated, onPageDeleted, modalRef}) {
         />
       </Col>
     </Row>
+    <Row>
+      <Col sm={4} style={{maxWidth: '225px'}}>
+        <Form.Check
+          className={'form-control-sm'}
+          checked={formData.edits?.RequiresPassword || false}
+          id={'RequiresPassword'}
+          label={'Requires simple password'}
+          onChange={(e) => formData.onDataChanged({name: 'RequiresPassword', value: e.target.checked})}
+          inline
+        />
+      </Col>
+      <Col>
+        <Form.Control
+          type={'input'}
+          size={'sm'}
+          sm={4}
+          id={'RequiresPassword'}
+          value={formData.edits?.PagePassword || ''}
+          disabled={!formData.edits?.RequiresPassword}
+          onChange={(e) => formData.onDataChanged({name: 'PagePassword', value: e.target.value})}
+        />
+      </Col>
+    </Row>
     <Row className={'mt-2'}>
       <Col xs={'auto'} className={'pe-0'}>
         {onUpdate && isDataValid && (

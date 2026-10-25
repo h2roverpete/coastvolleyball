@@ -10,6 +10,15 @@
   --page-background-color: var(--bs-body-bg); /* page content background */
 }
 
+div.Livestream {
+  aspect-ratio: 16 / 9;
+  width:100%;
+  background-color:#00000044;
+  display:flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* Navbar icon */
 .NavBarBrandIcon {
   width: 40px !important;
