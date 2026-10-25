@@ -24,7 +24,7 @@ const Login = () => {
   const scope = 'profile email phone'
 
   const {Auth} = useRestApi();
-  const {setError} = useSiteContext();
+  const {showErrorAlert} = useSiteContext();
   const [searchParams] = useSearchParams();
   const {token, setToken} = useAuth();
   const navigate = useNavigate();
@@ -56,7 +56,7 @@ const Login = () => {
       fetchingToken.current = true;
       // check received state against state originally sent
       if (cookies.loginState !== searchParams.get('state')) {
-        setError({
+        showErrorAlert({
           title: 'Invalid login state',
           description: "Couldn't verify login state.",
         })
@@ -72,7 +72,7 @@ const Login = () => {
             navigate('/');
           }
         ).catch((error) => {
-            setError({
+            showErrorAlert({
               title: `${error.status} Login Error`,
               description: `Couldn't retrieve token. Code=${error.code}`
             });
@@ -80,7 +80,7 @@ const Login = () => {
         );
       }
     }
-  }, [Auth, cookies.loginState, navigate, searchParams, setCookie, setError, setToken, token, loginResponse]);
+  }, [Auth, cookies.loginState, navigate, searchParams, setCookie, showErrorAlert, setToken, token, loginResponse]);
 
   return (
     <>

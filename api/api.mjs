@@ -32,6 +32,8 @@ import axios from "axios";
  * @property {Boolean} [PageHidden]           Hide page from site navigation?
  * @property {string} [PageRoute]             Unique page route for navigating to page within site.
  * @property {Boolean} [RequiresLogin]        Page requires user login and BROWSE_PROTECTED permission to view.
+ * @property {Boolean} [RequiresPassword]     Page requires a simple password to view.
+ * @property {String} [PagePassword]          Simple password to view page.
  * @property {String} [Created]               Creation timestamp.
  * @property {String} [Modified]              Modification timestamp. Used when updating the sitemap XML.
  */
