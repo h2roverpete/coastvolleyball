@@ -20,8 +20,8 @@ export default function PagePassword({pageData, onSuccess, apiRef}) {
         if (decoded) {
           const t = Math.floor(Date.now() / 1000);
           if (decoded.exp > t) {
-            // token is current, just check page id
-            return decoded.PageID === pageData.PageID
+            // token is current, check page ID and password
+            return decoded.PageID === pageData.PageID && decoded.PagePassword === pageData.PagePassword;
           } else {
             try {
               const newToken = await Pages.refreshPageToken(pageData.PageID, token.refresh_token);
@@ -77,7 +77,7 @@ export default function PagePassword({pageData, onSuccess, apiRef}) {
             }
           }}
         />
-        <div className={'small text-danger'}>{passwordError}</div>
+        <div className={'small text-danger mt-1'}>{passwordError}</div>
       </Col>
       <Col sm={2} className="mt-3">
         <Button size={'sm'} onClick={() => onSubmit()}>Submit</Button>

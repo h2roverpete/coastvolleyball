@@ -3,7 +3,6 @@ import PageContent from "framework/ui/content/PageContent";
 import PageTitle from "framework/ui/content/PageTitle";
 import PageSections from "framework/ui/content/PageSections";
 import PageSwiper from "framework/ui/content/PageSwiper";
-import Logo from "./Logo";
 import {useSiteContext} from "framework/ui/content/Site";
 import Breadcrumbs from "framework/ui/content/Breadcrumbs";
 import PageNavigation from "framework/ui/content/PageNavigation";

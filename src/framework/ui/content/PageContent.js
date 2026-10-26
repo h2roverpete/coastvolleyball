@@ -1,10 +1,9 @@
-import {useEffect, useMemo, useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {Permission, Resource} from "../../auth/Permissions";
 import {useAuth} from "../../auth/AuthProvider";
 import {usePageContext} from "./Page";
 import RestrictedContent from "../../auth/RestrictedContent";
 import './PageContent.css';
-import {useCookies} from "react-cookie";
 import PagePassword from "./PagePassword";
 
 /**
