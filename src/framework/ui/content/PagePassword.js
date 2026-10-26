@@ -1,4 +1,4 @@
-import {Button, Col, Form, Row} from "react-bootstrap";
+import {Button, Col, Form, Row, Spinner} from "react-bootstrap";
 import {useRef, useState} from "react";
 import {useCookies} from "react-cookie";
 import {useRestApi} from "../../api/RestApi";
@@ -8,8 +8,9 @@ export default function PagePassword({pageData, onSuccess, apiRef}) {
 
   const {Pages} = useRestApi();
   const [cookies, setCookie] = useCookies();
-  const password = useRef(null);
+  const [password, setPassword] = useState('');
   const [passwordError, setPasswordError] = useState(null);
+  const [busy, setBusy] = useState(false);
 
   async function canView() {
     if (pageData && cookies && Pages) {
@@ -45,12 +46,15 @@ export default function PagePassword({pageData, onSuccess, apiRef}) {
   }
 
   function onSubmit() {
-    Pages.loginToPage(pageData.PageID, password.current.value).then((result) => {
+    setBusy(true);
+    Pages.loginToPage(pageData.PageID, password).then((result) => {
       setCookie(`page${pageData.PageID}token`, result);
       setPasswordError(null);
       onSuccess(result);
+      setBusy(false);
     }).catch(() => {
-      setPasswordError(`Invalid login.`);
+      setPasswordError(`Invalid password.`);
+      setBusy(false);
     })
   }
 
@@ -70,17 +74,25 @@ export default function PagePassword({pageData, onSuccess, apiRef}) {
           type={'password'}
           name={'PagePassword'}
           isInvalid={passwordError?.length}
-          ref={password}
-          onKeyDown={(event)=> {
+          value={password}
+          onKeyDown={(event) => {
             if (event.key === 'Enter') {
               onSubmit();
             }
           }}
+          onChange={(event) => {setPassword(event.target.value)}}
         />
         <div className={'small text-danger mt-1'}>{passwordError}</div>
       </Col>
       <Col sm={2} className="mt-3">
-        <Button size={'sm'} onClick={() => onSubmit()}>Submit</Button>
+        <Button
+          size={'sm'}
+          style={{width: '75px'}}
+          onClick={() => onSubmit()}
+          disabled={!password.length}
+        >
+          {busy ? <Spinner size={'sm'}/> : <>Log In</>}
+        </Button>
       </Col>
     </Row>
   </div>
