@@ -66,7 +66,7 @@ export function isValidYouTubeUrl(url) {
 }
 
 export function isValidRoute(pageData, outlineData) {
-  if (!pageData.PageRoute || pageData.PageRoute.charAt(0) !== '/' || pageData.PageRoute.match(/^\/[a-z0-9]+$/) === null) {
+  if (!pageData.PageRoute || pageData.PageRoute.charAt(0) !== '/' || pageData.PageRoute.match(/^\/[a-z0-9\/]+$/) === null) {
     return false;
   }
   for (const page of outlineData) {
