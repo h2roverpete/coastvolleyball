@@ -56,10 +56,7 @@ const Login = () => {
       fetchingToken.current = true;
       // check received state against state originally sent
       if (cookies.loginState !== searchParams.get('state')) {
-        showErrorAlert({
-          title: 'Invalid login state',
-          description: "Couldn't verify login state.",
-        })
+        showErrorAlert("Couldn't verify login state.");
         setCookie("loginState", null);
       } else {
         Auth.getAuthToken(
@@ -72,10 +69,7 @@ const Login = () => {
             navigate('/');
           }
         ).catch((error) => {
-            showErrorAlert({
-              title: `${error.status} Login Error`,
-              description: `Couldn't retrieve token. Code=${error.code}`
-            });
+            showErrorAlert(`Couldn't retrieve token. Code=${error.code}`);
           }
         );
       }
