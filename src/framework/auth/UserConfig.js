@@ -295,6 +295,29 @@ export default function UserConfig({className, style, userData, onCancel, onUpda
           </Form.Select>
         </Col>
       </Row>
+      <Row className={'mt-2'}>
+        <Form.Label
+          column={'sm'}
+          sm={labelCols}
+          className={'required'}
+          htmlFor={'LivestreamPermission'}
+        >
+          Livestreams
+        </Form.Label>
+        <Col>
+          <Form.Select
+            name={'LivestreamPermission'}
+            size={'sm'}
+            value={formData.edits.LivestreamPermission || ''}
+            onChange={(e) => formData.onDataChanged({name: 'LivestreamPermission', value: e.target.value})}
+          >
+            <option value={''}>(select)</option>
+            {[...ResourcePermissions[Resource.LIVESTREAM]].reverse().map(item => (
+              <option key={item.permission} value={item.permission}>{item.description}</option>
+            ))}
+          </Form.Select>
+        </Col>
+      </Row>
       <CrudButtons
         data={userData}
         keyName={'UserID'}

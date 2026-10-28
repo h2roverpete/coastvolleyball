@@ -850,6 +850,51 @@ export default function RestApi(props) {
     });
   }, []);
 
+  const getLivestreams = useCallback(async () => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.get(`${host}/api/v1/livestreams`);
+        return response.data;
+      }
+    });
+  }, []);
+
+  const getLivestream = useCallback(async (livestreamId) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.get(`${host}/api/v1/livestreams/${livestreamId}`);
+        return response.data;
+      }
+    });
+  }, []);
+
+  const insertOrUpdateLivestream = useCallback(async (data) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.post(`${host}/api/v1/livestreams`, data);
+        return response.data;
+      }
+    });
+  }, []);
+
+  const deleteLivestream = useCallback(async (livestreamId) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.delete(`${host}/api/v1/livestreams/${livestreamId}`);
+        return response.data;
+      }
+    });
+  }, []);
+
+  const getStreamInfo = useCallback(async (livestreamId) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.get(`${host}/api/v1/livestreams/${livestreamId}/stream`);
+        return response.data;
+      }
+    });
+  }, []);
+
   /**
    * @callback RestApiCall
    * @return {Promise<any>}
@@ -1004,6 +1049,13 @@ export default function RestApi(props) {
         getSmsMessageLog: getSmsMessageLog,
         getSmsCampaignLog: getSmsCampaignLog,
         getSmsLogData: getSmsLogData,
+      },
+      Livestreams: {
+        getLivestreams: getLivestreams,
+        getLivestream: getLivestream,
+        insertOrUpdateLivestream: insertOrUpdateLivestream,
+        deleteLivestream: deleteLivestream,
+        getStreamInfo: getStreamInfo,
       }
     }}>
       {props.children}

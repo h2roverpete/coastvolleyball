@@ -7,7 +7,7 @@ import {useNavigate} from "react-router";
 import {useAuth} from "./AuthProvider";
 import {useCookies} from "react-cookie";
 import {useRestApi} from "../api/RestApi";
-import {Button, Col, Container, Form, Row} from "react-bootstrap";
+import {Button, Col, Form, Row} from "react-bootstrap";
 import {isValidEmail, isValidPassword} from "../util/Validators";
 
 /**

@@ -35,7 +35,8 @@
     "react-social-media-embed": "^2.5.18",
     "sass": "^1.105.1",
     "states-us": "^1.1.1",
-    "swiper": "^12.2.0"
+    "swiper": "^12.2.0",
+    "amazon-ivs-player": "^1.57.0"
   },
   "devDependencies": {
     "@aws-sdk/client-cloudfront": "^3.1147.0",

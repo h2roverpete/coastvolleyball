@@ -6,6 +6,7 @@ import {Permission, Resource} from "../../auth/Permissions";
 import {Button, Spinner} from "react-bootstrap";
 import {useRestApi} from "../../api/RestApi";
 import {useSiteContext} from "./Site";
+import {BsPlus} from "react-icons/bs";
 
 /**
  * Element to show all the sections on a page
@@ -18,7 +19,7 @@ import {useSiteContext} from "./Site";
 export default function PageSections({children}) {
 
   const {pageData, sectionData, setSectionData} = usePageContext();
-  const {showErrorAlert} = useSiteContext();
+  const {showErrorAlert, siteData} = useSiteContext();
   const {hasPermission} = useAuth();
   const {PageSections} = useRestApi();
 
@@ -42,42 +43,16 @@ export default function PageSections({children}) {
     }
   }
 
-  function addPageSection() {
-    setBusy(true);
-    PageSections.insertOrUpdatePageSection({
-      PageID: pageData.PageID,
-      PageSectionSeq: 1,
-    }).then((newSection) => {
-      setSectionData([newSection]);
-      setBusy(false);
-    }).catch(error => {
-      showErrorAlert(`Error adding section.`, error);
-      setBusy(false);
-    });
-  }
-
   return <>
     {pageData?.PageContent ? <>{pageData.PageContent}</> : <>
       {sectionData !== null ? (<>
-          {sectionData.length > 0 ? <>
-            {sectionData.map(section => (<Fragment key={section.PageSectionID + "_" + section.Modified}>
-              <PageSection
-                pageSectionData={section}
-                data-testid={`PageSection-section.PageSectionID`}
-                canEdit={canEdit}
-              />
-            </Fragment>))}
-          </> : <>
-            {canEdit &&
-              <Button
-                className={'mt-3'}
-                style={{width: "200px"}}
-                onClick={addPageSection}
-              >
-                {busy ? <Spinner size={"sm"}></Spinner> : <>Add Page Section</> }
-              </Button>
-            }
-          </>}
+          {sectionData.map(section => (<Fragment key={section.PageSectionID + "_" + section.Modified}>
+            <PageSection
+              pageSectionData={section}
+              data-testid={`PageSection-section.PageSectionID`}
+              canEdit={canEdit}
+            />
+          </Fragment>))}
           {children}
         </>) :
         <div className="PageLoading">
