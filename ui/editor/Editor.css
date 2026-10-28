@@ -52,8 +52,8 @@
 
 /** Container for editor panels */
 .EditorPanel {
-  margin-top: 5px;
-  margin-bottom: 5px;
+  margin: 5px 0 5px 0;
+  width: 100%;
 }
 
 /* Editor panel body */

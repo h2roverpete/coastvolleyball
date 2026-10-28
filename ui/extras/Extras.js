@@ -10,6 +10,8 @@ import {Permission, Resource} from "../../auth/Permissions";
 import {useRestApi} from "../../api/RestApi";
 import {usePageContext} from "../content/Page";
 import SmsSignup from "../sms/SmsSignup";
+import LivestreamPanel from "./livestream/LivestreamPanel";
+import "./Extras.css";
 
 const ExtrasContext = createContext({});
 
@@ -61,8 +63,8 @@ export default function Extras({extras}) {
     moveExtraUp: handleMoveUp,
     moveExtraDown: handleMoveDown,
   }}>
-    <Container fluid={true} className="Extras p-0">
-      <Row className="ExtrasRow m-0 justify-content-start align-items-start">
+    <div className="Extras">
+      <Row className="ExtrasRow m-0 justify-content-start align-items-start d-flex w-100">
         {extras?.map((extra) => (<React.Fragment key={extra.ExtraID + '_' + extra.Modified}>
             {extra.ExtraType === 'guestbook' && (
               <GuestBook guestBookId={extra.GuestBookID} extraData={extra} sectionExtras={extras}
@@ -84,11 +86,14 @@ export default function Extras({extras}) {
             {extra.ExtraType === 'youtube' && (
               <YouTubeExtra extraData={extra} sectionExtras={extras} canEdit={canEdit}/>
             )}
+          {extra.ExtraType === 'livestream' && (
+            <LivestreamPanel livestreamId={extra.LivestreamID}/>
+          )}
           </React.Fragment>)
         )
         }
       </Row>
-    </Container>
+    </div>
   </ExtrasContext>)
 }
 

@@ -70,7 +70,6 @@ export default function PagePassword({pageData, onSuccess, apiRef}) {
       </Form.Label>
       <Col sm={4} className={'mt-3'}>
         <Form.Control
-          size={'sm'}
           type={'password'}
           name={'PagePassword'}
           isInvalid={passwordError?.length}

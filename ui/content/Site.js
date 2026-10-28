@@ -156,7 +156,7 @@ export default function Site(props) {
     let msg;
     if (typeof error === 'string' || error instanceof String) {
       if (alert !== error) {
-        msg = `${error} ${exception?.response?.data?.message ? exception.response.data.message : exception.message ? exception.message : ''}`;
+        msg = `${error} ${exception?.response?.data?.message ? exception.response.data.message : exception?.message ? exception.message : ''}`;
       }
     } else if (error?.response?.data?.message) {
       //

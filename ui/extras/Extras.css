@@ -1,0 +1,10 @@
+.Extras {
+  padding: 0;
+  display: flex;
+  width: 100%;
+}
+
+.ExtrasRow {
+  display: flex;
+  width: 100%;
+}

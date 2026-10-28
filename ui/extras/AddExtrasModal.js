@@ -5,12 +5,13 @@ import {useSiteContext} from "../content/Site";
 import {usePageContext} from "../content/Page";
 import {useEffect, useRef, useState} from "react";
 import {Button, Col, Form, Modal, Row, Spinner} from "react-bootstrap";
-import {useFormData} from "../editor/FormEditor";
+import FormEditor, {useFormData} from "../editor/FormEditor";
 import YouTubeExtraFields from "./youtube/YouTubeExtraFields";
 import InstagramExtraFields from "./instagram/InstagramExtraFields";
 import FileExtraFields from "./file/FileExtraFields";
 import {useAuth} from "../../auth/AuthProvider";
 import {Permission, Resource} from "../../auth/Permissions";
+import LivestreamExtraFields from "./livestream/LivestreamExtraFields";
 
 /**
  * @callback Callback
@@ -31,7 +32,7 @@ export default function AddExtrasModal({show, onHide, onSubmit, pageSectionId}) 
 
   const {siteData, showErrorAlert} = useSiteContext();
   const {pageData, addExtraToPage} = usePageContext();
-  const {GuestBooks, Galleries, Extras, SMS} = useRestApi();
+  const {GuestBooks, Galleries, Extras, SMS, Livestreams} = useRestApi();
   const {hasPermission} = useAuth();
 
   /** @type FormDataAPI<ExtraData> */
@@ -214,6 +215,25 @@ export default function AddExtrasModal({show, onHide, onSubmit, pageSectionId}) 
           });
         }
         break;
+      case 'livestream':
+        if (!formData.edits.LivestreamID) {
+          // TODO create new livestream
+        } else {
+          // create an Extra for an existing SMS campaign
+          Extras.insertOrUpdateExtra({
+            ExtraType: formData.edits.ExtraType,
+            SiteID: siteData.SiteID,
+            PageID: pageData.PageID,
+            PageSectionID: pageSectionId,
+            LivestreamID: formData.edits.LivestreamID
+          }).then((extra) => {
+            console.debug(`Extra added.`);
+            onExtraAdded(extra);
+          }).catch((err) => {
+            showErrorAlert(`Error adding extra.`, err);
+          });
+        }
+        break;
       case 'file':
       case 'instagram':
       case 'youtube':
@@ -262,6 +282,8 @@ export default function AddExtrasModal({show, onHide, onSubmit, pageSectionId}) 
         return formData.edits.ExtraFile !== null
       case 'sms':
         return formData.edits.SMSCampaignID > 0 || formData.edits.CampaignName?.length > 0
+      case 'livestream':
+        return formData.edits.LivestreamID > 0 || formData.edits.LivestreamName?.length > 0
       default:
         return false;
     }
@@ -301,6 +323,7 @@ export default function AddExtrasModal({show, onHide, onSubmit, pageSectionId}) 
               <option value='youtube'>YouTube Video</option>
               <option value='file'>File</option>
               <option value='sms'>SMS Campaign</option>
+              <option value='livestream'>Livestream</option>
             </Form.Select>
           </Col>
         </Row>
@@ -522,6 +545,9 @@ export default function AddExtrasModal({show, onHide, onSubmit, pageSectionId}) 
             </Row>
           )}
         </>)}
+        {formData.edits.ExtraType === 'livestream' && (
+          <LivestreamExtraFields/>
+        )}
         {formData.edits.ExtraType === 'instagram' && (
           <InstagramExtraFields/>
         )}
