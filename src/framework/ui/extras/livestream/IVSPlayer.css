@@ -1,0 +1,35 @@
+div.IVSPlayer {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0;
+  background-color: #000000;
+}
+
+div.IVSPlayerWrapper {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  background-color: #000;
+  overflow: hidden;
+}
+
+iframe.IVSPlayerIFrame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+div.IVSPlayerMessage {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  padding: 10%;
+  text-align: center;
+  aspect-ratio: 16/9;
+}

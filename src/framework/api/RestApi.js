@@ -895,6 +895,16 @@ export default function RestApi(props) {
     });
   }, []);
 
+  const getConfigurationXml = useCallback(async (livestreamId) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.get(`${host}/api/v1/livestreams/${livestreamId}/config`);
+        return response.data;
+      }
+    });
+  }, []);
+
+
   /**
    * @callback RestApiCall
    * @return {Promise<any>}
@@ -1056,6 +1066,7 @@ export default function RestApi(props) {
         insertOrUpdateLivestream: insertOrUpdateLivestream,
         deleteLivestream: deleteLivestream,
         getStreamInfo: getStreamInfo,
+        getConfigurationXml: getConfigurationXml,
       }
     }}>
       {props.children}

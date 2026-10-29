@@ -45,7 +45,6 @@ export default function LivestreamFields({data, onAdd, onUpdate, onDelete, onCan
   function isDataValid() {
     return formData.edits.LivestreamName?.length > 0
       && formData.edits.SiteID > 0
-      && formData.edits.IVSChannelARN?.length > 0
   }
 
   /**
@@ -130,25 +129,6 @@ export default function LivestreamFields({data, onAdd, onUpdate, onDelete, onCan
             </option>
           )}
         </Form.Select>
-      </Col>
-    </Row>
-    <Row className={'mt-2'}>
-      <Form.Label
-        column={'sm'}
-        sm={labelCols}
-        htmlFor={'IVSChannelARN'}
-      >
-        IVS Channel ARN
-      </Form.Label>
-      <Col>
-        <Form.Control
-          size={'sm'}
-          name={'IVSChannelARN'}
-          isValid={formData.isTouched('IVSChannelARN') && formData.edits.IVSChannelARN?.length > 0}
-          isInvalid={formData.isTouched('IVSChannelARN') && !(formData.edits.IVSChannelARN?.length > 0)}
-          value={formData.edits?.IVSChannelARN || ''}
-          onChange={(e) => formData.onDataChanged({name: 'IVSChannelARN', value: e.target.value})}
-        />
       </Col>
     </Row>
     <CrudButtons
