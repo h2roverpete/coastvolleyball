@@ -64,7 +64,7 @@ export default function Extras({extras}) {
     moveExtraDown: handleMoveDown,
   }}>
     <div className="Extras">
-      <Row className="ExtrasRow m-0 justify-content-start align-items-start d-flex w-100">
+      <div className="ExtrasRow m-0 justify-content-start align-items-start d-flex flex-column w-100">
         {extras?.map((extra) => (<React.Fragment key={extra.ExtraID + '_' + extra.Modified}>
             {extra.ExtraType === 'guestbook' && (
               <GuestBook guestBookId={extra.GuestBookID} extraData={extra} sectionExtras={extras}
@@ -92,7 +92,7 @@ export default function Extras({extras}) {
           </React.Fragment>)
         )
         }
-      </Row>
+      </div>
     </div>
   </ExtrasContext>)
 }
