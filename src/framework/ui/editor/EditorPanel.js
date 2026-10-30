@@ -104,6 +104,7 @@ export default function EditorPanel(
                 variant="secondary"
                 onClick={() => formData.revert()}
                 disabled={!formData.isDataChanged()}
+                hidden={!formData.edits.length}
               >
                 Revert
               </Button>

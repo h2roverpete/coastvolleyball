@@ -20,7 +20,7 @@ export default function IVSPlayer({data}) {
       if (data) {
         Livestreams.getStreamInfo(data.LivestreamID).then((stream) => {
           setStreamInfo(stream);
-        }).catch(() => {
+        }).catch((err) => {
           // stream not available
           setStreamInfo(null);
         })
@@ -46,7 +46,7 @@ export default function IVSPlayer({data}) {
           </div>
           :
           <div className={'IVSPlayerMessage'}>
-            {data.LivestreamName} is currently not streaming. Please wait for the livestream to start.
+            {data.LivestreamName} is not currently streaming. Please wait for the livestream to start.
           </div>
         }
       </div>

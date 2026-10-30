@@ -2,10 +2,13 @@ import {useEffect, useState} from "react";
 import {Permission, Resource} from "./Permissions";
 import {useAuth} from "./AuthProvider";
 import RestrictedContent from "./RestrictedContent";
+import UserList from "./UserList";
+import {useSiteContext} from "../ui/content/Site";
 
 export default function SiteUsers() {
 
   const {hasPermission} = useAuth();
+  const {siteData} = useSiteContext();
   const [canView, setCanView] = useState(true);
 
   useEffect(() => {
@@ -15,7 +18,7 @@ export default function SiteUsers() {
   return (<>
     {canView ? (
       <div className="PageSection">
-        (user list here)
+        <UserList siteId={siteData?.SiteID}/>
       </div>
     ) : (
       <RestrictedContent/>

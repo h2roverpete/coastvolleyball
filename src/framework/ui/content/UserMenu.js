@@ -12,6 +12,7 @@ export default function UserMenu({buttonRef, onClose}) {
   const navigate = useNavigate();
   const [campaigns, setCampaigns] = useState(/** @type {[SMSCampaignData]} */ null);
   const [hasSmsPermission, setHasSmsPermission] = useState(false);
+  const [hasUserPermission, setHasUserPermission] = useState(false);
   const {SMS} = useRestApi();
   const {hasPermission} = useAuth();
 
@@ -26,9 +27,9 @@ export default function UserMenu({buttonRef, onClose}) {
   }, [campaigns, setCampaigns, hasPermission, hasSmsPermission, SMS]);
 
   useEffect(() => {
-    const result = hasPermission(Resource.SMS, Permission.SEND);
-    setHasSmsPermission(result);
-  }, [hasPermission, setHasSmsPermission])
+    setHasSmsPermission(hasPermission(Resource.SMS, Permission.SEND));
+    setHasUserPermission(hasPermission(Resource.USERS, Permission.ADMIN));
+  }, [hasPermission, setHasSmsPermission, setHasUserPermission])
 
   return (<>
     <div
@@ -59,6 +60,14 @@ export default function UserMenu({buttonRef, onClose}) {
             </div>
           )}
         </>}
+        {hasUserPermission &&
+          <span className="dropdown-item" onClick={() => {
+            navigate(`/admin/users`);
+            onClose?.();
+          }}>
+            Manage Users
+          </span>
+        }
         {!isAuthenticated && (
           <span className="dropdown-item" onClick={() => {
             navigate('/login');

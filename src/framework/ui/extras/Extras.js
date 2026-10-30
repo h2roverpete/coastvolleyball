@@ -3,7 +3,6 @@ import Gallery from "../gallery/Gallery";
 import React, {createContext, useContext, useEffect, useState} from "react";
 import FileExtra from "./file/FileExtra";
 import YouTubeExtra from "./youtube/YouTubeExtra";
-import {Container, Row} from "react-bootstrap";
 import InstagramExtra from "./instagram/InstagramExtra";
 import {useAuth} from "../../auth/AuthProvider";
 import {Permission, Resource} from "../../auth/Permissions";
@@ -86,9 +85,9 @@ export default function Extras({extras}) {
             {extra.ExtraType === 'youtube' && (
               <YouTubeExtra extraData={extra} sectionExtras={extras} canEdit={canEdit}/>
             )}
-          {extra.ExtraType === 'livestream' && (
-            <LivestreamPanel livestreamId={extra.LivestreamID}/>
-          )}
+            {extra.ExtraType === 'livestream' && (
+              <LivestreamPanel livestreamId={extra.LivestreamID} extraData={extra}/>
+            )}
           </React.Fragment>)
         )
         }

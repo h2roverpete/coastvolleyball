@@ -1,5 +1,5 @@
 import {Button, Col, Form, Row, Spinner} from "react-bootstrap";
-import {useRef, useState} from "react";
+import {useState} from "react";
 import {useCookies} from "react-cookie";
 import {useRestApi} from "../../api/RestApi";
 import {jwtDecode} from "jwt-decode";
@@ -21,8 +21,8 @@ export default function PagePassword({pageData, onSuccess, apiRef}) {
         if (decoded) {
           const t = Math.floor(Date.now() / 1000);
           if (decoded.exp > t) {
-            // token is current, check page ID and password
-            return decoded.PageID === pageData.PageID && decoded.PagePassword === pageData.PagePassword;
+            // token is current, check page ID
+            return decoded.PageID === pageData.PageID
           } else {
             try {
               const newToken = await Pages.refreshPageToken(pageData.PageID, token.refresh_token);

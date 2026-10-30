@@ -32,7 +32,7 @@ export default function PageContent({children}) {
     if (!canView && pageData && hasPermission) {
       if (pageData.RequiresPassword && passwordApi.current) {
         // check if user is logged in with admin permission
-        if (hasPermission(Resource.PAGE, Permission.ADMIN)) {
+        if (hasPermission(Resource.PAGE, Permission.BROWSE_PROTECTED)) {
           setCanView(true);
         } else {
           // not admin, check page password
@@ -70,7 +70,7 @@ export default function PageContent({children}) {
       {canView ?
         <div className="PageContent container-fluid" data-testid="PageContent">
           {children}
-          {canEdit && sectionData?.length === 0 &&
+          {canEdit && sectionData?.length === 0 && pageData.PageID > 0 &&
             <div className={'w-100'}>
               <Button
                 variant={siteData?.SiteTheme}

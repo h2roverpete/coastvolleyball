@@ -5,7 +5,7 @@ import {useSiteContext} from "../content/Site";
 import {usePageContext} from "../content/Page";
 import {useEffect, useRef, useState} from "react";
 import {Button, Col, Form, Modal, Row, Spinner} from "react-bootstrap";
-import FormEditor, {useFormData} from "../editor/FormEditor";
+import {useFormData} from "../editor/FormEditor";
 import YouTubeExtraFields from "./youtube/YouTubeExtraFields";
 import InstagramExtraFields from "./instagram/InstagramExtraFields";
 import FileExtraFields from "./file/FileExtraFields";
@@ -32,7 +32,7 @@ export default function AddExtrasModal({show, onHide, onSubmit, pageSectionId}) 
 
   const {siteData, showErrorAlert} = useSiteContext();
   const {pageData, addExtraToPage} = usePageContext();
-  const {GuestBooks, Galleries, Extras, SMS, Livestreams} = useRestApi();
+  const {GuestBooks, Galleries, Extras, SMS} = useRestApi();
   const {hasPermission} = useAuth();
 
   /** @type FormDataAPI<ExtraData> */

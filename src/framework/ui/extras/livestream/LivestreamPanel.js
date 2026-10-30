@@ -1,4 +1,15 @@
-import {Col, Row, Form, Tooltip, OverlayTrigger, Button} from "react-bootstrap";
+import {
+  Col,
+  Row,
+  Form,
+  Tooltip,
+  OverlayTrigger,
+  Button,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader
+} from "react-bootstrap";
 import {BsCopy} from "react-icons/bs";
 import {useEffect, useState} from "react";
 import IVSPlayer from "./IVSPlayer";
@@ -8,18 +19,21 @@ import {useRestApi} from "../../../api/RestApi";
 import {useSiteContext} from "../../content/Site";
 import {useAuth} from "../../../auth/AuthProvider";
 import {Resource, Permission} from "../../../auth/Permissions";
-import mustache from "mustache";
+import {usePageContext} from "../../content/Page";
 
-export default function LivestreamPanel({data, livestreamId}) {
+export default function LivestreamPanel({data, livestreamId, extraData}) {
 
-  const {Livestreams} = useRestApi();
+  const {Livestreams, Extras} = useRestApi();
   const {showErrorAlert} = useSiteContext();
   const {hasPermission} = useAuth();
+  const {removeExtraFromPage} = usePageContext();
 
   const [copyIngestUrlTooltip, setCopyIngestUrlTooltip] = useState('Copy URL to clipboard.');
   const [copyKeyTooltip, setCopyKeyTooltip] = useState('Copy key to clipboard.');
   const [livestreamData, setLivestreamData] = useState(data);
   const [canBroadcast, setCanBroadcast] = useState(false);
+  const [canEdit, setCanEdit] = useState(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
   useEffect(() => {
     if (!livestreamData && livestreamId && Livestreams) {
@@ -29,15 +43,19 @@ export default function LivestreamPanel({data, livestreamId}) {
         showErrorAlert(error);
       })
     }
-  }, [data, livestreamData, livestreamId]);
+  }, [data, livestreamData, livestreamId, Livestreams, showErrorAlert]);
 
   useEffect(() => {
     setCanBroadcast(hasPermission(Resource.LIVESTREAM, Permission.BROADCAST));
   }, [hasPermission]);
 
+  useEffect(() => {
+    setCanEdit(hasPermission(Resource.PAGE, Permission.ADMIN));
+  }, [hasPermission]);
+
   function downloadConfigFile() {
-    Livestreams.getConfigurationXml(livestreamData.LivestreamID).then((xml)=> {
-      const blob = new Blob([xml], { type: 'application/xml;charset=utf-8;' });
+    Livestreams.getConfigurationXml(livestreamData.LivestreamID).then((xml) => {
+      const blob = new Blob([xml], {type: 'application/xml;charset=utf-8;'});
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -51,12 +69,26 @@ export default function LivestreamPanel({data, livestreamId}) {
     })
   }
 
+  function handleDelete() {
+    if (extraData) {
+      Extras.deleteExtra(extraData.ExtraID).then(() => {
+        removeExtraFromPage(extraData.ExtraID);
+      }).catch((error) => {
+        showErrorAlert(error);
+      });
+    }
+  }
+
+  const extraButtons = <>
+    <Button variant={'danger'} size={'sm'} onClick={() => setShowDeleteConfirmation(true)}>Remove from Page</Button>
+  </>;
+
   return <>
     {livestreamData && <>
       <IVSPlayer data={livestreamData}/>
       {canBroadcast &&
         <FormEditor>
-          <EditorPanel hideButtons>
+          <EditorPanel hideButtons={!canEdit} extraButtons={extraButtons}>
             <Row className={'mt-2'}>
               <Form.Label column={'sm'} htmlFor={'IVSIngestEndpoint'}>Secure Ingest URL</Form.Label>
               <Col xs={8} className={'d-flex justify-content-start align-items-center'}>
@@ -125,15 +157,26 @@ export default function LivestreamPanel({data, livestreamId}) {
               </Col>
             </Row>
             <Row className={'mt-2'}>
-              <Col>
+              <Col></Col>
+              <Col xs={9}>
                 <Button size={'sm'} onClick={downloadConfigFile}>
-                  Download BlackMagic Camera Configuration
+                  Download Blackmagic Configuration
                 </Button>
               </Col>
             </Row>
           </EditorPanel>
         </FormEditor>
       }
+      <Modal show={showDeleteConfirmation} onHide={()=>setShowDeleteConfirmation(false)} className={'Editor'}>
+        <ModalBody>
+          <h4>Remove Livestream</h4>
+          Are you sure you want to remove the {livestreamData.LivestreamName} livestream from the page? The livestream itself will not be deleted.
+        <div className={'d-flex justify-content-end align-items-center gap-3'}>
+          <Button size={'sm'} variant="danger" onClick={handleDelete}>Remove</Button>
+          <Button size={'sm'} variant="secondary" onClick={()=>setShowDeleteConfirmation(false)}>Cancel</Button>
+        </div>
+        </ModalBody>
+      </Modal>
     </>}
   </>;
 }
