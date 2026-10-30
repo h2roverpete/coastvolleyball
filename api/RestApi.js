@@ -482,6 +482,15 @@ export default function RestApi(props) {
     });
   }, []);
 
+  const getSiteUsers = useCallback(async () => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.get(`${host}/api/v1/content/sites/${siteId}/users`);
+        return response.data;
+      }
+    });
+  }, []);
+
   const getUser = useCallback(async (userId) => {
     return await adminApiCall(() => {
       return async () => {
@@ -1033,6 +1042,7 @@ export default function RestApi(props) {
       Users: {
         getUsers: getUsers,
         getUser: getUser,
+        getSiteUsers: getSiteUsers,
         insertOrUpdateUser: insertOrUpdateUser,
         deleteUser: deleteUser,
       },

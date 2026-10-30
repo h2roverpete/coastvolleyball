@@ -90,7 +90,7 @@ export default function PageConfig({onPageUpdated, onPageDeleted, modalRef}) {
   }
 
   function isValidRoute(route) {
-    return route?.match(/^\/[a-z0-9\/]+/) && !routes.includes(route);
+    return route?.match(/^\/[a-z0-9/]+/) && !routes.includes(route);
   }
 
   return (<>

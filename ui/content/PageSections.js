@@ -3,10 +3,7 @@ import React, {Fragment, useEffect, useState} from "react";
 import {usePageContext} from "./Page";
 import {useAuth} from "../../auth/AuthProvider";
 import {Permission, Resource} from "../../auth/Permissions";
-import {Button, Spinner} from "react-bootstrap";
-import {useRestApi} from "../../api/RestApi";
-import {useSiteContext} from "./Site";
-import {BsPlus} from "react-icons/bs";
+import {Spinner} from "react-bootstrap";
 
 /**
  * Element to show all the sections on a page
@@ -18,13 +15,10 @@ import {BsPlus} from "react-icons/bs";
  */
 export default function PageSections({children}) {
 
-  const {pageData, sectionData, setSectionData} = usePageContext();
-  const {showErrorAlert, siteData} = useSiteContext();
+  const {pageData, sectionData} = usePageContext();
   const {hasPermission} = useAuth();
-  const {PageSections} = useRestApi();
 
   const [canEdit, setCanEdit] = useState(false);
-  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     setCanEdit(hasPermission?.(Resource.PAGE, Permission.EDIT));

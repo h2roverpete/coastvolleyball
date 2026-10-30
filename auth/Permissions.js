@@ -10,13 +10,13 @@
  * @enum {string}
  */
 const Resource = {
-  SITE: "site",
-  PAGE: "page",
-  GALLERY: "gallery",
-  GUESTBOOK: "guestbook",
-  USERS: "users",
-  SMS: "sms",
-  LIVESTREAM: "livestream",
+  SITE: "Site",
+  PAGE: "Page",
+  GALLERY: "Gallery",
+  GUESTBOOK: "GuestBook",
+  USERS: "User",
+  SMS: "Sms",
+  LIVESTREAM: "Livestream",
 }
 
 /**
@@ -27,7 +27,6 @@ const Permission = {
   ADMIN: "admin",
   EDIT: "edit",
   BROWSE_PROTECTED: "browse_protected",
-  BROWSE: "browse",
   UPDATE: "update",
   ADD: "add",
   DELETE: "delete",
@@ -45,23 +44,23 @@ const ResourcePermissions = {
   [Resource.SITE]: [
     {permission: Permission.ADMIN, description: 'Administrator'},
     {permission: Permission.EDIT, description: 'Edit Site Outline'},
-    {permission: Permission.BROWSE, description: 'Browse Only'},
+    {permission: Permission.NONE, description: 'None'},
   ],
   [Resource.PAGE]: [
     {permission: Permission.ADMIN, description: 'Administrator'},
     {permission: Permission.EDIT, description: 'Edit Page Contents'},
     {permission: Permission.BROWSE_PROTECTED, description: 'Browse Protected Pages'},
-    {permission: Permission.BROWSE, description: 'Browse Only'},
+    {permission: Permission.NONE, description: 'None'},
   ],
   [Resource.GALLERY]: [
     {permission: Permission.ADMIN, description: 'Administrator'},
     {permission: Permission.EDIT, description: 'Edit Gallery Contents'},
     {permission: Permission.ADD, description: 'Add Photos'},
-    {permission: Permission.BROWSE, description: 'Browse Only'},
+    {permission: Permission.NONE, description: 'None'},
   ],
   [Resource.GUESTBOOK]: [
     {permission: Permission.ADMIN, description: 'Administrator'},
-    {permission: Permission.BROWSE, description: 'Browse Only'},
+    {permission: Permission.NONE, description: 'None'},
   ],
   [Resource.USERS]: [
     {permission: Permission.ADMIN, description: 'Administrator'},
@@ -70,10 +69,12 @@ const ResourcePermissions = {
   [Resource.SMS]: [
     {permission: Permission.ADMIN, description: 'Administrator'},
     {permission: Permission.SEND, description: 'Send Messages'},
+    {permission: Permission.NONE, description: 'None'},
   ],
   [Resource.LIVESTREAM]: [
     {permission: Permission.ADMIN, description: 'Administrator'},
     {permission: Permission.BROADCAST, description: 'Broadcaster'},
+    {permission: Permission.NONE, description: 'None'},
   ]
 }
 

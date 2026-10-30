@@ -28,7 +28,7 @@ export default function LivestreamExtraFields() {
         showErrorAlert(`Error getting livestream list.`, err);
       })
     }
-  }, [siteData, Livestreams, setLivestreamList, showErrorAlert]);
+  }, [siteData, Livestreams, setLivestreamList, showErrorAlert, livestreamList?.length]);
 
   const labelCols = 4;
   return <>

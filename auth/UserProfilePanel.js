@@ -7,6 +7,7 @@ import {useRestApi} from "../api/RestApi";
 import {useSiteContext} from "../ui/content/Site";
 import {isValidEmail, isValidPassword} from "../util/Validators"
 import {Container} from "react-bootstrap";
+import {useEffect, useState} from "react";
 
 /**
  * Display message that the user doesn't have permission to view the content.
@@ -16,36 +17,28 @@ import {Container} from "react-bootstrap";
  */
 export default function UserProfilePanel() {
 
-  const {isAuthenticated} = useAuth();
+  const {isAuthenticated, currentUser} = useAuth();
+  const [user, setUser] = useState(null);
   const {Users} = useRestApi();
-  const {showErrorAlert} = useSiteContext();
 
-  function handleUpdate(data) {
-    if (data.UserPhone) {
-      // remove formatting from phone number
-      data.UserPhone = data.UserPhone.replaceAll(/[^0-9+]/g, "");
+  useEffect(() => {
+    if (!user && currentUser) {
+      // always load user data from database, don't use token
+      Users.getUser(currentUser.UserID).then((result) => {
+        setUser(result);
+      });
     }
-    Users.insertOrUpdateUser(data).then(() => {
-      console.debug("User updated successfully.");
-    }).catch(err => showErrorAlert(err));
-  }
-
-  function isDataValid(data) {
-    return data.UserName?.length > 0
-      && isValidEmail(data.UserEmail)
-      && (isValidPassword(data.Password) || !data.Password)
-  }
+  }, [currentUser, Users])
 
   return (<>
-    {isAuthenticated ? (
-      <Container className="PageSection">
-        <FormEditor>
-          <form>
-            <UserFields/>
-            <EditorButtons onUpdate={handleUpdate} isDataValid={isDataValid}/>
-          </form>
-        </FormEditor>
-      </Container>
-    ) : <RestrictedContent/>}
+    {isAuthenticated ? <>
+      {user &&
+        <Container className="PageSection">
+          <FormEditor>
+            <UserFields data={user}/>
+          </FormEditor>
+        </Container>
+      }
+    </> : <RestrictedContent/>}
   </>);
 }

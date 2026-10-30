@@ -10,7 +10,7 @@ import {useAuth} from "../../auth/AuthProvider";
 import {Permission, Resource} from "../../auth/Permissions";
 import Login from "../../auth/Login";
 import Error404 from "../../util/Error404";
-import SiteUsers from "../../auth/SiteUsers";
+import SiteUsersPage from "../../auth/SiteUsers";
 import UserProfilePanel from "../../auth/UserProfilePanel";
 import {Outline} from "framework/util/OutlineUtil"
 import SmsAdminPage from "../sms/SmsAdminPage";
@@ -70,7 +70,7 @@ export default function Site(props) {
   const [canBrowseProtected, setCanBrowseProtected] = useState(false);
   const [metaPages] = useState([
     {name: 'user', id: -1, title: 'User Profile', path: '/admin/user', content: <UserProfilePanel/>},
-    {name: 'users', id: -2, title: 'Site Users', path: '/admin/users', content: <SiteUsers/>},
+    {name: 'users', id: -2, title: 'Site Users', path: '/admin/users', content: <SiteUsersPage/>},
     {name: 'sms', id: -3, title: 'SMS Campaign Administration', path: '/admin/sms', content: <SmsAdminPage/>},
     {name: 'login', id: -4, title: 'Log In', path: '/login', content: <Login/>},
     {name: 'logout', id: -5, title: 'Log Out', path: '/logout', content: <Logout/>},

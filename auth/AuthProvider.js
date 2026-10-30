@@ -12,6 +12,7 @@ export default function AuthProvider(props) {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const {Auth} = useRestApi();
+  const siteId = parseInt(process.env.REACT_APP_SITE_ID);
 
   useEffect(() => {
     setIsAuthenticated(cookies.token && user);
@@ -35,7 +36,7 @@ export default function AuthProvider(props) {
   const hasPermission = useCallback((resource, permission) => {
     console.debug(`Check permission '${resource}:${permission}' for current user.`);
     if (user) {
-      if (user.SiteID !== '0' && user.SiteID !== process.env.REACT_APP_SITE_ID) {
+      if (user.SiteID !== 0 && user.SiteID !== siteId) {
         console.error(`User not authorized for this site.`);
         return false;
       } else {
@@ -45,7 +46,7 @@ export default function AuthProvider(props) {
       console.debug(`User not logged in.`);
       return false;
     }
-  }, [user]);
+  }, [user, siteId, checkPermission]);
 
   const setToken = useCallback((newToken) => {
     console.debug(`Set token: ${JSON.stringify(newToken)}`);
