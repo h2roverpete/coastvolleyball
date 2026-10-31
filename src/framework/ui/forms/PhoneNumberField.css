@@ -7,7 +7,5 @@ li.country:hover{
 div.flag-dropdown,
 input.form-control.phone {
   border-color: var(--bs-border-color) !important;
-  font-size: .875em !important;
-  height: 2.2em;
-  border-radius: 0 !important;
+  font-family: var(--bs-body-font-family) !important;
 }
