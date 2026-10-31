@@ -136,7 +136,7 @@ export default function SmsWhitelist({campaignId}) {
       ))}
       </tbody>
     </Table>
-    <Button size={'sm'} onClick={onAddItem}>Add Whitelist Entry</Button>
+    <Button size={'sm'} variant={'secondary'} onClick={onAddItem}>Add Whitelist Entry</Button>
     <SmsWhitelistEntryModal
       show={editItem != null}
       entry={editItem}

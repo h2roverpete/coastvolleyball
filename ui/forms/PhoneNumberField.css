@@ -1,11 +1,13 @@
-
 div.selected-flag,
 li.country.highlight,
 li.country:hover{
-  background-color: #88888822 !important;
+  background-color: var(--bs-secondary-bg) !important;
 }
+
 div.flag-dropdown,
 input.form-control.phone {
   border-color: var(--bs-border-color) !important;
-  font-size:16px !important;
+  font-size: .875em !important;
+  height: 2.2em;
+  border-radius: 0 !important;
 }

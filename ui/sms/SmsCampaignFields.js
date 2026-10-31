@@ -15,7 +15,7 @@ import {isValidEmail} from "../../util/Validators";
  * @returns {JSX.Element}
  * @constructor
  */
-export default function SmsCampaignFields({campaign, onAdd, onUpdate, onDelete, onCancel}) {
+export default function SmsCampaignFields({campaign, smsCampaignId, onAdd, onUpdate, onDelete, onCancel}) {
 
   const {Sites} = useRestApi();
   const {showErrorAlert} = useSiteContext();
@@ -33,6 +33,15 @@ export default function SmsCampaignFields({campaign, onAdd, onUpdate, onDelete, 
       }).catch((error) => showErrorAlert(error));
     }
   }, [sites, Sites, showErrorAlert]);
+
+  useEffect(() => {
+    if (!campaign && smsCampaignId && !formData.edits.SMSCampaignID) {
+      // load campaign data by id
+      SMS.getSmsCampaign(smsCampaignId).then((response) => {
+        formData.update(response);
+      }).catch((error) => showErrorAlert(error));
+    }
+  }, [campaign, smsCampaignId, SMS, formData, showErrorAlert]);
 
   useEffect(() => {
     // TODO fix dependency loop here
@@ -58,7 +67,7 @@ export default function SmsCampaignFields({campaign, onAdd, onUpdate, onDelete, 
   function handleUpdate() {
     SMS.insertOrUpdateSmsCampaign(formData.edits).then((result) => {
       formData.update(result);
-      if (campaign.SMSCampaignID > 0) {
+      if (formData.edits.SMSCampaignID > 0) {
         onUpdate?.(result);
       } else {
         onAdd?.(result);
@@ -94,7 +103,7 @@ export default function SmsCampaignFields({campaign, onAdd, onUpdate, onDelete, 
     <Accordion defaultActiveKey={'config'}>
       <Accordion.Item eventKey={'config'}>
         <Accordion.Header>
-          Configuration
+          General
         </Accordion.Header>
         <Accordion.Body className="p-2">
           <Row className={'mt-1'}>
@@ -129,7 +138,7 @@ export default function SmsCampaignFields({campaign, onAdd, onUpdate, onDelete, 
                 size={'sm'}
                 name={'SiteID'}
                 value={formData.edits?.SiteID || 0}
-                onChange={(e) => formData.onDataChanged({name: 'SiteID', value: e.target.value})}
+                onChange={(e) => formData.onDataChanged({name: 'SiteID', value: parseInt(e.target.value)})}
               >
                 <option value={0}>(select a site)</option>
                 {sites?.map((site) =>
@@ -257,9 +266,9 @@ export default function SmsCampaignFields({campaign, onAdd, onUpdate, onDelete, 
               sm={labelCols}
               htmlFor={'CampaignOriginationIdentity'}
             >
-              Origination
+              Origination Number
             </Form.Label>
-            <Col className={'col-sm-4'}>
+            <Col sm={4} className={'d-flex align-items-center justify-content-center'}>
               <Form.Control
                 size={'sm'}
                 name={'CampaignOriginationIdentity'}
@@ -278,7 +287,7 @@ export default function SmsCampaignFields({campaign, onAdd, onUpdate, onDelete, 
             >
               Type
             </Form.Label>
-            <Col className={'col-sm-4 d-flex'}>
+            <Col sm={4} className={'d-flex align-items-center justify-content-start'}>
               <Form.Check
                 type={'radio'}
                 name={'CampaignOriginationIsRCS'}
@@ -329,7 +338,7 @@ export default function SmsCampaignFields({campaign, onAdd, onUpdate, onDelete, 
             >
               Admin Origination
             </Form.Label>
-            <Col className={'col-sm-4'}>
+            <Col sm={4} className={'d-flex align-items-center justify-content-center'}>
               <Form.Control
                 size={'sm'}
                 name={'CampaignAdminOriginationIdentity'}
@@ -351,7 +360,7 @@ export default function SmsCampaignFields({campaign, onAdd, onUpdate, onDelete, 
             >
               Reply Topic ARN
             </Form.Label>
-            <Col>
+            <Col sm={8} className={'d-flex align-items-center justify-content-center'}>
               <Form.Control
                 size={'sm'}
                 name={'CampaignSnsTopicArn'}
@@ -375,7 +384,7 @@ export default function SmsCampaignFields({campaign, onAdd, onUpdate, onDelete, 
               sm={12}
               htmlFor={'CampaignDescription'}
             >
-              Description
+              Description Text
             </Form.Label>
             <Col>
               <Form.Control
@@ -396,7 +405,7 @@ export default function SmsCampaignFields({campaign, onAdd, onUpdate, onDelete, 
               sm={12}
               htmlFor={'CampaignAgreement'}
             >
-              SMS Agreement Checkbox
+              SMS Agreement Checkbox Text
             </Form.Label>
             <Col>
               <Form.Control
@@ -417,7 +426,7 @@ export default function SmsCampaignFields({campaign, onAdd, onUpdate, onDelete, 
               sm={12}
               htmlFor={'CampaignTermsAndConditions'}
             >
-              Terms &amp; Conditions Checkbox
+              Terms &amp; Conditions Checkbox Text
             </Form.Label>
             <Col>
               <Form.Control
@@ -458,7 +467,7 @@ export default function SmsCampaignFields({campaign, onAdd, onUpdate, onDelete, 
               sm={12}
               htmlFor={'CampaignConfirmation'}
             >
-              Confirmation
+              Confirmation Text
             </Form.Label>
             <Col>
               <Form.Control

@@ -32,7 +32,7 @@ export default function AddExtrasModal({show, onHide, onSubmit, pageSectionId}) 
 
   const {siteData, showErrorAlert} = useSiteContext();
   const {pageData, addExtraToPage} = usePageContext();
-  const {GuestBooks, Galleries, Extras, SMS} = useRestApi();
+  const {GuestBooks, Galleries, Extras, SMS, Livestreams} = useRestApi();
   const {hasPermission} = useAuth();
 
   /** @type FormDataAPI<ExtraData> */
@@ -198,7 +198,26 @@ export default function AddExtrasModal({show, onHide, onSubmit, pageSectionId}) 
         break;
       case 'sms':
         if (!formData.edits.SMSCampaignID) {
-          // TODO create new SMS campaign
+          SMS.insertOrUpdateSmsCampaign({
+            CampaignName: formData.edits.CampaignName,
+            SiteID: siteData.SiteID,
+            CampaignAdminEmail: formData.edits.CampaignAdminEmail,
+            CampaignEmail: formData.edits.CampaignEmail,
+            EmailCampaign: true,
+          }).then((result) => {
+            Extras.insertOrUpdateExtra({
+              ExtraType: formData.edits.ExtraType,
+              SiteID: siteData.SiteID,
+              PageID: pageData.PageID,
+              PageSectionID: pageSectionId,
+              SMSCampaignID: result.SMSCampaignID
+            }).then((extra) => {
+              console.debug(`Extra added.`);
+              onExtraAdded(extra);
+            }).catch((err) => {
+              showErrorAlert(`Error adding extra.`, err);
+            });
+          }).catch((err) => showErrorAlert(`Error adding SMS CampaignID ${err}`));
         } else {
           // create an Extra for an existing SMS campaign
           Extras.insertOrUpdateExtra({
@@ -217,7 +236,26 @@ export default function AddExtrasModal({show, onHide, onSubmit, pageSectionId}) 
         break;
       case 'livestream':
         if (!formData.edits.LivestreamID) {
-          // TODO create new livestream
+          // create a new livestream
+          Livestreams.insertOrUpdateLivestream({
+            LivestreamName: formData.edits.LivestreamName,
+            SiteID: siteData.SiteID,
+          })
+            .then(result => {
+              // create an Extra for an existing SMS campaign
+              Extras.insertOrUpdateExtra({
+                ExtraType: formData.edits.ExtraType,
+                SiteID: siteData.SiteID,
+                PageID: pageData.PageID,
+                PageSectionID: pageSectionId,
+                LivestreamID: result.LivestreamID
+              }).then((extra) => {
+                console.debug(`Extra added.`);
+                onExtraAdded(extra);
+              }).catch((err) => {
+                showErrorAlert(`Error adding extra.`, err);
+              });
+            }).catch((err) => showErrorAlert(`Error adding livestream.`, err));
         } else {
           // create an Extra for an existing SMS campaign
           Extras.insertOrUpdateExtra({
@@ -527,7 +565,7 @@ export default function AddExtrasModal({show, onHide, onSubmit, pageSectionId}) 
                 </Form.Select>
               </Col>
             </Row>
-          ) : (
+          ) : ( <>
             <Row className="mt-2">
               <Form.Label className='required' column={'sm'} htmlFor={'CampaignName'} sm={labelCols}>
                 Campaign Name</Form.Label>
@@ -543,7 +581,31 @@ export default function AddExtrasModal({show, onHide, onSubmit, pageSectionId}) 
                 />
               </Col>
             </Row>
-          )}
+            <Row className="mt-2">
+              <Form.Label className='required' column={'sm'} htmlFor={'CampaignAdminEmail'} sm={labelCols}>
+                Admin Email</Form.Label>
+              <Col>
+                <EmailField
+                  id="CampaignAdminEmail"
+                  name="CampaignAdminEmail"
+                  size="sm"
+                  value={formData.edits.CampaignAdminEmail || ''}
+                />
+              </Col>
+            </Row>
+            <Row className="mt-2">
+              <Form.Label className='required' column={'sm'} htmlFor={'CampaignEmail'} sm={labelCols}>
+                 Campaign Email</Form.Label>
+              <Col>
+                <EmailField
+                  id="CampaignEmail"
+                  name="CampaignEmail"
+                  size="sm"
+                  value={formData.edits.CampaignEmail || ''}
+                />
+              </Col>
+            </Row>
+          </>)}
         </>)}
         {formData.edits.ExtraType === 'livestream' && (
           <LivestreamExtraFields/>

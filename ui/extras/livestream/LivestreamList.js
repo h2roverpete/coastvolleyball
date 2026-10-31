@@ -100,13 +100,13 @@ export default function SmsCampaignList() {
 
   return <>
     {canEdit && listItems && <>
-      {view !== null ? <div className="LivestreamList position-relative mt-2">
+      {view !== null ? <div className="LivestreamList Editor position-relative mt-2">
           <CloseButton
             className={'position-absolute'}
             style={{top: '0px', right: '0px'}}
             onClick={() => setView(null)}
           />
-          <h4>{view.LivestreamName}</h4>
+          <h5>{view.LivestreamName}</h5>
           <LivestreamPanel data={view}/>
         </div>
         :
@@ -134,6 +134,16 @@ export default function SmsCampaignList() {
               </th>
               <th
                 className={'text-nowrap'}
+                onClick={() => onSortBy('SiteID')}
+                role={'button'}
+              >
+                Site ID
+                {sortKey === 'SiteID' && (<span className={'ms-2'}>
+            {sortAscending ? <BsSortDown/> : <BsSortUp/>}
+          </span>)}
+              </th>
+              <th
+                className={'text-nowrap'}
                 onClick={() => onSortBy('LivestreamName')}
                 role={'button'}
               >
@@ -154,6 +164,9 @@ export default function SmsCampaignList() {
               >
                 <td>
                   {item.LivestreamID}
+                </td>
+                <td>
+                  {item.SiteID}
                 </td>
                 <td className={'d-flex align-items-center position-relative'}>
                   <OverlayTrigger
