@@ -1,8 +1,9 @@
 import {Button, Col, Collapse, Row} from "react-bootstrap";
 import {useState} from "react";
 import {useFormData} from "./FormEditor";
-import {BsChevronCompactDown, BsChevronCompactUp, BsXLg} from "react-icons/bs";
+import {BsChevronCompactDown, BsChevronCompactUp, BsThreeDotsVertical, BsXLg} from "react-icons/bs";
 import {useTouchContext} from "../../util/TouchProvider";
+import EditorPanelMenu from "./EditorPanelMenu";
 
 export const Direction = {
   /** slide up */
@@ -21,6 +22,7 @@ export const Direction = {
  * @param onDelete {function()}             Callback when Delete button is clicked.
  * @param isDataValid {function():boolean}  Callback to check if current data is valid (controls Revert enabling)
  * @param [extraButtons] {JSX.Element}      Extra buttons for the bottom right of the panel.
+ * @param [menuItems] {[]}                  Array of menu items.
  * @param [hideButtons] {boolean}           Hide the built-in panel buttons for Update and Revert
  * @param [hideCloseBox] {boolean}          Hide the close box
  * @param children {[JSX.Element]}          Child elements, i.e. Rows and Cols and form controls.
@@ -37,6 +39,7 @@ export default function EditorPanel(
     children,
     buttonRef,
     extraButtons,
+    menuItems,
     hideButtons = false,
     hideCloseBox = false,
     direction = Direction.DOWN,
@@ -67,23 +70,19 @@ export default function EditorPanel(
         }}
         className={`Editor EditorPanel Body ${expanded ? 'expanded' : 'collapsed'}`}
       >
-        {!hideCloseBox && (
+        {!hideCloseBox &&
           <BsXLg
-            style={{
-              position: 'absolute',
-              top: '10px',
-              right: '10px',
-              fontSize: '14pt',
-              cursor: 'pointer',
-            }}
+            className={'EditorPanelCloseBox'}
             onClick={() => {
               setExpanded(false)
             }}
           />
-        )}
+        }
+        <EditorPanelMenu menuItems={menuItems}
+        />
         {children}
-        {!hideButtons && (
-          <Row className={'mt-4'}>
+        {!hideButtons && (onUpdate || onDelete)&& (
+          <Row className={'EditorPanelButtons mt-4'}>
             <Col xs={'auto'} className={'pe-0'}>
               {onUpdate && isDataValid && (
                 <Button

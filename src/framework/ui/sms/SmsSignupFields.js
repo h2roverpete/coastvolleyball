@@ -6,33 +6,34 @@ import {useSiteContext} from "../content/Site";
 import './SmsSignupFields.css';
 import {isValidEmail} from "../../util/Validators";
 
-const PhoneNumberField = lazy(()=>import("../forms/PhoneNumberField")) ;
-const EmailField  = lazy(()=>import("../forms/EmailField")) ;
+const PhoneNumberField = lazy(() => import("../forms/PhoneNumberField"));
+const EmailField = lazy(() => import("../forms/EmailField"));
 
 /**
- * Display message that the user doesn't have permission to view the content.
+ * Fields for SMS campaign signup.
  *
  * @returns {JSX.Element}
  * @constructor
  */
-export default function SmsSignupFields({smsCampaignId}) {
-
-  /** @type {[SMSCampaignData,React.Dispatch<React.SetStateAction<SMSCampaignData>>]} */
-  const [smsCampaignConfig, setSmsCampaignConfig] = useState();
+export default function SmsSignupFields({campaign, smsCampaignId}) {
 
   const {SMS} = useRestApi();
-  const [submitted, setSubmitted] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const {showErrorAlert} = useSiteContext();
   const formData = useFormData();
 
+  const [smsCampaignConfig, setSmsCampaignConfig] = useState(null);
+  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
   useEffect(() => {
-    if (!smsCampaignConfig) {
+    if (campaign) {
+      setSmsCampaignConfig(campaign);
+    } else if (smsCampaignId) {
       SMS.getSmsCampaign(smsCampaignId).then((response) => {
         setSmsCampaignConfig(response);
       }).catch((error) => showErrorAlert(error));
     }
-  })
+  }, [smsCampaignConfig, smsCampaignId, SMS, campaign, showErrorAlert]);
 
   useEffect(() => {
     // set up default notification method
@@ -60,7 +61,7 @@ export default function SmsSignupFields({smsCampaignId}) {
   function handleSubmit() {
     setSubmitting(true);
     const data = {
-      SMSCampaignID: parseInt(smsCampaignId),
+      SMSCampaignID: parseInt(smsCampaignConfig.SMSCampaignID),
       SubscriberName: formData.edits.SubscriberName,
     }
     if (formData.edits.NotificationMethod !== 'email') {
@@ -205,11 +206,15 @@ export default function SmsSignupFields({smsCampaignId}) {
                     role={'button'}
                     name={`AcceptTermsAndConditions`}
                     checked={formData.edits?.AcceptTermsAndConditions || 0}
-                    onChange={(e) => formData.onDataChanged({name: 'AcceptTermsAndConditions', value: e.target.checked})}
+                    onChange={(e) => formData.onDataChanged({
+                      name: 'AcceptTermsAndConditions',
+                      value: e.target.checked
+                    })}
                   />
                 </Col>
                 <Col>
-                  <div className="SectionText" dangerouslySetInnerHTML={{__html: smsCampaignConfig?.CampaignTermsAndConditions}}/>
+                  <div className="SectionText"
+                       dangerouslySetInnerHTML={{__html: smsCampaignConfig?.CampaignTermsAndConditions}}/>
                 </Col>
               </Row>
             }

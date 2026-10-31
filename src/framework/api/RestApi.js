@@ -482,7 +482,7 @@ export default function RestApi(props) {
     });
   }, []);
 
-  const getSiteUsers = useCallback(async () => {
+  const getSiteUsers = useCallback(async (siteId) => {
     return await adminApiCall(() => {
       return async () => {
         const response = await axios.get(`${host}/api/v1/content/sites/${siteId}/users`);

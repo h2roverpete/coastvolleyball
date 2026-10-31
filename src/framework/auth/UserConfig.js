@@ -149,7 +149,7 @@ export default function UserConfig({className, style, userData, onCancel, onUpda
             size={'sm'}
             id={'SiteID'}
             value={formData.edits?.SiteID || ''}
-            onChange={(e) => formData.onDataChanged({name: 'SiteID', value: e.target.value})}
+            onChange={(e) => formData.onDataChanged({name: 'SiteID', value: parseInt(e.target.value)})}
           >
             <option value={''}>(select)</option>
             <option value={0}>All Sites</option>

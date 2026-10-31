@@ -46,7 +46,7 @@ export default function AuthProvider(props) {
       console.debug(`User not logged in.`);
       return false;
     }
-  }, [user, siteId, checkPermission]);
+  }, [user, siteId]);
 
   const setToken = useCallback((newToken) => {
     console.debug(`Set token: ${JSON.stringify(newToken)}`);

@@ -18,7 +18,7 @@ export default function UserModal({data, siteId, show, onHide, onAdd, onUpdate, 
   return <>
     <Modal show={show} onHide={onHide} className={'Editor'} size="lg">
       <ModalBody className="Editor">
-        <h5>User Info</h5>
+        <h5>{data?.UserID ? 'Edit User Properties' : <>Add a {siteId && 'Site'} User</>}</h5>
         <UserFields data={data} siteId={siteId} onAdd={onAdd} onUpdate={onUpdate} onDelete={onDelete} onCancel={onHide} />
       </ModalBody>
     </Modal>

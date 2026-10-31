@@ -5,10 +5,6 @@ import {
   Tooltip,
   OverlayTrigger,
   Button,
-  Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader
 } from "react-bootstrap";
 import {BsCopy} from "react-icons/bs";
 import {useEffect, useState} from "react";
@@ -19,21 +15,18 @@ import {useRestApi} from "../../../api/RestApi";
 import {useSiteContext} from "../../content/Site";
 import {useAuth} from "../../../auth/AuthProvider";
 import {Resource, Permission} from "../../../auth/Permissions";
-import {usePageContext} from "../../content/Page";
 
-export default function LivestreamPanel({data, livestreamId, extraData}) {
+export default function LivestreamPanel({data, livestreamId, menuItems}) {
 
-  const {Livestreams, Extras} = useRestApi();
+  const {Livestreams} = useRestApi();
   const {showErrorAlert} = useSiteContext();
   const {hasPermission} = useAuth();
-  const {removeExtraFromPage} = usePageContext();
 
   const [copyIngestUrlTooltip, setCopyIngestUrlTooltip] = useState('Copy URL to clipboard.');
   const [copyKeyTooltip, setCopyKeyTooltip] = useState('Copy key to clipboard.');
   const [livestreamData, setLivestreamData] = useState(data);
   const [canBroadcast, setCanBroadcast] = useState(false);
   const [canEdit, setCanEdit] = useState(false);
-  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
   useEffect(() => {
     if (!livestreamData && livestreamId && Livestreams) {
@@ -69,27 +62,14 @@ export default function LivestreamPanel({data, livestreamId, extraData}) {
     })
   }
 
-  function handleDelete() {
-    if (extraData) {
-      Extras.deleteExtra(extraData.ExtraID).then(() => {
-        removeExtraFromPage(extraData.ExtraID);
-      }).catch((error) => {
-        showErrorAlert(error);
-      });
-    }
-  }
-
-  const extraButtons = <>
-    <Button variant={'danger'} size={'sm'} onClick={() => setShowDeleteConfirmation(true)}>Remove from Page</Button>
-  </>;
-
   return <>
     {livestreamData && <>
       <IVSPlayer data={livestreamData}/>
       {canBroadcast &&
         <FormEditor>
-          <EditorPanel hideButtons={!canEdit} extraButtons={extraButtons}>
-            <Row className={'mt-2'}>
+          <EditorPanel hideButtons={!canEdit} menuItems={menuItems}>
+            <h5>{livestreamData.LivestreamName} Stream Settings</h5>
+            <Row className={'mt-3'}>
               <Form.Label column={'sm'} htmlFor={'IVSIngestEndpoint'}>Secure Ingest URL</Form.Label>
               <Col xs={8} className={'d-flex justify-content-start align-items-center'}>
                 <Form.Control
@@ -167,16 +147,6 @@ export default function LivestreamPanel({data, livestreamId, extraData}) {
           </EditorPanel>
         </FormEditor>
       }
-      <Modal show={showDeleteConfirmation} onHide={()=>setShowDeleteConfirmation(false)} className={'Editor'}>
-        <ModalBody>
-          <h4>Remove Livestream</h4>
-          Are you sure you want to remove the {livestreamData.LivestreamName} livestream from the page? The livestream itself will not be deleted.
-        <div className={'d-flex justify-content-end align-items-center gap-3'}>
-          <Button size={'sm'} variant="danger" onClick={handleDelete}>Remove</Button>
-          <Button size={'sm'} variant="secondary" onClick={()=>setShowDeleteConfirmation(false)}>Cancel</Button>
-        </div>
-        </ModalBody>
-      </Modal>
     </>}
   </>;
 }

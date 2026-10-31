@@ -11,6 +11,7 @@ import {usePageContext} from "../content/Page";
 import SmsSignup from "../sms/SmsSignup";
 import LivestreamPanel from "./livestream/LivestreamPanel";
 import "./Extras.css";
+import {useSiteContext} from "../content/Site";
 
 const ExtrasContext = createContext({});
 
@@ -26,7 +27,8 @@ export default function Extras({extras}) {
   // imports
   const {hasPermission} = useAuth();
   const {Extras} = useRestApi();
-  const {moveExtraUp, moveExtraDown} = usePageContext();
+  const {moveExtraUp, moveExtraDown, removeExtraFromPage} = usePageContext();
+  const {showErrorAlert} = useSiteContext();
 
   // states
   const [canEdit, setCanEdit] = useState(false);
@@ -40,10 +42,7 @@ export default function Extras({extras}) {
     Extras.moveUp(extraData.ExtraID)
       .then(() => {
         console.debug(`Extra ${extraData.ExtraID} moved up.`);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+      }).catch((err) => showErrorAlert(err));
     moveExtraUp(extraData);
   }
 
@@ -51,11 +50,15 @@ export default function Extras({extras}) {
     Extras.moveDown(extraData.ExtraID)
       .then(() => {
         console.debug(`Extra ${extraData.ExtraID} moved down.`);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+      }).catch((err) => showErrorAlert(err));
     moveExtraDown(extraData);
+  }
+
+  function handleDelete(extraData) {
+    Extras.deleteExtra(extraData.ExtraID)
+      .then(() => {
+        removeExtraFromPage(extraData.ExtraID);
+      }).catch((err) => showErrorAlert(err));
   }
 
   return (<ExtrasContext value={{
@@ -66,15 +69,21 @@ export default function Extras({extras}) {
       <div className="ExtrasRow m-0 justify-content-start align-items-start d-flex flex-column w-100">
         {extras?.map((extra) => (<React.Fragment key={extra.ExtraID + '_' + extra.Modified}>
             {extra.ExtraType === 'guestbook' && (
-              <GuestBook guestBookId={extra.GuestBookID} extraData={extra} sectionExtras={extras}
-                         extraId={extra.ExtraID}/>
+              <GuestBook
+                guestBookId={extra.GuestBookID}
+                extraData={extra}
+                sectionExtras={extras}
+                extraId={extra.ExtraID}
+              />
             )}
             {extra.ExtraType === 'gallery' && (
               <Gallery galleryId={extra.GalleryID} extraData={extra} sectionExtras={extras} extraId={extra.ExtraID}/>
             )}
             {extra.ExtraType === 'sms' && (
-              <SmsSignup smsCampaignId={extra.SMSCampaignID} extraData={extra} sectionExtras={extras}
-                         extraId={extra.ExtraID}/>
+              <SmsSignup
+                smsCampaignId={extra.SMSCampaignID}
+                menuItems={[{label: `Remove from Page`, action: () => handleDelete(extra)}]}
+              />
             )}
             {extra.ExtraType === 'instagram' && (
               <InstagramExtra extraData={extra} sectionExtras={extras} canEdit={canEdit}/>
@@ -86,7 +95,10 @@ export default function Extras({extras}) {
               <YouTubeExtra extraData={extra} sectionExtras={extras} canEdit={canEdit}/>
             )}
             {extra.ExtraType === 'livestream' && (
-              <LivestreamPanel livestreamId={extra.LivestreamID} extraData={extra}/>
+              <LivestreamPanel
+                livestreamId={extra.LivestreamID}
+                menuItems={[{label: `Remove from Page`, action: () => handleDelete(extra)}]}
+              />
             )}
           </React.Fragment>)
         )

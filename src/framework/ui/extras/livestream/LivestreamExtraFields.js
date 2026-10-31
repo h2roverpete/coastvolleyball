@@ -18,9 +18,9 @@ export default function LivestreamExtraFields() {
       Livestreams.getLivestreams().then((result) => {
         const siteLivestreams = [];
         for (const livestream of result) {
-          // if (!livestream.SiteID || livestream.SiteID === siteData.SiteID) {
+          if (!livestream.SiteID || livestream.SiteID === siteData.SiteID) {
             siteLivestreams.push(livestream);
-          // }
+          }
         }
         console.debug(`List of ${siteLivestreams.length} livestreams loaded.`);
         setLivestreamList(siteLivestreams);

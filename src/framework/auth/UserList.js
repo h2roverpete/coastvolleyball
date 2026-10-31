@@ -57,9 +57,9 @@ export default function UserList({siteId}) {
         }).catch(e => {
           showErrorAlert(`Error getting users.`, e);
         })
-      };
+      }
     }
-  }, [Users, listItems, setListItems, sortFunction, canEdit, showErrorAlert]);
+  }, [Users, listItems, setListItems, sortFunction, canEdit, showErrorAlert, siteId]);
 
   useEffect(() => {
     if (listItems) {
@@ -136,18 +136,40 @@ export default function UserList({siteId}) {
                 onClick={() => onSortBy('UserID')}
                 role={'button'}
               >
-                ID
+                User ID
                 {sortKey === 'UserID' && (<span className={'ms-2'}>
             {sortAscending ? <BsSortDown/> : <BsSortUp/>}
           </span>)}
               </th>
+              {!siteId &&
+                <th
+                  className={'text-nowrap'}
+                  onClick={() => onSortBy('SiteID')}
+                  role={'button'}
+                >
+                  Site ID
+                  {sortKey === 'SiteID' && (<span className={'ms-2'}>
+            {sortAscending ? <BsSortDown/> : <BsSortUp/>}
+          </span>)}
+                </th>
+              }
               <th
                 className={'text-nowrap'}
                 onClick={() => onSortBy('UserName')}
                 role={'button'}
               >
-                Name
+                User Name
                 {sortKey === 'UserName' && (<span className={'ms-2'}>
+            {sortAscending ? <BsSortDown/> : <BsSortUp/>}
+          </span>)}
+              </th>
+              <th
+                className={'text-nowrap'}
+                onClick={() => onSortBy('UserEmail')}
+                role={'button'}
+              >
+                Email
+                {sortKey === 'UserEmail' && (<span className={'ms-2'}>
             {sortAscending ? <BsSortDown/> : <BsSortUp/>}
           </span>)}
               </th>
@@ -164,6 +186,11 @@ export default function UserList({siteId}) {
                 <td>
                   {item.UserID}
                 </td>
+                {!siteId &&
+                  <td>
+                    {item.SiteID}
+                  </td>
+                }
                 <td className={'d-flex align-items-center position-relative'}>
                   <OverlayTrigger
                     delay={{show: 1000, hide: 500}}
@@ -179,6 +206,9 @@ export default function UserList({siteId}) {
                     />
                   </OverlayTrigger>
                   {item.UserName}
+                </td>
+                <td>
+                  {item.UserEmail}
                 </td>
               </tr>
             ))}

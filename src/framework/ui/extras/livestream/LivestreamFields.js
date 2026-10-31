@@ -120,7 +120,7 @@ export default function LivestreamFields({data, onAdd, onUpdate, onDelete, onCan
           size={'sm'}
           name={'SiteID'}
           value={formData.edits?.SiteID || 0}
-          onChange={(e) => formData.onDataChanged({name: 'SiteID', value: e.target.value})}
+          onChange={(e) => formData.onDataChanged({name: 'SiteID', value: parseInt(e.target.value)})}
         >
           <option value={0}>(select a site)</option>
           {sites?.map((site) =>

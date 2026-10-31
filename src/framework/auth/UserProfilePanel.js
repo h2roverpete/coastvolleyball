@@ -2,10 +2,7 @@ import {useAuth} from "./AuthProvider";
 import RestrictedContent from "./RestrictedContent";
 import FormEditor from "../ui/editor/FormEditor";
 import UserFields from "./UserFields";
-import EditorButtons from "../ui/editor/EditorButtons";
 import {useRestApi} from "../api/RestApi";
-import {useSiteContext} from "../ui/content/Site";
-import {isValidEmail, isValidPassword} from "../util/Validators"
 import {Container} from "react-bootstrap";
 import {useEffect, useState} from "react";
 
@@ -28,7 +25,7 @@ export default function UserProfilePanel() {
         setUser(result);
       });
     }
-  }, [currentUser, Users])
+  }, [user, currentUser, Users])
 
   return (<>
     {isAuthenticated ? <>

@@ -286,6 +286,8 @@ import axios from "axios";
  * @property {String} [ExtraFile]       S3 path to file attached to the Extra
  * @property {String} [GalleryID]       Gallery ID when ExtraType == 'gallery'
  * @property {String} [GuestBookID]     Guest book ID when ExtraType == 'guestbook'
+ * @property {String} [SMSCampaignID]    SMS campaign ID when ExtraType == 'sms'
+ * @property {String} [LivestreamID]     Livestream ID when ExtraType == 'livestream'
  * @property {String} [YouTubeVideoURL] Video URL when ExtraType == 'youtube'
  * @property {String} [AspectRatio]     Aspect ratio for display, i.e. 4 / 3 or  16 / 9.
  * @property {number} [DisplayWidth]    Display width in columns when ExtraDisplay is 'embed'
