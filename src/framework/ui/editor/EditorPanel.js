@@ -1,7 +1,7 @@
 import {Button, Col, Collapse, Row} from "react-bootstrap";
 import {useState} from "react";
 import {useFormData} from "./FormEditor";
-import {BsChevronCompactDown, BsChevronCompactUp, BsThreeDotsVertical, BsXLg} from "react-icons/bs";
+import {BsChevronCompactDown, BsChevronCompactUp, BsXLg} from "react-icons/bs";
 import {useTouchContext} from "../../util/TouchProvider";
 import EditorPanelMenu from "./EditorPanelMenu";
 

@@ -1,10 +1,11 @@
 import {useAuth} from "./AuthProvider";
-import RestrictedContent from "./RestrictedContent";
 import FormEditor from "../ui/editor/FormEditor";
-import UserFields from "./UserFields";
 import {useRestApi} from "../api/RestApi";
 import {Container} from "react-bootstrap";
-import {useEffect, useState} from "react";
+import {lazy, Suspense, useEffect, useState} from "react";
+
+const UserFields = lazy(() => import("./UserFields"));
+const RestrictedContent = lazy(() => import("./RestrictedContent"));
 
 /**
  * Display message that the user doesn't have permission to view the content.
@@ -28,7 +29,7 @@ export default function UserProfilePanel() {
   }, [user, currentUser, Users])
 
   return (<>
-    {isAuthenticated ? <>
+    {isAuthenticated ? <Suspense>
       {user &&
         <Container className="PageSection">
           <FormEditor>
@@ -36,6 +37,6 @@ export default function UserProfilePanel() {
           </FormEditor>
         </Container>
       }
-    </> : <RestrictedContent/>}
+    </Suspense> : <RestrictedContent/>}
   </>);
 }

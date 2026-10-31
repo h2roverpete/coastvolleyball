@@ -3,20 +3,20 @@ import ReactGA from 'react-ga4';
 import 'bootstrap/dist/js/bootstrap.bundle.js';
 import {Route, Routes, useLocation} from "react-router";
 import {useRestApi} from "../../api/RestApi";
-import Logout from '../../auth/Logout';
 import {Alert, Spinner} from "react-bootstrap";
 import Head from "./Head";
 import {useAuth} from "../../auth/AuthProvider";
 import {Permission, Resource} from "../../auth/Permissions";
-import Login from "../../auth/Login";
-import Error404 from "../../util/Error404";
-import SiteUsersPage from "../../auth/SiteUsers";
-import UserProfilePanel from "../../auth/UserProfilePanel";
 import {Outline} from "framework/util/OutlineUtil"
-import SmsAdminPage from "../sms/SmsAdminPage";
 import './Site.css';
 
 const SiteEditor = lazy(() => import("../editor/SiteEditor"));
+const UserProfilePanel = lazy(() => import("../../auth/UserProfilePanel"));
+const SiteUsersPage = lazy(() => import("../../auth/SiteUsers"));
+const Login = lazy(() => import("../../auth/Login"));
+const Logout = lazy(() => import("../../auth/Logout"));
+const Error404 = lazy(() => import("../../util/Error404"));
+const SmsAdminPage = lazy(() => import("../sms/SmsAdminPage"));
 
 /**
  * @typedef ErrorData
@@ -69,12 +69,12 @@ export default function Site(props) {
   const [canEdit, setCanEdit] = useState(false);
   const [canBrowseProtected, setCanBrowseProtected] = useState(false);
   const [metaPages] = useState([
-    {name: 'user', id: -1, title: 'User Profile', path: '/admin/user', content: <UserProfilePanel/>},
-    {name: 'users', id: -2, title: 'Site Users', path: '/admin/users', content: <SiteUsersPage/>},
-    {name: 'sms', id: -3, title: 'SMS Campaign Administration', path: '/admin/sms', content: <SmsAdminPage/>},
-    {name: 'login', id: -4, title: 'Log In', path: '/login', content: <Login/>},
-    {name: 'logout', id: -5, title: 'Log Out', path: '/logout', content: <Logout/>},
-    {name: 'error', id: -6, title: 'Error 404 - Not Found', path: '*', content: <Error404/>},
+    {name: 'user', id: -1, title: 'User Profile', path: '/admin/user', content: <Suspense><UserProfilePanel/></Suspense>},
+    {name: 'users', id: -2, title: 'Site Users', path: '/admin/users', content: <Suspense><SiteUsersPage/></Suspense>},
+    {name: 'sms', id: -3, title: 'SMS Campaign Administration', path: '/admin/sms', content: <Suspense><SmsAdminPage/></Suspense>},
+    {name: 'login', id: -4, title: 'Log In', path: '/login', content: <Suspense><Login/></Suspense>},
+    {name: 'logout', id: -5, title: 'Log Out', path: '/logout', content: <Suspense><Logout/></Suspense>},
+    {name: 'error', id: -6, title: 'Error 404 - Not Found', path: '*', content: <Suspense><Error404/></Suspense>},
   ]);
   const [redirect, setRedirect] = useState(0);
 

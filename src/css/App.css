@@ -14,15 +14,6 @@ img.NavBarBrandIcon {
   width: 60px !important;
 }
 
-div.Livestream {
-  aspect-ratio: 16 / 9;
-  width:100%;
-  background-color:#00000044;
-  display:flex;
-  align-items: center;
-  justify-content: center;
-}
-
 /* Navbar icon */
 .NavBarBrandIcon {
   width: 40px !important;
@@ -31,6 +22,7 @@ div.Livestream {
 
 ol.breadcrumb {
   border-color: var(--bs-border-color);
+  font-size: var(--bs-body-font-size) !important;
 }
 
 /* bootstrap sm width */

@@ -1,19 +1,19 @@
-import GuestBook from "../guestbook/GuestBook";
-import Gallery from "../gallery/Gallery";
-import React, {createContext, useContext, useEffect, useState} from "react";
-import FileExtra from "./file/FileExtra";
-import YouTubeExtra from "./youtube/YouTubeExtra";
-import InstagramExtra from "./instagram/InstagramExtra";
+import React, {createContext, lazy, Suspense, useContext, useEffect, useState} from "react";
 import {useAuth} from "../../auth/AuthProvider";
 import {Permission, Resource} from "../../auth/Permissions";
 import {useRestApi} from "../../api/RestApi";
 import {usePageContext} from "../content/Page";
-import SmsSignup from "../sms/SmsSignup";
-import LivestreamPanel from "./livestream/LivestreamPanel";
 import "./Extras.css";
 import {useSiteContext} from "../content/Site";
 
 const ExtrasContext = createContext({});
+const SmsSignup = lazy(() => import("../sms/SmsSignup"));
+const Gallery = lazy(() => import("../gallery/Gallery"));
+const LivestreamPanel = lazy(() => import("./livestream/LivestreamPanel"));
+const FileExtra = lazy(() => import("./file/FileExtra"));
+const YouTubeExtra = lazy(() => import("./youtube/YouTubeExtra"));
+const InstagramExtra = lazy(() => import("./instagram/InstagramExtra"));
+const GuestBook = lazy(() => import("../guestbook/GuestBook"));
 
 /**
  * Display any extras.
@@ -68,38 +68,38 @@ export default function Extras({extras}) {
     <div className="Extras">
       <div className="ExtrasRow m-0 justify-content-start align-items-start d-flex flex-column w-100">
         {extras?.map((extra) => (<React.Fragment key={extra.ExtraID + '_' + extra.Modified}>
-            {extra.ExtraType === 'guestbook' && (
+            {extra.ExtraType === 'guestbook' && <Suspense>
               <GuestBook
                 guestBookId={extra.GuestBookID}
                 extraData={extra}
                 sectionExtras={extras}
                 extraId={extra.ExtraID}
               />
-            )}
-            {extra.ExtraType === 'gallery' && (
+            </Suspense>}
+            {extra.ExtraType === 'gallery' && <Suspense>
               <Gallery galleryId={extra.GalleryID} extraData={extra} sectionExtras={extras} extraId={extra.ExtraID}/>
-            )}
-            {extra.ExtraType === 'sms' && (
+            </Suspense>}
+            {extra.ExtraType === 'sms' && <Suspense>
               <SmsSignup
                 smsCampaignId={extra.SMSCampaignID}
                 menuItems={[{label: `Remove from Page`, action: () => handleDelete(extra)}]}
               />
-            )}
-            {extra.ExtraType === 'instagram' && (
+            </Suspense>}
+            {extra.ExtraType === 'instagram' && <Suspense>
               <InstagramExtra extraData={extra} sectionExtras={extras} canEdit={canEdit}/>
-            )}
-            {extra.ExtraType === 'file' && (
+            </Suspense>}
+            {extra.ExtraType === 'file' && <Suspense>
               <FileExtra extraData={extra} sectionExtras={extras} canEdit={canEdit}/>
-            )}
-            {extra.ExtraType === 'youtube' && (
+            </Suspense>}
+            {extra.ExtraType === 'youtube' && <Suspense>
               <YouTubeExtra extraData={extra} sectionExtras={extras} canEdit={canEdit}/>
-            )}
-            {extra.ExtraType === 'livestream' && (
+            </Suspense>}
+            {extra.ExtraType === 'livestream' && <Suspense>
               <LivestreamPanel
                 livestreamId={extra.LivestreamID}
                 menuItems={[{label: `Remove from Page`, action: () => handleDelete(extra)}]}
               />
-            )}
+            </Suspense>}
           </React.Fragment>)
         )
         }

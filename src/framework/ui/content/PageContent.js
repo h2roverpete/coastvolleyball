@@ -1,13 +1,14 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {lazy, Suspense, useEffect, useRef, useState} from "react";
 import {Permission, Resource} from "../../auth/Permissions";
 import {useAuth} from "../../auth/AuthProvider";
 import {usePageContext} from "./Page";
-import RestrictedContent from "../../auth/RestrictedContent";
 import './PageContent.css';
-import PagePassword from "./PagePassword";
 import {Button, Spinner} from "react-bootstrap";
 import {useRestApi} from "../../api/RestApi";
 import {useSiteContext} from "./Site";
+
+const RestrictedContent = lazy(() => import("../../auth/RestrictedContent"));
+const PagePassword = lazy(() => import("./PagePassword"));
 
 /**
  * Element to show page content
@@ -86,9 +87,9 @@ export default function PageContent({children}) {
         </div>
         :
         pageData?.RequiresPassword ?
-          <PagePassword onSuccess={() => setCanView(true)} pageData={pageData} apiRef={passwordApi}/>
+          <Suspense><PagePassword onSuccess={() => setCanView(true)} pageData={pageData} apiRef={passwordApi}/></Suspense>
           : pageData?.RequiresLogin &&
-          <RestrictedContent/>
+          <Suspense><RestrictedContent/></Suspense>
       }
     </>}
   </>);

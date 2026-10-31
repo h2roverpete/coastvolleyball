@@ -1,14 +1,16 @@
-import EditableField from "../editor/EditableField";
-import {useCallback, useEffect, useMemo, useRef, useState} from "react";
+import {lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {useRestApi} from "../../api/RestApi";
 import {usePageContext} from "./Page";
 import PageSectionImage from "./PageSectionImage";
-import {DropState, FileDropTarget} from "../editor/FileDropTarget";
 import Extras from "../extras/Extras";
 import {useSiteContext} from "./Site";
 import {useTouchContext} from "../../util/TouchProvider";
-import EditSectionMenu from "../editor/EditSectionMenu";
 import './PageSection.css';
+
+const EditSectionMenu = lazy(() => import("../editor/EditSectionMenu"));
+const EditableField = lazy(() => import("../editor/EditableField"));
+const DropState = lazy(() => import("../editor/FileDropTarget").DropState);
+const FileDropTarget = lazy(() => import("../editor/FileDropTarget"));
 
 /**
  * Display a page section.
@@ -158,7 +160,7 @@ export default function PageSection({pageSectionData, canEdit = false}) {
     );
   } else {
     // editable version of page section
-    return (<>
+    return (<Suspense>
       <div
         className={`PageSection`}
         onMouseOver={() => {
@@ -238,6 +240,6 @@ export default function PageSection({pageSectionData, canEdit = false}) {
         />
       </div>
       <Extras extras={pageSectionData.Extras}/>
-    </>);
+    </Suspense>);
   }
 }

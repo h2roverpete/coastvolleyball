@@ -1,10 +1,11 @@
 import {useLocation} from "react-router";
-import {useEffect, useState} from "react";
-import SmsCampaignPanel from "./SmsCampaignPanel";
+import {lazy, Suspense, useEffect, useState} from "react";
 import {useRestApi} from "../../api/RestApi";
 import {useSiteContext} from "../content/Site";
 import {Resource, Permission} from "../../auth/Permissions";
 import {useAuth} from "../../auth/AuthProvider";
+
+const SmsCampaignPanel = lazy(() => import("./SmsCampaignPanel"));
 
 export default function SmsAdminPage() {
 
@@ -40,7 +41,7 @@ export default function SmsAdminPage() {
 
   return <>{canView ? <>
       <div className="SmsAdmin">
-        <SmsCampaignPanel campaignData={campaign}/>
+        <Suspense><SmsCampaignPanel campaignData={campaign}/></Suspense>
       </div>
     </>
     :

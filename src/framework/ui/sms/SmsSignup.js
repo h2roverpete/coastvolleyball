@@ -25,7 +25,8 @@ export default function SmsSignup({smsCampaignId, menuItems}) {
 
   useEffect(() => {
     setCanEdit(hasPermission(Resource.SMS, Permission.ADMIN));
-  }, []);
+  }, [hasPermission]);
+
   useEffect(() => {
     if (!campaignData) {
       if (smsCampaignId) {
