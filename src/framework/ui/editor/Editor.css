@@ -66,7 +66,7 @@
 /* Optional dropdown menu in editor top area */
 div.EditorPanelMenu {
   position: absolute;
-  top:17px;
+  top:19px;
   right:40px;
   cursor:pointer;
   font-size: 14pt;
@@ -75,7 +75,7 @@ div.EditorPanelMenu {
 /* Close box for editor panels */
 .EditorPanelCloseBox {
   position: absolute;
-  top:18px;
+  top:20px;
   right:12px;
   cursor:pointer;
   font-size: 14pt;
@@ -250,6 +250,7 @@ div.SiteEditor {
 /* no margin for site editor */
 .SiteConfigPanel .EditorPanel {
   margin: 0;
+  max-width: 200px;
 }
 
 /* no margin for page editor */
@@ -281,6 +282,8 @@ div.SiteEditor {
   padding: 20px 10px 10px 15px;
   border: none;
   border-top: 1px solid var(--bs-border-color);
+  border-right: 1px solid var(--bs-border-color);
+  max-width: 200px;
 }
 
 /* Page editor toggle arrow collapsed */

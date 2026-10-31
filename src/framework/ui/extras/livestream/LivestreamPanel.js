@@ -138,11 +138,12 @@ export default function LivestreamPanel({data, livestreamId, menuItems}) {
             </Row>
             <Row className={'mt-2'}>
               <Col></Col>
-              <Col xs={9}>
+              <Col xs={8}>
                 <Button size={'sm'} onClick={downloadConfigFile}>
                   Download Blackmagic Configuration
                 </Button>
               </Col>
+              <Col xs={1}></Col>
             </Row>
           </EditorPanel>
         </FormEditor>

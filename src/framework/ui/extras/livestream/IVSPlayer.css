@@ -32,5 +32,5 @@ div.IVSPlayerMessage {
   padding: 10%;
   text-align: center;
   aspect-ratio: 16/9;
-  font-size: var(--bs-body-font-size);
+  font-size: clamp(var(--bs-body-font-size), var(--bs-body-font-size) + 0.3dvw, 20pt);
 }
