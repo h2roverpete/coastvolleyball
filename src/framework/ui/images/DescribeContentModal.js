@@ -1,4 +1,4 @@
-import {Button, Col, Modal, ModalBody, ModalFooter, ModalHeader, Row, Form, Spinner} from "react-bootstrap";
+import {Button, Col, Modal, ModalBody, Row, Form, Spinner} from "react-bootstrap";
 import {useCallback, useEffect, useState} from "react";
 import {useFormData} from "../editor/FormEditor";
 import {useSiteContext} from "../content/Site";

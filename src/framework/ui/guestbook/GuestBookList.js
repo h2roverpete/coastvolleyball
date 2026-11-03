@@ -58,7 +58,7 @@ export default function GuestBookList({siteId}) {
         })
       }
     }
-  }, [GuestBooks, listItems, setListItems, sortFunction, canEdit, showErrorAlert]);
+  }, [GuestBooks, siteId, listItems, setListItems, sortFunction, canEdit, showErrorAlert]);
 
   useEffect(() => {
     if (listItems) {

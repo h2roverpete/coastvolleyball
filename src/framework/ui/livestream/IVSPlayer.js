@@ -32,7 +32,7 @@ export default function IVSPlayer({data}) {
     getStreamInfo();
     const intervalId = setInterval(getStreamInfo, 10000);
     return () => clearInterval(intervalId);
-  }, [data, Livestreams, setStreamInfo]);
+  }, [data, Livestreams, setStreamInfo, showErrorAlert]);
 
   return <>
     {data && <>

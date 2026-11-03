@@ -31,11 +31,11 @@ export default function PageContent({children}) {
 
   useEffect(() => {
     if (!canView && pageData && hasPermission) {
-      if (pageData.RequiresPassword && passwordApi.current) {
+      if (pageData.RequiresPassword) {
         // check if user is logged in with admin permission
         if (hasPermission(Resource.PAGE, Permission.BROWSE_PROTECTED)) {
           setCanView(true);
-        } else {
+        } else if (passwordApi.current) {
           // not admin, check page password
           passwordApi.current.canView().then((result) => {
             setCanView(result);

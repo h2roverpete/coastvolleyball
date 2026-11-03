@@ -32,7 +32,7 @@ export default function PageFields({data, pageId, siteId, onUpdate, onDelete, on
       // default values
       formData.update({SiteID: siteId});
     }
-  }, [pageId, data, showErrorAlert, Pages]);
+  }, [pageId, siteId, data, showErrorAlert, Pages]);
 
   useEffect(() => {
     if (outlineData && formData.edits.PageID) {
@@ -44,7 +44,7 @@ export default function PageFields({data, pageId, siteId, onUpdate, onDelete, on
       }
       setRoutes(routeList);
     }
-  }, [outlineData]);
+  }, [outlineData, formData.edits.PageID]);
 
   function isDataValid() {
     return isValidRoute(formData.edits?.PageRoute)

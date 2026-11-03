@@ -26,7 +26,7 @@ export default function GalleryPanel({galleryId, galleryData, onUpdate, onDelete
 
   // imports
   const {Galleries, Sites} = useRestApi();
-  const {siteData, showErrorAlert} = useSiteContext();
+  const {showErrorAlert} = useSiteContext();
   const {supportsHover} = useTouchContext();
   const {hasPermission} = useAuth();
 
@@ -44,7 +44,6 @@ export default function GalleryPanel({galleryId, galleryData, onUpdate, onDelete
   // refs
   const fileDropRef = useRef(null);
   const buttonRef = useRef(null);
-  const expandButtonRef = useRef(null);
 
   useEffect(() => {
     setCanEdit(hasPermission?.(Resource.GALLERY, Permission.EDIT));
@@ -69,7 +68,7 @@ export default function GalleryPanel({galleryId, galleryData, onUpdate, onDelete
         showErrorAlert(`Error loading gallery ${galleryId}: ${error}`);
       })
     }
-  }, [galleryId, galleryData, setGalleryConfig, showErrorAlert, Galleries]);
+  }, [galleryId, Sites, galleryData, setGalleryConfig, showErrorAlert, Galleries]);
 
   useEffect(() => {
     if (galleryConfig && !galleryPhotos) {
@@ -86,7 +85,7 @@ export default function GalleryPanel({galleryId, galleryData, onUpdate, onDelete
         showErrorAlert(`Error loading photos for gallery ${galleryId}: ${error}`);
       })
     }
-  }, [galleryConfig, showErrorAlert, Galleries, galleryPhotos]);
+  }, [galleryConfig, galleryId, showErrorAlert, Galleries, galleryPhotos]);
 
   function updateCurrentPhoto(data) {
     setGalleryPhotos(
@@ -325,7 +324,7 @@ export default function GalleryPanel({galleryId, galleryData, onUpdate, onDelete
         </div>
       </>)}
     </div>
-    {canEdit && <><EditorPanel menuItems={menuItems}>
+    {canAdmin && <><EditorPanel menuItems={menuItems}>
       <h5>Photo Gallery Settings</h5>
       <FormEditor>
         <GalleryFields

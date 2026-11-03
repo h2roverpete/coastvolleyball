@@ -41,7 +41,7 @@ export default function GalleryFields({data, galleryId, siteId, onCancel, onUpda
       // default values
       formData.update({SiteID:siteId});
     }
-  }, [galleryId, data, showErrorAlert, Galleries]);
+  }, [galleryId, siteId, data, showErrorAlert, Galleries]);
 
   useEffect(() => {
     if (!siteList) {

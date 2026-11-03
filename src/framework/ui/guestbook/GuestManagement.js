@@ -12,7 +12,6 @@ import {
   Spinner
 } from "react-bootstrap";
 import {useCallback, useEffect, useState} from "react";
-import {usePageContext} from "../content/Page";
 import {Permission, Resource} from "../../auth/Permissions";
 import {useAuth} from "../../auth/AuthProvider";
 import {useRestApi} from "../../api/RestApi";

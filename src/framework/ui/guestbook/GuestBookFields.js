@@ -37,7 +37,7 @@ export default function GuestBookFields({data, guestBookId, siteId, onUpdate, on
         formData.setData(data);
       }).catch((err) => showErrorAlert(`Error loading guest book.`,err));
     }
-  }, [data, formData]);
+  }, [data, GuestBooks, guestBookId, showErrorAlert, formData]);
 
   useEffect(() => {
     if (!siteList) {

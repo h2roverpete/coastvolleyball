@@ -1,9 +1,8 @@
-import {useEffect, useState, memo, useContext, createContext, useRef, Suspense, lazy} from "react";
+import {useEffect, useState, memo, Suspense, lazy} from "react";
 import '../forms/Forms.css'
 import {useRestApi} from "../../api/RestApi";
 import {Button} from "react-bootstrap";
 import {isValidEmail} from "../../util/Validators";
-import {useTouchContext} from "../../util/TouchProvider";
 import {useAuth} from "../../auth/AuthProvider";
 import {Permission, Resource} from "../../auth/Permissions";
 import {useSiteContext} from "../content/Site";
@@ -13,7 +12,6 @@ const GuestFields = lazy(()=>import("./GuestFields"));
 const GuestFeedbackFields = lazy(()=>import("./GuestFeedbackFields"));
 const GuestBookConfigPanel = lazy(() => import("./GuestBookConfigPanel"));
 const FormEditor = lazy(() => import("../editor/FormEditor"));
-const MoveExtraMenu = lazy(() => import("../extras/MoveExtraMenu"));
 
 /**
  * @callback DataChange
@@ -45,9 +43,6 @@ function GuestBook({guestBookId, menuItems}) {
   const [guestBookConfig, setGuestBookConfig] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [canEdit, setCanEdit] = useState(false);
-
-  // refs
-  const menuRef = useRef(null);
 
   useEffect(() => {
     setCanEdit(hasPermission?.(Resource.GUESTBOOK, Permission.ADMIN));

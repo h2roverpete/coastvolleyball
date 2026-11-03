@@ -58,7 +58,7 @@ export default function GalleryList({siteId}) {
         })
       }
     }
-  }, [Galleries, listItems, setListItems, sortFunction, canEdit, showErrorAlert]);
+  }, [Galleries, listItems, siteId, setListItems, sortFunction, canEdit, showErrorAlert]);
 
   useEffect(() => {
     if (listItems) {

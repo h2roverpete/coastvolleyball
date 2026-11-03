@@ -26,7 +26,7 @@ export default function LivestreamFields({data, livestreamId, siteId, onUpdate, 
     if (siteId && !formData.edits.SiteID) {
       formData.update({SiteID: siteId});
     }
-  }, [data, formData]);
+  }, [data, siteId, formData]);
 
   useEffect(() => {
     if (!sites) {

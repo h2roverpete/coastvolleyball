@@ -59,7 +59,7 @@ export default function LivestreamList({siteId}) {
         })
       }
     }
-  }, [Livestreams, listItems, setListItems, sortFunction, canEdit, showErrorAlert]);
+  }, [Livestreams, siteId, listItems, setListItems, sortFunction, canEdit, showErrorAlert]);
 
   useEffect(() => {
     if (listItems) {
@@ -76,11 +76,6 @@ export default function LivestreamList({siteId}) {
       console.debug(`Sort ascending ${!sortAscending}`);
       setSortAscending(!sortAscending);
     }
-  }
-
-  function handleAdd(campaign) {
-    setEdit(null);
-    setListItems([...listItems, campaign]);
   }
 
   function handleUpdate(newData) {

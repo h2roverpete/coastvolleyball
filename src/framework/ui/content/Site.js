@@ -9,8 +9,6 @@ import {useAuth} from "../../auth/AuthProvider";
 import {Permission, Resource} from "../../auth/Permissions";
 import {Outline} from "framework/util/OutlineUtil"
 import './Site.css';
-import GalleryPanel from "../gallery/GalleryPanel";
-import GalleryList from "../gallery/GalleryList";
 
 const SiteEditor = lazy(() => import("../editor/SiteEditor"));
 const UserProfilePanel = lazy(() => import("../../auth/UserProfilePanel"));
@@ -21,6 +19,7 @@ const Error404 = lazy(() => import("../../util/Error404"));
 const SmsAdminPage = lazy(() => import("../sms/SmsAdminPage"));
 const LivestreamList = lazy(() => import("../livestream/LivestreamList"));
 const GuestBookList = lazy(() => import("../guestbook/GuestBookList"));
+const GalleryList = lazy(() => import("../gallery/GalleryList"));
 
 /**
  * @typedef ErrorData

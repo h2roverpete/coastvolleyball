@@ -32,7 +32,7 @@ export default function UserMenu({buttonRef, onClose}) {
         showErrorAlert(`Error getting messaging campaign list.`,err);
       })
     }
-  }, [siteData, campaigns, setCampaigns, hasPermission, hasSmsPermission, SMS]);
+  }, [siteData, campaigns, setCampaigns, hasPermission, hasSmsPermission, SMS, showErrorAlert]);
 
   useEffect(() => {
     if (siteData && hasGalleryPermission && !galleries) {
@@ -42,7 +42,7 @@ export default function UserMenu({buttonRef, onClose}) {
         showErrorAlert(`Error getting gallery list.`,err);
       })
     }
-  }, [siteData, galleries, setGalleries, hasGalleryPermission, Galleries]);
+  }, [siteData, galleries, setGalleries, hasGalleryPermission, Galleries, showErrorAlert]);
 
   useEffect(() => {
     if (siteData && hasLivestreamPermission && !livestreams) {
@@ -52,7 +52,7 @@ export default function UserMenu({buttonRef, onClose}) {
         showErrorAlert(`Error getting livestream list.`,err);
       })
     }
-  }, [siteData, livestreams, Livestreams, hasLivestreamPermission, setLivestreams]);
+  }, [siteData, livestreams, Livestreams, hasLivestreamPermission, setLivestreams, showErrorAlert]);
 
   useEffect(() => {
     if (siteData && hasGuestBookPermission && !guestBooks) {
@@ -62,7 +62,7 @@ export default function UserMenu({buttonRef, onClose}) {
         showErrorAlert(`Error getting guest book list.`,err);
       })
     }
-  }, [siteData, livestreams, Livestreams, hasLivestreamPermission, setLivestreams]);
+  }, [siteData, guestBooks, GuestBooks, hasGuestBookPermission, setGuestBooks, showErrorAlert]);
 
   useEffect(() => {
     setHasSmsPermission(hasPermission(Resource.SMS, Permission.SEND));
