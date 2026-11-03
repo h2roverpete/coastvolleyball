@@ -11,7 +11,7 @@ import InstagramExtraFields from "./instagram/InstagramExtraFields";
 import FileExtraFields from "./file/FileExtraFields";
 import {useAuth} from "../../auth/AuthProvider";
 import {Permission, Resource} from "../../auth/Permissions";
-import LivestreamExtraFields from "./livestream/LivestreamExtraFields";
+import LivestreamExtraFields from "../livestream/LivestreamExtraFields";
 
 /**
  * @callback Callback
@@ -99,10 +99,10 @@ export default function AddExtrasModal({show, onHide, onSubmit, pageSectionId}) 
             siteCampaigns.push(campaign);
           }
         }
-        console.debug(`List of ${siteCampaigns.length} SMS campaigns loaded.`);
+        console.debug(`List of ${siteCampaigns.length} campaigns loaded.`);
         setSmsCampaignsList(siteCampaigns);
       }).catch((err) => {
-        showErrorAlert(`Error getting SMS campaigns list.`, err);
+        showErrorAlert(`Error getting campaigns list.`, err);
       })
     }
   }, [canEdit, siteData, Galleries, showErrorAlert, SMS]);
@@ -217,7 +217,7 @@ export default function AddExtrasModal({show, onHide, onSubmit, pageSectionId}) 
             }).catch((err) => {
               showErrorAlert(`Error adding extra.`, err);
             });
-          }).catch((err) => showErrorAlert(`Error adding SMS CampaignID ${err}`));
+          }).catch((err) => showErrorAlert(`Error adding CampaignID ${err}`));
         } else {
           // create an Extra for an existing SMS campaign
           Extras.insertOrUpdateExtra({
@@ -336,8 +336,8 @@ export default function AddExtrasModal({show, onHide, onSubmit, pageSectionId}) 
 
   return (
     <Modal show={show}>
-      <Modal.Header><h5>Add an Extra</h5></Modal.Header>
       <Modal.Body>
+        <h5>Add an Extra</h5>
         <Row>
           <Form.Label
             className='required'
@@ -360,7 +360,7 @@ export default function AddExtrasModal({show, onHide, onSubmit, pageSectionId}) 
               <option value='instagram'>Instagram Gallery</option>
               <option value='youtube'>YouTube Video</option>
               <option value='file'>File</option>
-              <option value='sms'>SMS Campaign</option>
+              <option value='sms'>Messaging Campaign</option>
               <option value='livestream'>Livestream</option>
             </Form.Select>
           </Col>
@@ -619,25 +619,26 @@ export default function AddExtrasModal({show, onHide, onSubmit, pageSectionId}) 
         {formData.edits.ExtraType === 'file' && (
           <FileExtraFields/>
         )}
-      </Modal.Body>
-      <Modal.Footer>
-        <div
-          ref={uploadingRef}
-          className="d-flex align-items-center justify-content-start small flex-grow-1 d-none"
-        >
-          <Spinner animation="border" role="status" className='me-2'/> Uploading...<br/>
+        <div className="d-flex align-items-center justify-content-end gap-3 mt-3">
+          <div
+            ref={uploadingRef}
+            className="d-flex align-items-center justify-content-start small flex-grow-1 d-none"
+          >
+            <Spinner animation="border" role="status" className='me-2'/> Uploading...<br/>
+          </div>
+          <Button size="sm" variant="secondary" onClick={onCancel} ref={cancelRef}>Cancel</Button>
+          <Button
+            size="sm"
+            variant="primary"
+            disabled={!isDataValid()}
+            onClick={() => {
+              onAddExtra();
+            }}
+            ref={submitRef}
+          >Add Extra</Button>
         </div>
-        <Button size="sm" variant="secondary" onClick={onCancel} ref={cancelRef}>Cancel</Button>
-        <Button
-          size="sm"
-          variant="primary"
-          disabled={!isDataValid()}
-          onClick={() => {
-            onAddExtra();
-          }}
-          ref={submitRef}
-        >Add Extra</Button>
-      </Modal.Footer>
+      </Modal.Body>
+
     </Modal>
   );
 

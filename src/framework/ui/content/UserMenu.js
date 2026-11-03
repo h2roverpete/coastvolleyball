@@ -5,31 +5,72 @@ import {useNavigate} from "react-router";
 import {Nav} from "react-bootstrap";
 import {Resource, Permission} from "../../auth/Permissions";
 import {useRestApi} from "../../api/RestApi";
+import {useSiteContext} from "./Site";
 
 export default function UserMenu({buttonRef, onClose}) {
 
   const {isAuthenticated, currentUser} = useAuth();
   const navigate = useNavigate();
+  const {siteData, showErrorAlert} = useSiteContext();
   const [campaigns, setCampaigns] = useState(/** @type {[SMSCampaignData]} */ null);
+  const [galleries, setGalleries] = useState(/** @type {[GalleryData]} */ null);
+  const [livestreams, setLivestreams] = useState(/** @type {[LivestreamData]} */ null);
+  const [guestBooks, setGuestBooks] = useState(/** @type {[GuestBookData]} */ null);
   const [hasSmsPermission, setHasSmsPermission] = useState(false);
   const [hasUserPermission, setHasUserPermission] = useState(false);
-  const {SMS} = useRestApi();
+  const [hasGalleryPermission, setHasGalleryPermission] = useState(false);
+  const [hasLivestreamPermission, setHasLivestreamPermission] = useState(false);
+  const [hasGuestBookPermission, setHasGuestbookPermission] = useState(false);
+  const {SMS, Galleries, Livestreams, GuestBooks} = useRestApi();
   const {hasPermission} = useAuth();
 
   useEffect(() => {
-    if (hasSmsPermission && !campaigns) {
-      SMS.getSmsCampaigns().then((response) => {
+    if (siteData && hasSmsPermission && !campaigns) {
+      SMS.getSmsCampaignsForSite(siteData.SiteID).then((response) => {
         setCampaigns(response);
       }).catch((err) => {
-        console.error(err);
+        showErrorAlert(`Error getting messaging campaign list.`,err);
       })
     }
-  }, [campaigns, setCampaigns, hasPermission, hasSmsPermission, SMS]);
+  }, [siteData, campaigns, setCampaigns, hasPermission, hasSmsPermission, SMS]);
+
+  useEffect(() => {
+    if (siteData && hasGalleryPermission && !galleries) {
+      Galleries.getGalleriesForSite(siteData.SiteID).then((response) => {
+        setGalleries(response);
+      }).catch((err) => {
+        showErrorAlert(`Error getting gallery list.`,err);
+      })
+    }
+  }, [siteData, galleries, setGalleries, hasGalleryPermission, Galleries]);
+
+  useEffect(() => {
+    if (siteData && hasLivestreamPermission && !livestreams) {
+      Livestreams.getLivestreamsForSite(siteData.SiteID).then((response) => {
+        setLivestreams(response);
+      }).catch((err) => {
+        showErrorAlert(`Error getting livestream list.`,err);
+      })
+    }
+  }, [siteData, livestreams, Livestreams, hasLivestreamPermission, setLivestreams]);
+
+  useEffect(() => {
+    if (siteData && hasGuestBookPermission && !guestBooks) {
+      GuestBooks.getGuestBooksForSite(siteData.SiteID).then((response) => {
+        setGuestBooks(response);
+      }).catch((err) => {
+        showErrorAlert(`Error getting guest book list.`,err);
+      })
+    }
+  }, [siteData, livestreams, Livestreams, hasLivestreamPermission, setLivestreams]);
 
   useEffect(() => {
     setHasSmsPermission(hasPermission(Resource.SMS, Permission.SEND));
     setHasUserPermission(hasPermission(Resource.USERS, Permission.ADMIN));
-  }, [hasPermission, setHasSmsPermission, setHasUserPermission])
+    setHasGalleryPermission(hasPermission(Resource.GALLERY, Permission.ADMIN));
+    setHasLivestreamPermission(hasPermission(Resource.LIVESTREAM, Permission.ADMIN));
+    setHasGuestbookPermission(hasPermission(Resource.GUESTBOOK, Permission.ADMIN));
+  }, [hasPermission, setHasSmsPermission, setHasUserPermission, setHasGalleryPermission, setHasLivestreamPermission, setHasGuestbookPermission]);
 
   return (<>
     <div
@@ -50,22 +91,40 @@ export default function UserMenu({buttonRef, onClose}) {
             onClose?.();
           }}>User Profile</span>
         )}
-        {hasSmsPermission && campaigns && <>
+        {hasGalleryPermission && galleries?.length > 0 && <>
+            <span className="dropdown-item" onClick={() => {
+              navigate(`/admin/galleries`);
+              onClose?.();
+            }}>Manage Photo Galleries</span>
+        </>}
+        {hasSmsPermission && campaigns?.length > 0 && <>
           {campaigns.map((campaign) =>
-            <div key={campaign.SMSCampaignID}>{campaign.SiteID === parseInt(process.env.REACT_APP_SITE_ID) &&
+            <div key={campaign.SMSCampaignID}>{campaign.SiteID === siteData.SiteID &&
               <span className="dropdown-item" onClick={() => {
                 navigate(`/admin/sms?campaignId=${campaign.SMSCampaignID}`);
                 onClose?.();
-              }}>{campaign.CampaignName} SMS</span>}
+              }}>Manage {campaign.CampaignName}</span>}
             </div>
           )}
+        </>}
+        {hasLivestreamPermission && livestreams?.length > 0 && <>
+            <span className="dropdown-item" onClick={() => {
+              navigate(`/admin/livestreams`);
+              onClose?.();
+            }}>Manage Livestreams</span>
+        </>}
+        {hasGuestBookPermission && guestBooks?.length > 0 && <>
+            <span className="dropdown-item" onClick={() => {
+              navigate(`/admin/guestbooks`);
+              onClose?.();
+            }}>Manage Guest Books</span>
         </>}
         {hasUserPermission &&
           <span className="dropdown-item" onClick={() => {
             navigate(`/admin/users`);
             onClose?.();
           }}>
-            Manage Users
+            Manage Site Users
           </span>
         }
         {!isAuthenticated && (

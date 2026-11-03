@@ -9,6 +9,8 @@ import {useAuth} from "../../auth/AuthProvider";
 import {Permission, Resource} from "../../auth/Permissions";
 import {Outline} from "framework/util/OutlineUtil"
 import './Site.css';
+import GalleryPanel from "../gallery/GalleryPanel";
+import GalleryList from "../gallery/GalleryList";
 
 const SiteEditor = lazy(() => import("../editor/SiteEditor"));
 const UserProfilePanel = lazy(() => import("../../auth/UserProfilePanel"));
@@ -17,6 +19,8 @@ const Login = lazy(() => import("../../auth/Login"));
 const Logout = lazy(() => import("../../auth/Logout"));
 const Error404 = lazy(() => import("../../util/Error404"));
 const SmsAdminPage = lazy(() => import("../sms/SmsAdminPage"));
+const LivestreamList = lazy(() => import("../livestream/LivestreamList"));
+const GuestBookList = lazy(() => import("../guestbook/GuestBookList"));
 
 /**
  * @typedef ErrorData
@@ -71,10 +75,13 @@ export default function Site(props) {
   const [metaPages] = useState([
     {name: 'user', id: -1, title: 'User Profile', path: '/admin/user', content: <Suspense><UserProfilePanel/></Suspense>},
     {name: 'users', id: -2, title: 'Site Users', path: '/admin/users', content: <Suspense><SiteUsersPage/></Suspense>},
-    {name: 'sms', id: -3, title: 'SMS Campaign Administration', path: '/admin/sms', content: <Suspense><SmsAdminPage/></Suspense>},
+    {name: 'sms', id: -3, title: 'Messaging Campaigns', path: '/admin/sms', content: <Suspense><SmsAdminPage/></Suspense>},
     {name: 'login', id: -4, title: 'Log In', path: '/login', content: <Suspense><Login/></Suspense>},
     {name: 'logout', id: -5, title: 'Log Out', path: '/logout', content: <Suspense><Logout/></Suspense>},
-    {name: 'error', id: -6, title: 'Error 404 - Not Found', path: '*', content: <Suspense><Error404/></Suspense>},
+    {name: 'galleries', id: -6, title: 'Photo Galleries', path: '/admin/galleries', content: <Suspense><GalleryList siteId={parseInt(process.env.REACT_APP_SITE_ID)}/></Suspense>},
+    {name: 'livestreams', id: -7, title: 'Livestreams', path: '/admin/livestreams', content: <Suspense><LivestreamList siteId={parseInt(process.env.REACT_APP_SITE_ID)}/></Suspense>},
+    {name: 'guestbooks', id: -8, title: 'Guest Books', path: '/admin/guestbooks', content: <Suspense><GuestBookList siteId={parseInt(process.env.REACT_APP_SITE_ID)}/></Suspense>},
+    {name: 'error', id: -9, title: 'Error 404 - Not Found', path: '*', content: <Suspense><Error404/></Suspense>}
   ]);
   const [redirect, setRedirect] = useState(0);
 

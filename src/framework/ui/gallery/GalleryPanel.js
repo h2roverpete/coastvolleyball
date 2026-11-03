@@ -1,4 +1,4 @@
-import React, {lazy, Suspense, useEffect, useMemo, useRef, useState} from "react";
+import React, {Suspense, useEffect, useMemo, useRef, useState} from "react";
 import "react-image-gallery/styles/image-gallery.css";
 import {useRestApi} from "../../api/RestApi";
 import './Gallery.css';
@@ -8,14 +8,12 @@ import {BsThreeDotsVertical} from "react-icons/bs";
 import {useTouchContext} from "../../util/TouchProvider";
 import {Permission, Resource} from "../../auth/Permissions";
 import {useAuth} from "../../auth/AuthProvider";
-import {useExtrasContext} from "../extras/Extras";
-
-const ImageGallery = lazy(() => import("react-image-gallery"));
-const GalleryConfig = lazy(() => import("./GalleryConfig"));
-const FormEditor = lazy(() => import("../editor/FormEditor"));
-const DescribePhotoModal = lazy(() => import("./DescribePhotoModal"));
-const FileDropTarget = lazy(() => import("../editor/FileDropTarget"));
-const {DropState} = lazy(() => import("../editor/FileDropTarget"));
+import EditorPanel from "../editor/EditorPanel";
+import FormEditor from "../editor/FormEditor";
+import GalleryFields from "./GalleryFields";
+import FileDropTarget, {DropState} from '../editor/FileDropTarget';
+import ImageGallery from "react-image-gallery";
+import DescribePhotoModal from "./DescribePhotoModal";
 
 /**
  * Display a photo gallery
@@ -24,19 +22,20 @@ const {DropState} = lazy(() => import("../editor/FileDropTarget"));
  * @returns {JSX.Element}
  * @constructor
  */
-export default function Gallery({galleryId, extraData, sectionExtras}) {
+export default function GalleryPanel({galleryId, galleryData, onUpdate, onDelete, menuItems}) {
 
   // imports
-  const {Galleries} = useRestApi();
+  const {Galleries, Sites} = useRestApi();
   const {siteData, showErrorAlert} = useSiteContext();
   const {supportsHover} = useTouchContext();
   const {hasPermission} = useAuth();
-  const {moveExtraUp, moveExtraDown} = useExtrasContext();
 
   // states
-  const [galleryConfig, setGalleryConfig] = useState(null);
-  const [galleryPhotos, setGalleryPhotos] = useState([]);
+  const [galleryConfig, setGalleryConfig] = useState(/** @type {GalleryData}*/null);
+  const [galleryPhotos, setGalleryPhotos] = useState(/**@type [{PhotoData}]*/ null);
   const [currentPhoto, setCurrentPhoto] = useState(null);
+  const [gallerySite, setGallerySite] = useState(null);
+
   const [canEdit, setCanEdit] = useState(false);
   const [canAddPhotos, setCanAddPhotos] = useState(false);
   const [canAdmin, setCanAdmin] = useState(false);
@@ -54,19 +53,27 @@ export default function Gallery({galleryId, extraData, sectionExtras}) {
   }, [setCanEdit, setCanAddPhotos, setCanAdmin, hasPermission]);
 
   useEffect(() => {
-    if (galleryId) {
+    if (galleryData) {
+      setGalleryConfig(galleryData);
+      Sites.getSite(galleryData.SiteID).then(site => {
+        setGallerySite(site);
+      }).catch(error => showErrorAlert(error));
+    } else if (galleryId) {
       Galleries.getGallery(galleryId).then((data) => {
         console.debug(`Loaded gallery ${galleryId}.`);
         setGalleryConfig(data);
+        Sites.getSite(data.SiteID).then(site => {
+          setGallerySite(site);
+        }).catch(error => showErrorAlert(error));
       }).catch(error => {
         showErrorAlert(`Error loading gallery ${galleryId}: ${error}`);
       })
     }
-  }, [galleryId, showErrorAlert, Galleries]);
+  }, [galleryId, galleryData, setGalleryConfig, showErrorAlert, Galleries]);
 
   useEffect(() => {
-    if (galleryPhotos.length === 0) {
-      Galleries.getPhotos(galleryId).then((data) => {
+    if (galleryConfig && !galleryPhotos) {
+      Galleries.getPhotos(galleryConfig.GalleryID).then((data) => {
         console.debug(`Loaded ${data.length} photos for gallery ${galleryId}.`);
         if (galleryConfig?.RandomizeOrder) {
           data.sort(() => Math.random() - 0.5);
@@ -79,7 +86,7 @@ export default function Gallery({galleryId, extraData, sectionExtras}) {
         showErrorAlert(`Error loading photos for gallery ${galleryId}: ${error}`);
       })
     }
-  }, [galleryId, galleryConfig, showErrorAlert, Galleries, galleryPhotos.length]);
+  }, [galleryConfig, showErrorAlert, Galleries, galleryPhotos]);
 
   function updateCurrentPhoto(data) {
     setGalleryPhotos(
@@ -97,7 +104,7 @@ export default function Gallery({galleryId, extraData, sectionExtras}) {
   function uploadFile(file) {
     console.debug(`Uploading photo...`);
     fileDropRef.current?.setDropState(DropState.UPLOADING);
-    Galleries.uploadPhoto(siteData.SiteID, galleryId, file)
+    Galleries.uploadPhoto(gallerySite.SiteID, galleryConfig.GalleryID, file)
       .then((result) => {
         console.debug(`Photo uploaded successfully.`);
         fileDropRef.current?.setDropState(DropState.HIDDEN);
@@ -125,7 +132,7 @@ export default function Gallery({galleryId, extraData, sectionExtras}) {
     for (const file of files) {
       promises.push(
         new Promise((resolve, reject) => {
-            Galleries.uploadPhoto(siteData.SiteID, galleryId, file)
+            Galleries.uploadPhoto(gallerySite.SiteID, galleryConfig.GalleryID, file)
               .then((result) => {
                 console.debug(`Photo uploaded successfully.`);
                 progress.now++;
@@ -148,34 +155,36 @@ export default function Gallery({galleryId, extraData, sectionExtras}) {
   }
 
   const images = useMemo(() => {
-    // build list of images for gallery
-    console.debug(`Build list of images for gallery control...`);
-    const list = [];
-    for (const photo of galleryPhotos) {
-      if (photo.PhotoFile && siteData) {
-        // new format upload
-        list.push({
-          original: `${siteData.SiteRootUrl}/${photo.PhotoFile}`,
-          thumbnail: `${siteData.SiteRootUrl}/${photo.PhotoFile}`,
-        })
-      } else if (photo.PhotoSmall && photo.PhotoLarge) {
-        list.push({
-          original: `${process.env.PUBLIC_URL}/images/gallery/${photo.SubDirectory.toString().padStart(3, '0')}/${photo.PhotoLarge}`,
-          thumbnail: `${process.env.PUBLIC_URL}/images/gallery/${photo.SubDirectory.toString().padStart(3, '0')}/${photo.PhotoSmall}`,
-        })
+    if (galleryPhotos?.length > 0 && gallerySite) {
+      // build list of images for gallery
+      console.debug(`Build list of images for gallery control...`);
+      const list = [];
+      for (const photo of galleryPhotos) {
+        if (photo.PhotoFile && gallerySite) {
+          // new format upload
+          list.push({
+            original: `${gallerySite.SiteRootUrl}/${photo.PhotoFile}`,
+            thumbnail: `${gallerySite.SiteRootUrl}/${photo.PhotoFile}`,
+          })
+        } else if (photo.PhotoSmall && photo.PhotoLarge) {
+          list.push({
+            original: `${gallerySite.SiteRootUrl}/images/gallery/${photo.SubDirectory.toString().padStart(3, '0')}/${photo.PhotoLarge}`,
+            thumbnail: `${gallerySite.SiteRootUrl}/images/gallery/${photo.SubDirectory.toString().padStart(3, '0')}/${photo.PhotoSmall}`,
+          })
+        }
       }
-    }
-    console.debug(`Built list of ${list.length} images.`);
-    return list;
-  }, [galleryPhotos, siteData]);
+      console.debug(`Built list of ${list.length} images.`);
+      return list;
+    } else return [];
+  }, [galleryPhotos, gallerySite]);
 
   useEffect(() => {
     // keep current photo in sync with gallery display
     console.debug(`Checking current photo.`);
-    if (!currentPhoto && galleryPhotos.length > 0) {
+    if (!currentPhoto && galleryPhotos?.length > 0) {
       console.debug(`Setting current photo to first.`);
       setCurrentPhoto(galleryPhotos[0]);
-    } else if (currentPhoto && galleryPhotos.length === 0) {
+    } else if (currentPhoto && galleryPhotos?.length === 0) {
       console.debug(`Setting current photo to null.`);
       setCurrentPhoto(null);
     } else if (currentPhoto && galleryPhotos.length > 0) {
@@ -200,7 +209,7 @@ export default function Gallery({galleryId, extraData, sectionExtras}) {
   function onDeletePhoto() {
     if (currentPhoto) {
       console.debug(`Delete photo ${currentPhoto.PhotoID}`);
-      Galleries.deletePhoto(galleryId, currentPhoto.PhotoID).then((result) => {
+      Galleries.deletePhoto(galleryConfig.GalleryID, currentPhoto.PhotoID).then((result) => {
         console.debug(`Photo deleted.`);
         const newPhotos = [];
         for (const photo of galleryPhotos) {
@@ -229,124 +238,111 @@ export default function Gallery({galleryId, extraData, sectionExtras}) {
     }
   }
 
-  /**
-   * Receive result after photo update
-   * @param newData {PhotoData}
-   */
   function handlePhotoUpdate(newData) {
     updateCurrentPhoto(newData);
   }
 
-  return (<div
-    className="Gallery"
-    onDragEnter={(e) => {
-      if (canAddPhotos) {
-        fileDropRef.current?.onDragEnter(e, DropState.ADD);
-      }
-    }}
-    onMouseOver={() => {
-      if (canAddPhotos && supportsHover) {
-        // show editor button and property panel
-        buttonRef.current.hidden = false;
-        if (canAdmin) {
-          expandButtonRef.current.hidden = false;
+  function handleUpdate(newData) {
+    setGalleryConfig(newData);
+    onUpdate?.(newData);
+  }
+
+  return <>
+    <div
+      className="Gallery"
+      onDragEnter={(e) => {
+        if (canAddPhotos) {
+          fileDropRef.current?.onDragEnter(e, DropState.ADD);
         }
-      }
-    }}
-    onMouseOut={() => {
-      if (canAddPhotos && supportsHover) {
-        // hide editor button and property panel
-        buttonRef.current.hidden = true;
-        if (canAdmin) {
-          expandButtonRef.current.hidden = true;
+      }}
+      onMouseOver={() => {
+        if (canAddPhotos && supportsHover && buttonRef.current) {
+          // show editor button and property panel
+          buttonRef.current.hidden = false;
         }
-      }
-    }}
-    onPaste={(e) => {
-      if (canAddPhotos) {
-        onPaste(e)
-      }
-    }}
-    onTouchMove={(e) => {
-      e.stopPropagation()
-    }}
-  >
-    {images?.length > 0 && (<Suspense>
-      <ImageGallery items={images} ref={galleryRef} onSlide={onSlide}/>
-    </Suspense>)}
-    {canAddPhotos && (<>
-      {images?.length === 0 && (
-        <div className={'Editor EmptyElement'} style={{height: '100px'}}>(Empty Gallery)</div>
-      )}
-      <FileDropTarget
-        ref={fileDropRef}
-        onFileSelected={uploadFile}
-        onFilesSelected={uploadFiles}
-        onError={onDropError}
-        multiple={true}
-      />
-      <div
-        className="EditGalleryPhoto Editor dropdown"
-        hidden={supportsHover}
-        ref={buttonRef}
-      >
-        <Button
-          className={`EditButton`}
-          type="button"
-          variant={siteData?.SiteTheme}
-          size={'sm'}
-          aria-expanded="false"
-          data-bs-toggle="dropdown"
-        >
-          <BsThreeDotsVertical/>
-        </Button>
-        <ul
-          className="dropdown-menu Editor"
-          style={{zIndex: 100, cursor: 'pointer'}}
-        >
-          {currentPhoto && canEdit && (<>
-            <li>
-              <button className="dropdown-item" onClick={() => setShowDescribePhotoModal(true)}>Describe Photo</button>
-            </li>
-            <li>
-              <button className="dropdown-item" onClick={onDeletePhoto}>Delete Photo</button>
-            </li>
-          </>)}
-          <li>
-            <button className="dropdown-item" onClick={fileDropRef.current?.selectFile}>Upload Photos</button>
-          </li>
-          {extraData.ExtraID !== sectionExtras[0].ExtraID && (
-            <li>
-              <button className="dropdown-item" onClick={() => moveExtraUp(extraData)}>Move Up</button>
-            </li>
-          )}
-          {extraData.ExtraID !== sectionExtras[sectionExtras.length - 1].ExtraID && (
-            <li>
-              <button className="dropdown-item" onClick={() => moveExtraDown(extraData)}>Move Down</button>
-            </li>
-          )}
-        </ul>
-      </div>
-    </>)}
-    {
-      canAdmin && (<Suspense>
-        <FormEditor>
-          <GalleryConfig
-            galleryConfig={galleryConfig}
-            setGalleryConfig={setGalleryConfig}
-            extraId={extraData.ExtraID}
-            buttonRef={expandButtonRef}
-          />
-        </FormEditor>
-        <DescribePhotoModal
-          show={showDescribePhotoModal}
-          onHide={() => setShowDescribePhotoModal(false)}
-          onUpdate={handlePhotoUpdate}
-          photoData={currentPhoto}
+      }}
+      onMouseOut={() => {
+        if (canAddPhotos && supportsHover && buttonRef.current) {
+          // hide editor button and property panel
+          buttonRef.current.hidden = true;
+        }
+      }}
+      onPaste={(e) => {
+        if (canAddPhotos) {
+          onPaste(e)
+        }
+      }}
+      onTouchMove={(e) => {
+        e.stopPropagation()
+      }}
+    >
+      {images?.length > 0 && (<Suspense>
+        <ImageGallery items={images} ref={galleryRef} onSlide={onSlide}/>
+      </Suspense>)}
+      {canAddPhotos && (<>
+        {images && images.length === 0 && (
+          <div className={'Editor EmptyElement'} style={{height: '200px'}}>(Empty Gallery)</div>
+        )}
+        <FileDropTarget
+          ref={fileDropRef}
+          onFileSelected={uploadFile}
+          onFilesSelected={uploadFiles}
+          onError={onDropError}
+          multiple={true}
         />
-      </Suspense>)
-    }
-  </div>)
+        <div
+          className="EditGalleryPhoto Editor dropdown"
+          hidden={supportsHover}
+          ref={buttonRef}
+        >
+          <Button
+            className={`EditButton`}
+            type="button"
+            variant="secondary"
+            size={'sm'}
+            aria-expanded="false"
+            data-bs-toggle="dropdown"
+          >
+            <BsThreeDotsVertical/>
+          </Button>
+          <ul
+            className="dropdown-menu Editor"
+            style={{zIndex: 100, cursor: 'pointer'}}
+          >
+            {currentPhoto && canEdit && (<>
+              <li>
+                <button className="dropdown-item" onClick={() => setShowDescribePhotoModal(true)}>Describe Photo
+                </button>
+              </li>
+              <li>
+                <button className="dropdown-item" onClick={onDeletePhoto}>Delete Photo</button>
+              </li>
+            </>)}
+            <li>
+              <button className="dropdown-item" onClick={fileDropRef.current?.selectFile}>Upload Photos</button>
+            </li>
+          </ul>
+        </div>
+      </>)}
+    </div>
+    {canEdit && <><EditorPanel menuItems={menuItems}>
+      <h5>Photo Gallery Settings</h5>
+      <FormEditor>
+        <GalleryFields
+          data={galleryConfig}
+          onDelete={onDelete}
+          onUpdate={handleUpdate}
+        />
+      </FormEditor>
+      <DescribePhotoModal
+        show={showDescribePhotoModal}
+        onHide={() => setShowDescribePhotoModal(false)}
+        onUpdate={handlePhotoUpdate}
+        photoData={currentPhoto}
+      />
+    </EditorPanel>
+    </>}
+  </>;
 }
 
 /**

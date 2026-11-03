@@ -8,8 +8,8 @@ import {useSiteContext} from "../content/Site";
 
 const ExtrasContext = createContext({});
 const SmsSignup = lazy(() => import("../sms/SmsSignup"));
-const Gallery = lazy(() => import("../gallery/Gallery"));
-const LivestreamPanel = lazy(() => import("./livestream/LivestreamPanel"));
+const GalleryPanel = lazy(() => import("../gallery/GalleryPanel"));
+const LivestreamPanel = lazy(() => import("../livestream/LivestreamPanel"));
 const FileExtra = lazy(() => import("./file/FileExtra"));
 const YouTubeExtra = lazy(() => import("./youtube/YouTubeExtra"));
 const InstagramExtra = lazy(() => import("./instagram/InstagramExtra"));
@@ -61,28 +61,45 @@ export default function Extras({extras}) {
       }).catch((err) => showErrorAlert(err));
   }
 
+  const menuItemList = extras?.map((item, index, array) => {
+    let menuItems = [{label: `Remove from Page`, action: () => handleDelete(item)}];
+    if (index > 0) {
+      menuItems.push({label: `Move Up`, action: () => moveExtraUp(item)})
+    }
+    if (index < array.length - 1) {
+      menuItems.push({label: `Move Down`, action: () => moveExtraDown(item)})
+    }
+    return menuItems;
+  })
+
   return (<ExtrasContext value={{
     moveExtraUp: handleMoveUp,
     moveExtraDown: handleMoveDown,
   }}>
     <div className="Extras">
       <div className="ExtrasRow m-0 justify-content-start align-items-start d-flex flex-column w-100">
-        {extras?.map((extra) => (<React.Fragment key={extra.ExtraID + '_' + extra.Modified}>
+        {extras?.map((extra, index) => (<React.Fragment key={extra.ExtraID + '_' + extra.Modified}>
             {extra.ExtraType === 'guestbook' && <Suspense>
               <GuestBook
                 guestBookId={extra.GuestBookID}
                 extraData={extra}
                 sectionExtras={extras}
                 extraId={extra.ExtraID}
+                menuItems={menuItemList[index]}
               />
             </Suspense>}
             {extra.ExtraType === 'gallery' && <Suspense>
-              <Gallery galleryId={extra.GalleryID} extraData={extra} sectionExtras={extras} extraId={extra.ExtraID}/>
+              <GalleryPanel
+                galleryId={extra.GalleryID}
+                onDelete={() => handleDelete(extra)}
+                menuItems={menuItemList[index]}
+              />
             </Suspense>}
             {extra.ExtraType === 'sms' && <Suspense>
               <SmsSignup
                 smsCampaignId={extra.SMSCampaignID}
-                menuItems={[{label: `Remove from Page`, action: () => handleDelete(extra)}]}
+                onDelete={() => handleDelete(extra)}
+                menuItems={menuItemList[index]}
               />
             </Suspense>}
             {extra.ExtraType === 'instagram' && <Suspense>
@@ -97,7 +114,7 @@ export default function Extras({extras}) {
             {extra.ExtraType === 'livestream' && <Suspense>
               <LivestreamPanel
                 livestreamId={extra.LivestreamID}
-                menuItems={[{label: `Remove from Page`, action: () => handleDelete(extra)}]}
+                menuItems={menuItemList[index]}
               />
             </Suspense>}
           </React.Fragment>)

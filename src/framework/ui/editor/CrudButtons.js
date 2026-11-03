@@ -5,7 +5,6 @@ import {useFormData} from "./FormEditor";
  * Standard action buttons for data edit panels & dialogs.
  * @template T
  *
- * @param data {T}                            Data being edited.
  * @param keyName {string}                    Primary key name in data, used to detect insert (no primary key) vs update (primary key exists).
  * @param type {string}                       User readable type for data, added to button names.
  * @param onUpdate {function(T)}              Update button was pressed. (Update button hidden if this prop is missing.)
@@ -17,7 +16,7 @@ import {useFormData} from "./FormEditor";
  * @returns {JSX.Element} Returns a Bootstrap <Row> containing the button UI.
  * @constructor
  */
-export default function CrudButtons({data, keyName, type, onUpdate, onCancel, onDelete, isDataValid, extraButtons}) {
+export default function CrudButtons({ keyName, type, onUpdate, onCancel, onDelete, isDataValid, extraButtons}) {
 
   const formData = useFormData();
 
@@ -29,11 +28,11 @@ export default function CrudButtons({data, keyName, type, onUpdate, onCancel, on
           size={'sm'}
           variant="primary"
           onClick={() => {
-            onUpdate?.(formData.edits);
+            onUpdate(formData.edits);
           }}
           disabled={!isDataValid(formData.edits) || !formData.isDataChanged()}
         >
-          {data?.[keyName] ? `Update ` : `Add `}<span className={`d-none d-sm-inline`}>{type}</span>
+          {formData?.edits[keyName] ? `Update ` : `Add `}<span className={`d-none d-sm-inline`}>{type}</span>
         </Button>
       )}
       <Button
@@ -57,7 +56,7 @@ export default function CrudButtons({data, keyName, type, onUpdate, onCancel, on
           Cancel
         </Button>
       )}
-      {onDelete && data?.[keyName] && (
+      {onDelete && formData?.edits[keyName] && (
         <Button
           size={'sm'}
           variant="danger"

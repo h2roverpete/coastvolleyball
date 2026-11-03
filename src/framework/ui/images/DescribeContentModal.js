@@ -3,6 +3,7 @@ import {useCallback, useEffect, useState} from "react";
 import {useFormData} from "../editor/FormEditor";
 import {useSiteContext} from "../content/Site";
 import {BsStars} from "react-icons/bs";
+import CrudButtons from "../editor/CrudButtons";
 
 /**
  * Modal for adding description and keywords to site content.
@@ -79,11 +80,9 @@ export default function DescribeContentModal(
 
   return (
     <Modal show={show} className={'Editor'}>
-      <ModalHeader>
-        <h5>{title ? <>{title}</> : <>Description & Keywords</>}</h5>
-      </ModalHeader>
       <ModalBody>
-        {prompt && <Row><Col>{prompt}</Col></Row>}
+        <h5>{title ? <>{title}</> : <>Description & Keywords</>}</h5>
+        {prompt && <div>{prompt}</div>}
         <Row className="mt-0">
           <Form.Label column="sm">Description</Form.Label>
         </Row>
@@ -112,49 +111,25 @@ export default function DescribeContentModal(
             />
           </Col>
         </Row>
-      </ModalBody>
-      <ModalFooter>
-        <Col className="text-start">
+        <CrudButtons
+          keyName={'id'}
+          onUpdate={handleUpdate}
+          onCancel={handleCancel}
+          isDataValid={()=>true}
+          extraButtons={
           <Button
-            size="sm"
-            variant="secondary"
-            className="me-2"
+            size={'sm'}
+            variant={'secondary'}
+            className={'me-2'}
             onClick={handleDescribe}
             disabled={describing}
             style={{minWidth: '100px'}}
           >
             {describing ? <Spinner size="sm"/> : <><BsStars size={15} className={'me-1'}/>Describe</>}
           </Button>
-          <Button
-            size="sm"
-            variant="secondary"
-            className="me-2"
-            onClick={()=>formData.revert()}
-            disabled={!formData.isDataChanged()}
-          >
-            Revert
-          </Button>
-        </Col>
-        <Col className='text-end'>
-          <Button
-            size="sm"
-            variant="secondary"
-            className="me-2"
-            onClick={handleCancel}
-          >
-            Cancel
-          </Button>
-          <Button
-            size="sm"
-            variant="primary"
-            className="me-2"
-            onClick={handleUpdate}
-            disabled={!formData.isDataChanged()}
-          >
-            Update
-          </Button>
-        </Col>
-      </ModalFooter>
+        }
+        />
+      </ModalBody>
     </Modal>
   )
 }

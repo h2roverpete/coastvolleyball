@@ -5,13 +5,13 @@ import {Button, CloseButton, Col, OverlayTrigger, Row, Table, Tooltip} from "rea
 import FormEditor from "framework/ui/editor/FormEditor";
 import {useAuth} from "framework/auth/AuthProvider";
 import {Permission, Resource} from "framework/auth/Permissions";
-import '../../css/EditableRow.css';
+import '../css/EditableRow.css';
 import './LivestreamList.css';
-import {useSiteContext} from "../../content/Site";
+import {useSiteContext} from "../content/Site";
 import LivestreamPanel from "./LivestreamPanel";
 import LivestreamModal from "./LivestreamModal";
 
-export default function SmsCampaignList() {
+export default function LivestreamList({siteId}) {
 
   // imports
   const {Livestreams} = useRestApi();
@@ -43,12 +43,21 @@ export default function SmsCampaignList() {
 
   useEffect(() => {
     if (!listItems && canEdit) {
-      Livestreams.getLivestreams().then(result => {
-        result.sort(sortFunction);
-        setListItems(result);
-      }).catch(e => {
-        showErrorAlert(`Error getting livestreams.`, e);
-      })
+      if (siteId > 0) {
+        Livestreams.getLivestreamsForSite(siteId).then(result => {
+          result.sort(sortFunction);
+          setListItems(result);
+        }).catch(e => {
+          showErrorAlert(`Error getting livestreams.`, e);
+        })
+      } else {
+        Livestreams.getLivestreams().then(result => {
+          result.sort(sortFunction);
+          setListItems(result);
+        }).catch(e => {
+          showErrorAlert(`Error getting livestreams.`, e);
+        })
+      }
     }
   }, [Livestreams, listItems, setListItems, sortFunction, canEdit, showErrorAlert]);
 
@@ -75,7 +84,7 @@ export default function SmsCampaignList() {
   }
 
   function handleUpdate(newData) {
-    // update campaign list
+    // update list
     setEdit(null);
     let updated = false;
     listItems.forEach((campaign, index) => {
@@ -86,7 +95,7 @@ export default function SmsCampaignList() {
       }
     });
     if (!updated) {
-      // campaign added, not updated
+      // item added, not updated
       listItems.push(newData);
     }
     listItems.sort(sortFunction);
@@ -132,7 +141,7 @@ export default function SmsCampaignList() {
             {sortAscending ? <BsSortDown/> : <BsSortUp/>}
           </span>)}
               </th>
-              <th
+              {!siteId && <th
                 className={'text-nowrap'}
                 onClick={() => onSortBy('SiteID')}
                 role={'button'}
@@ -141,7 +150,7 @@ export default function SmsCampaignList() {
                 {sortKey === 'SiteID' && (<span className={'ms-2'}>
             {sortAscending ? <BsSortDown/> : <BsSortUp/>}
           </span>)}
-              </th>
+              </th>}
               <th
                 className={'text-nowrap'}
                 onClick={() => onSortBy('LivestreamName')}
@@ -165,9 +174,9 @@ export default function SmsCampaignList() {
                 <td>
                   {item.LivestreamID}
                 </td>
-                <td>
+                {!siteId && <td>
                   {item.SiteID}
-                </td>
+                </td>}
                 <td className={'d-flex align-items-center position-relative'}>
                   <OverlayTrigger
                     delay={{show: 1000, hide: 500}}
@@ -202,9 +211,9 @@ export default function SmsCampaignList() {
           <FormEditor>
             <LivestreamModal
               data={edit}
+              siteId={siteId}
               show={edit !== null}
               onHide={() => setEdit(null)}
-              onAdd={handleAdd}
               onUpdate={handleUpdate}
               onDelete={handleDelete}
             />

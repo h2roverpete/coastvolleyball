@@ -14,7 +14,7 @@ import {Resource, Permission} from "../../auth/Permissions";
  * @returns {JSX.Element}
  * @constructor
  */
-export default function SmsSignup({smsCampaignId, menuItems}) {
+export default function SmsSignup({smsCampaignId, onDelete, menuItems}) {
 
   const {SMS} = useRestApi();
   const {showErrorAlert} = useSiteContext();
@@ -47,8 +47,8 @@ export default function SmsSignup({smsCampaignId, menuItems}) {
     <SmsSignupFields campaign={campaignData}/>
     {canEdit &&
       <EditorPanel menuItems={menuItems}>
-        <h5>Messaging Campaign Configuration</h5>
-        <SmsCampaignConfig campaign={campaignData} onUpdate={handleUpdate}/>
+        <h5>Messaging Campaign Settings</h5>
+        <SmsCampaignConfig campaign={campaignData} onUpdate={handleUpdate} onDelete={onDelete}/>
       </EditorPanel>
     }
   </FormEditor>

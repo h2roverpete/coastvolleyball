@@ -1,10 +1,10 @@
-import {useFormData} from "../../editor/FormEditor";
+import {useFormData} from "../editor/FormEditor";
 import {useEffect, useState} from "react";
 import {Button, Col, Form, Modal, Row} from "react-bootstrap";
-import {useRestApi} from "../../../api/RestApi"
-import {useSiteContext} from "../../content/Site";
+import {useRestApi} from "../../api/RestApi"
+import {useSiteContext} from "../content/Site";
 import './LivestreamFields.css'
-import CrudButtons from "../../editor/CrudButtons";
+import CrudButtons from "../editor/CrudButtons";
 
 /**
  * Display message that the user doesn't have permission to view the content.
@@ -12,7 +12,7 @@ import CrudButtons from "../../editor/CrudButtons";
  * @returns {JSX.Element}
  * @constructor
  */
-export default function LivestreamFields({data, onAdd, onUpdate, onDelete, onCancel}) {
+export default function LivestreamFields({data, livestreamId, siteId, onUpdate, onDelete, onCancel}) {
 
   const {Sites} = useRestApi();
   const {showErrorAlert} = useSiteContext();
@@ -21,6 +21,12 @@ export default function LivestreamFields({data, onAdd, onUpdate, onDelete, onCan
 
   const [sites, setSites] = useState();
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+
+  useEffect(() => {
+    if (siteId && !formData.edits.SiteID) {
+      formData.update({SiteID: siteId});
+    }
+  }, [data, formData]);
 
   useEffect(() => {
     if (!sites) {
@@ -53,25 +59,10 @@ export default function LivestreamFields({data, onAdd, onUpdate, onDelete, onCan
   function handleUpdate() {
     Livestreams.insertOrUpdateLivestream(formData.edits).then((result) => {
       formData.update(result);
-      if (data.LivestreamID > 0) {
-        onUpdate?.(result);
-      } else {
-        onAdd?.(result);
-      }
+      onUpdate?.(result);
     }).catch(error => {
       showErrorAlert(error);
     })
-  }
-
-  /**
-   * Handle cancel event from CrudButtons.
-   */
-  function handleCancel() {
-    onCancel();
-  }
-
-  function confirmDelete() {
-    setShowDeleteConfirmation(true);
   }
 
   /**
@@ -86,7 +77,7 @@ export default function LivestreamFields({data, onAdd, onUpdate, onDelete, onCan
     });
   }
 
-  const labelCols = 4;
+  const labelCols = 2;
   return <>
     <Row className={'mt-1'}>
       <Form.Label
@@ -107,7 +98,7 @@ export default function LivestreamFields({data, onAdd, onUpdate, onDelete, onCan
         />
       </Col>
     </Row>
-    <Row className={'mt-2'}>
+    {!siteId && <Row className={'mt-2'}>
       <Form.Label
         column={'sm'}
         sm={labelCols}
@@ -130,14 +121,14 @@ export default function LivestreamFields({data, onAdd, onUpdate, onDelete, onCan
           )}
         </Form.Select>
       </Col>
-    </Row>
+    </Row>}
     <CrudButtons
       data={formData.edits}
       type="Livestream"
       keyName={'LivestreamID'}
       onUpdate={handleUpdate}
-      onCancel={onCancel && handleCancel}
-      onDelete={onDelete && confirmDelete}
+      onCancel={onCancel}
+      onDelete={()=>setShowDeleteConfirmation(true)}
       isDataValid={isDataValid}
     />
     <Modal
@@ -146,7 +137,7 @@ export default function LivestreamFields({data, onAdd, onUpdate, onDelete, onCan
       className={'Editor'}
       size={'sm'}
     >
-      <Modal.Body>
+      <Modal.Body className={'Editor'}>
         <h5>Delete Livestream</h5>
         <div>Are you sure you want to delete {data?.LivestreamName}? This action can't be undone.</div>
         <div className='mt-2 d-flex justify-content-end gap-2'>

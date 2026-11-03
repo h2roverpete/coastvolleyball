@@ -94,7 +94,7 @@ export default function SmsCampaignFields({campaign, smsCampaignId, onAdd, onUpd
   function handleDelete() {
     setShowDeleteConfirmation(false);
     SMS.deleteSmsCampaign(formData.edits.SMSCampaignID).then((result) => {
-      onDelete(result);
+      onDelete?.(result);
     });
   }
 
@@ -642,7 +642,7 @@ export default function SmsCampaignFields({campaign, smsCampaignId, onAdd, onUpd
     >
       <Modal.Body>
         <h5>Delete Campaign</h5>
-        <div>Are you sure you want to delete {campaign?.CampaignName}? This action can't be undone.</div>
+        <div>Are you sure you want to delete &ldquo;{campaign?.CampaignName}&rdquo;? This action can't be undone.</div>
         <div className='mt-2 d-flex justify-content-end gap-2'>
           <Button size="sm" variant="secondary" onClick={() => setShowDeleteConfirmation(false)}>Cancel</Button>
           <Button size="sm" variant="danger" onClick={handleDelete}>Delete</Button>

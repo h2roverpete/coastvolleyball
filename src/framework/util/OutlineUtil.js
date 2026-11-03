@@ -12,13 +12,19 @@
  */
 export const updatePage = (pageData, outlineData) => {
   if (outlineData) {
+    let updated = false;
     const newOutlineData = outlineData.map((item) => {
       if (item.PageID === pageData.PageID) {
+        updated = true;
         return {...pageData};
       } else {
         return item;
       }
-    })
+    });
+    if (!updated) {
+      // page added not updated
+      newOutlineData.push(pageData);
+    }
     return buildOutline(newOutlineData);
   }
 };

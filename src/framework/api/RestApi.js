@@ -228,6 +228,15 @@ export default function RestApi(props) {
     });
   }, []);
 
+  const getGuestBooksForSite = useCallback(async (siteId) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.get(`${host}/api/v1/content/sites/${siteId}/guestbooks`);
+        return response.data;
+      }
+    });
+  }, []);
+
   const getGuestBook = useCallback(async (guestBookId) => {
     const response = await axios.get(`${host}/api/v1/guestbook/${guestBookId}`);
     return response.data;
@@ -299,6 +308,15 @@ export default function RestApi(props) {
     return await adminApiCall(() => {
       return async () => {
         const response = await axios.get(`${host}/api/v1/galleries`);
+        return response.data;
+      }
+    });
+  }, []);
+
+  const getGalleriesForSite = useCallback(async (siteId) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.get(`${host}/api/v1/content/sites/${siteId}/galleries`);
         return response.data;
       }
     });
@@ -552,6 +570,15 @@ export default function RestApi(props) {
     return await adminApiCall(() => {
       return async () => {
         const response = await axios.get(`${host}/api/v1/sms/campaigns`);
+        return response.data;
+      }
+    });
+  }, []);
+
+  const getSmsCampaignsForSite = useCallback(async (siteId) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.get(`${host}/api/v1/content/sites/${siteId}/campaigns`);
         return response.data;
       }
     });
@@ -868,6 +895,15 @@ export default function RestApi(props) {
     });
   }, []);
 
+  const getLivestreamsForSite = useCallback(async (siteId) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.get(`${host}/api/v1/content/sites/${siteId}/livestreams`);
+        return response.data;
+      }
+    });
+  }, []);
+
   const getLivestream = useCallback(async (livestreamId) => {
     return await adminApiCall(() => {
       return async () => {
@@ -1001,6 +1037,7 @@ export default function RestApi(props) {
       GuestBooks: {
         getGuestBook: getGuestBook,
         getGuestBooks: getGuestBooks,
+        getGuestBooksForSite: getGuestBooksForSite,
         insertOrUpdateGuestBook: insertOrUpdateGuestBook,
         deleteGuestBook: deleteGuestBook,
         getGuest: getGuest,
@@ -1013,6 +1050,7 @@ export default function RestApi(props) {
       Galleries: {
         getGallery: getGallery,
         getGalleries: getGalleries,
+        getGalleriesForSite: getGalleriesForSite,
         getPhotos: getPhotos,
         insertOrUpdateGallery: insertOrUpdateGallery,
         deleteGallery: deleteGallery,
@@ -1048,6 +1086,7 @@ export default function RestApi(props) {
       },
       SMS: {
         getSmsCampaigns: getSmsCampaigns,
+        getSmsCampaignsForSite: getSmsCampaignsForSite,
         getSmsCampaign: getSmsCampaign,
         deleteSmsCampaign: deleteSmsCampaign,
         getSmsCampaignSubscribers: getSmsCampaignSubscribers,
@@ -1072,6 +1111,7 @@ export default function RestApi(props) {
       },
       Livestreams: {
         getLivestreams: getLivestreams,
+        getLivestreamsForSite: getLivestreamsForSite,
         getLivestream: getLivestream,
         insertOrUpdateLivestream: insertOrUpdateLivestream,
         deleteLivestream: deleteLivestream,

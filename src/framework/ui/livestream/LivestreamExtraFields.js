@@ -1,8 +1,8 @@
 import {useEffect, useState} from "react";
-import {useSiteContext} from "../../content/Site";
-import {useRestApi} from "../../../api/RestApi";
+import {useSiteContext} from "../content/Site";
+import {useRestApi} from "../../api/RestApi";
 import {Col, Form, Row} from "react-bootstrap";
-import {useFormData} from "../../editor/FormEditor";
+import {useFormData} from "../editor/FormEditor";
 
 export default function LivestreamExtraFields() {
 

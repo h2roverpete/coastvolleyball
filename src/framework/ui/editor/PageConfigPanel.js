@@ -1,6 +1,6 @@
 import {useEffect, useRef} from "react";
 import {useNavigate} from "react-router";
-import PageConfig from "./PageConfig";
+import PageFields from "./PageFields";
 import FormEditor from "./FormEditor";
 import {useTouchContext} from "../../util/TouchProvider";
 import EditorPanel from "./EditorPanel";
@@ -24,11 +24,11 @@ export default function PageConfigPanel() {
     buttonRef.current?.click();
   }
 
-  function onPageUpdated() {
+  function handleUpdate() {
     collapsePanel();
   }
 
-  function onPageDeleted() {
+  function handleDelete() {
     collapsePanel();
     navigate('/');
   }
@@ -58,11 +58,11 @@ export default function PageConfigPanel() {
         ref={panelRef}
       >
         <FormEditor>
-          <EditorPanel buttonRef={buttonRef} hideButtons={true}>
-            <PageConfig
-              onPageUpdated={onPageUpdated}
-              onPageDeleted={onPageDeleted}
-              modalRef={panelRef}
+          <EditorPanel buttonRef={buttonRef}>
+            <PageFields
+              data={currentPage}
+              onUpdate={handleUpdate}
+              onDelete={handleDelete}
             />
           </EditorPanel>
         </FormEditor>

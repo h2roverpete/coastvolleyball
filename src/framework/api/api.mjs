@@ -104,6 +104,7 @@ import axios from "axios";
  * @typedef GuestBookConfig
  *
  * @property {Number} GuestBookID
+ * @property {Number} SiteID
  * @property {String} GuestBookName
  * @property {String} GuestBookEmail
  * @property {String} GuestBookCCEmail

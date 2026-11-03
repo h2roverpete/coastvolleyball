@@ -1,9 +1,12 @@
 import EmailField from "../forms/EmailField";
 import CustomFieldsConfig from "./CustomFieldsConfig";
-import {Col, Row, Form} from "react-bootstrap";
+import {Col, Row, Form, Button, Modal} from "react-bootstrap";
 import {useFormData} from "../editor/FormEditor";
-import {useCallback, useEffect} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {isValidEmail} from "../../util/Validators";
+import CrudButtons from "../editor/CrudButtons";
+import {useRestApi} from "../../api/RestApi";
+import {useSiteContext} from "../content/Site";
 
 /**
  * @typedef GuestBookFieldsApi
@@ -14,18 +17,35 @@ import {isValidEmail} from "../../util/Validators";
 /**
  * Display guest book configuration for editing.
  *
- * @param guestBookConfig {GuestBookConfig}
- * @param api {function(GuestBookFieldsApi)}
  * @returns {JSX.Element}
  * @constructor
  */
-export default function GuestBookFields({guestBookConfig, api}) {
+export default function GuestBookFields({data, guestBookId, siteId, onUpdate, onDelete, onCancel}) {
 
   const formData = useFormData();
+  const {GuestBooks, Sites} = useRestApi();
+  const {showErrorAlert} = useSiteContext();
+
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [siteList, setSiteList] = useState(null);
 
   useEffect(() => {
-    formData.setData(guestBookConfig);
-  }, [guestBookConfig, formData]);
+    if (data) {
+      formData.setData(data);
+    } else if (guestBookId) {
+      GuestBooks.getGuestBook(guestBookId).then((data) => {
+        formData.setData(data);
+      }).catch((err) => showErrorAlert(`Error loading guest book.`,err));
+    }
+  }, [data, formData]);
+
+  useEffect(() => {
+    if (!siteList) {
+      Sites.getSites().then((result) => {
+        setSiteList(result);
+      }).catch(error => showErrorAlert(`Error loading site list.`, error));
+    }
+  })
 
   const areCustomFieldsValid = useCallback(() => {
     for (let i = 0; i <= 8; i++) {
@@ -36,11 +56,29 @@ export default function GuestBookFields({guestBookConfig, api}) {
     return true;
   }, [formData]);
 
-  const isDataValid = useCallback(() => {
+  function isDataValid() {
     return formData.edits?.GuestBookName?.length > 0 && isValidEmail(formData.edits?.GuestBookEmail) && areCustomFieldsValid()
-  }, [formData, areCustomFieldsValid]);
+  }
 
-  const addCustomField = useCallback(() => {
+  function handleUpdate() {
+    GuestBooks.insertOrUpdateGuestBook(formData.edits)
+      .then(result => {
+        formData.update(result);
+        onUpdate?.(result);
+      })
+      .catch(error => showErrorAlert(`Error updating guest book.`, error));
+  }
+
+  function handleDelete() {
+    GuestBooks.deleteGuestBook(formData.edits.GuestBookID)
+      .then(result => {
+        setShowDeleteConfirmation(false);
+        onDelete?.(result);
+      })
+      .catch(error => showErrorAlert(`Error deleting guest book.`, error));
+  }
+
+  function addCustomField() {
     for (let i = 1; i <= 8; i++) {
       if (!formData.edits[`Custom${i}Type`]) {
         console.debug(`Adding custom field at position ${i}`);
@@ -54,9 +92,9 @@ export default function GuestBookFields({guestBookConfig, api}) {
         break;
       }
     }
-  }, [formData]);
+  }
 
-  const lastCustomField = useCallback(() => {
+  function lastCustomField() {
     let last = 0;
     for (let i = 1; i <= 8; i++) {
       if (formData.edits[`Custom${i}Type`]) {
@@ -64,18 +102,22 @@ export default function GuestBookFields({guestBookConfig, api}) {
       }
     }
     return last;
-  }, [formData]);
+  }
 
-  useEffect(() => {
-    if (api) {
-      api({
-        isDataValid: isDataValid,
-        addCustomField: addCustomField,
-        lastCustomField: lastCustomField,
-      })
-    }
-  }, [api, isDataValid, addCustomField, lastCustomField]);
+  const extraButtons = <>
+    <Button
+      size={"sm"}
+      variant={"secondary"}
+      disabled={lastCustomField() > 7}
+      onClick={addCustomField}
+      className="me-2"
+    >
+      <span className={"d-none d-sm-inline"}>Add a Field</span>
+      <span className={"d-inline d-sm-none"}>+ Field</span>
+    </Button>
+  </>;
 
+  const labelCols=2;
   return <>
     <Row>
       <Col>
@@ -97,6 +139,27 @@ export default function GuestBookFields({guestBookConfig, api}) {
         />
       </Col>
     </Row>
+    {!siteId && <Row className="mt-2">
+      <Form.Label
+        column={'sm'}
+        className="required"
+        sm={labelCols}
+        htmlFor={'GalleryName'}
+      >
+        Site
+      </Form.Label>
+      <Col>
+        <Form.Select
+          size={'sm'}
+          id={'SiteID'}
+          value={formData.edits?.SiteID || 0}
+          onChange={(e) => formData.onDataChanged({name: 'SiteID', value: parseInt(e.target.value)})}
+        >
+          <option value={0}>(select)</option>
+          {siteList?.map(site => <option key={site.SiteID} value={site.SiteID}>{site.SiteName}</option>)})
+        </Form.Select>
+      </Col>
+    </Row>}
     <Row>
       <Col sm={6}>
         <Form.Label
@@ -322,7 +385,6 @@ export default function GuestBookFields({guestBookConfig, api}) {
         />
       </Col>
     </Row>
-
     {formData.edits?.ShowMailingList && (
       <Row className="mt-2">
         <Col>
@@ -336,5 +398,29 @@ export default function GuestBookFields({guestBookConfig, api}) {
       </Row>
     )}
     <CustomFieldsConfig guestBookConfig={formData.edits} onChange={(data) => formData.onDataChanged(data)}/>
+    <CrudButtons
+      data={formData.edits}
+      keyName={'GuestBookID'}
+      onUpdate={handleUpdate}
+      onCancel={onCancel}
+      onDelete={() => setShowDeleteConfirmation(true)}
+      isDataValid={isDataValid}
+      extraButtons={extraButtons}
+    />
+    <Modal
+      show={showDeleteConfirmation}
+      onHide={() => setShowDeleteConfirmation(false)}
+      className={'Editor'}
+      size={'sm'}
+    >
+      <Modal.Body>
+        <h5>Delete Guest Book</h5>
+        <div>Are you sure you want to delete &ldquo;{formData?.edits.GuestBookName}&rdquo;? This action can't be undone.</div>
+        <div className={'mt-2 d-flex align-items-center justify-content-end gap-3'}>
+          <Button size={"sm"} variant={"secondary"} onClick={() => setShowDeleteConfirmation(false)}>Cancel</Button>
+          <Button size={"sm"} variant={"danger"} onClick={handleDelete}>Delete</Button>
+        </div>
+      </Modal.Body>
+    </Modal>
   </>
 }

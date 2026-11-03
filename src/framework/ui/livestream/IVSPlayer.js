@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
-import {useRestApi} from "../../../api/RestApi";
+import {useRestApi} from "../../api/RestApi";
 import './IVSPlayer.css';
+import {useSiteContext} from "../content/Site";
 
 /**
  * Display a live stream player in the browser.
@@ -12,6 +13,7 @@ import './IVSPlayer.css';
 export default function IVSPlayer({data}) {
 
   const {Livestreams} = useRestApi();
+  const {showErrorAlert} = useSiteContext();
 
   const [streamInfo, setStreamInfo] = useState(null);
 
@@ -19,10 +21,11 @@ export default function IVSPlayer({data}) {
     const getStreamInfo = () => {
       if (data) {
         Livestreams.getStreamInfo(data.LivestreamID).then((stream) => {
-          setStreamInfo(stream);
+          if (!stream.error) {
+            setStreamInfo(stream);
+          }
         }).catch((err) => {
-          // stream not available
-          setStreamInfo(null);
+          showErrorAlert(`Error getting stream.`, err);
         })
       }
     }
@@ -39,9 +42,8 @@ export default function IVSPlayer({data}) {
             <iframe
               src={data.IVSPlaybackURL}
               allow="autoplay; fullscreen; picture-in-picture"
-              allowFullScreen
               className={'IVSPlayerIFrame'}
-              title="Amazon IVS Live Stream Player Frame"
+              title={`${data.LivestreamName} Live Stream`}
             />
           </div>
           :

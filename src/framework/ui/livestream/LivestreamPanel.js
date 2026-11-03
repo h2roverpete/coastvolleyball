@@ -9,12 +9,12 @@ import {
 import {BsCopy} from "react-icons/bs";
 import {useEffect, useState} from "react";
 import IVSPlayer from "./IVSPlayer";
-import EditorPanel from "../../editor/EditorPanel";
-import FormEditor from "../../editor/FormEditor";
-import {useRestApi} from "../../../api/RestApi";
-import {useSiteContext} from "../../content/Site";
-import {useAuth} from "../../../auth/AuthProvider";
-import {Resource, Permission} from "../../../auth/Permissions";
+import EditorPanel from "../editor/EditorPanel";
+import FormEditor from "../editor/FormEditor";
+import {useRestApi} from "../../api/RestApi";
+import {useSiteContext} from "../content/Site";
+import {useAuth} from "../../auth/AuthProvider";
+import {Resource, Permission} from "../../auth/Permissions";
 
 export default function LivestreamPanel({data, livestreamId, menuItems}) {
 
@@ -68,7 +68,7 @@ export default function LivestreamPanel({data, livestreamId, menuItems}) {
       {canBroadcast &&
         <FormEditor>
           <EditorPanel hideButtons={!canEdit} menuItems={menuItems}>
-            <h5>{livestreamData.LivestreamName} Stream Settings</h5>
+            <h5>Stream Settings</h5>
             <Row className={'mt-3'}>
               <Form.Label column={'sm'} htmlFor={'IVSIngestEndpoint'}>Secure Ingest URL</Form.Label>
               <Col xs={8} className={'d-flex justify-content-start align-items-center'}>
