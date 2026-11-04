@@ -1,10 +1,11 @@
 import {useEffect, useState} from "react";
 import {useRestApi} from "../../api/RestApi";
 import {useSiteContext} from "../content/Site";
-import {Col, Form, Modal, ModalBody, Row, Button} from "react-bootstrap";
+import {Col, Form, Modal, ModalBody, Row, Button, Spinner} from "react-bootstrap";
 import {useFormData} from "../editor/FormEditor";
 import CrudButtons from "../editor/CrudButtons";
 import '../editor/Editor.css';
+
 /**
  * Manage gallery data.
  *
@@ -25,11 +26,13 @@ export default function GalleryFields({data, galleryId, siteId, onCancel, onUpda
 
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [siteList, setSiteList] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+  const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
     if (data) {
       // use provided data
-      formData.update({...data, SiteID:data.SiteID ? data.SiteID : siteId});
+      formData.update({...data, SiteID: data.SiteID ? data.SiteID : siteId});
     } else if (galleryId) {
       // fetch data from REST API
       Galleries.getGallery(galleryId).then((result) => {
@@ -39,7 +42,7 @@ export default function GalleryFields({data, galleryId, siteId, onCancel, onUpda
       })
     } else {
       // default values
-      formData.update({SiteID:siteId});
+      formData.update({SiteID: siteId});
     }
   }, [galleryId, siteId, data, showErrorAlert, Galleries]);
 
@@ -56,16 +59,27 @@ export default function GalleryFields({data, galleryId, siteId, onCancel, onUpda
   }
 
   function handleUpdate(data) {
+    setUpdating(true);
     Galleries.insertOrUpdateGallery(data).then((result) => {
       formData.update(result);
+      setUpdating(false);
       onUpdate?.(result);
-    }).catch(error => showErrorAlert(error));
+    }).catch(error => {
+      setUpdating(false);
+      showErrorAlert(error);
+    });
   }
 
   function handleDelete(data) {
+    setDeleting(true);
     Galleries.deleteGallery(data.GalleryID).then(() => {
+      setDeleting(false);
       onDelete?.(data);
-    }).catch(error => showErrorAlert(error));
+    }).catch(error => {
+        setDeleting(false);
+        showErrorAlert(error)
+      }
+    );
   }
 
   const labelCols = 2;
@@ -128,6 +142,8 @@ export default function GalleryFields({data, galleryId, siteId, onCancel, onUpda
       isDataValid={isDataValid}
       onDelete={() => setShowDeleteConfirmation(true)}
       onUpdate={handleUpdate}
+      updating={updating}
+      deleting={deleting}
     />
     <Modal show={showDeleteConfirmation} onHide={() => setShowDeleteConfirmation(false)} size={'sm'}>
       <ModalBody className={'Editor'}>
@@ -145,13 +161,16 @@ export default function GalleryFields({data, galleryId, siteId, onCancel, onUpda
           <Button
             size={'sm'}
             variant="danger"
-            onClick={() => handleDelete(formData?.edits)}
+            onClick={() => {
+              setShowDeleteConfirmation(false);
+              handleDelete(formData?.edits);
+            }}
           >
             Delete
           </Button>
-
         </div>
       </ModalBody>
     </Modal>
-  </>;
+  </>
+    ;
 }

@@ -25,7 +25,10 @@ export default function SmsWhitelistEntryFields({entry, onAdd, onDelete, onUpdat
   const {SMS} = useRestApi();
   const {showErrorAlert} = useSiteContext();
   const formData = useFormData();
+
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
     formData.update(entry);
@@ -45,6 +48,7 @@ export default function SmsWhitelistEntryFields({entry, onAdd, onDelete, onUpdat
    * Handle update event from CrudButtons.
    */
   function handleUpdate(data) {
+    setUpdating(true);
     data.Phone = data.Phone?.replace(/[^/+[0-9]/g, "");
     SMS.insertOrUpdateSmsWhitelistEntry(data).then((result) => {
       if (!data.WhitelistEntryID && result.WhitelistEntryID) {
@@ -52,8 +56,10 @@ export default function SmsWhitelistEntryFields({entry, onAdd, onDelete, onUpdat
       } else {
         onUpdate(result);
       }
+      setUpdating(false);
     }).catch((error) => {
       showErrorAlert(error);
+      setUpdating(false);
     })
   }
 
@@ -70,11 +76,14 @@ export default function SmsWhitelistEntryFields({entry, onAdd, onDelete, onUpdat
    * Handle delete event from CrudButtons.
    */
   function handleDelete() {
+    setDeleting(true);
     setShowDeleteConfirmation(false);
     SMS.deleteSmsWhitelistEntry(entry.SMSCampaignID, entry.WhitelistEntryID).then((result) => {
       onDelete(result);
+      setDeleting(false);
     }).catch((error) => {
       showErrorAlert(error);
+      setDeleting(false);
     })
   }
 
@@ -141,6 +150,8 @@ export default function SmsWhitelistEntryFields({entry, onAdd, onDelete, onUpdat
       onCancel={handleCancel}
       onDelete={() => setShowDeleteConfirmation(true)}
       isDataValid={isDataValid}
+      updating={updating}
+      deleting={deleting}
     />
 
     <Modal

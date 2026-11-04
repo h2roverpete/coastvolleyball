@@ -7,6 +7,7 @@ import {useFormData} from "./FormEditor";
 import {Button, Col, Form, Modal, Row} from "react-bootstrap";
 import {Permission, Resource} from "../../auth/Permissions";
 import {useAuth} from "../../auth/AuthProvider";
+import CrudButtons from "./CrudButtons";
 
 /**
  * Show modal dialog to create a new page
@@ -26,6 +27,7 @@ export default function NewPageModal({show, setShow}) {
 
   const [routes, setRoutes] = useState([]);
   const [canEdit, setCanEdit] = useState(false);
+  const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
     setCanEdit(hasPermission?.(Resource.SITE, Permission.EDIT));
@@ -61,7 +63,7 @@ export default function NewPageModal({show, setShow}) {
   }
 
   function insertNewPage() {
-    console.debug(`Insert new page...`);
+    setUpdating(true);
     Pages.insertOrUpdatePage({
       SiteID: siteData.SiteID,
       ParentID: 0,
@@ -71,21 +73,26 @@ export default function NewPageModal({show, setShow}) {
       PageHidden: formData.edits.PageHidden,
     })
       .then((newPage) => {
-        console.debug(`Page inserted.`);
         PageSections.insertOrUpdatePageSection({
           PageID: newPage.PageID,
           ParentID: 0
-        }).then((newSection) => {
-          console.debug(`Page section inserted.`);
+        }).then(() => {
+          setUpdating(false);
           setShow?.(false);
           formData.revert();
           Outline.addPage(newPage);
           navigate(newPage.PageRoute);
-        }).catch(e => console.error(`Error inserting new page section.`, e));
-      }).catch(e => console.error(`Error inserting new page.`, e));
+        }).catch(e => {
+          setUpdating(false);
+          console.error(`Error inserting new page section.`, e);
+        });
+      }).catch(e => {
+        setUpdating(false);
+      console.error(`Error inserting new page.`, e);
+    });
   }
 
-  function onCancel() {
+  function handleCancel() {
     formData.revert();
     setShow?.(false);
   }
@@ -93,11 +100,11 @@ export default function NewPageModal({show, setShow}) {
   return (
     <Modal
       show={show}
-      onHide={onCancel}
+      onHide={handleCancel}
       className={'Editor'}
     >
-      <Modal.Header><h5>New Page</h5></Modal.Header>
-      <Modal.Body>
+      <Modal.Body className={'Editor'}>
+        <h5>New Page</h5>
         <Row>
           <Form.Label
             htmlFor={'PageTitle'}
@@ -165,24 +172,14 @@ export default function NewPageModal({show, setShow}) {
             />
           </Col>
         </Row>
+        <CrudButtons
+          isDataValid={isDataValid}
+          onUpdate={insertNewPage}
+          type={'Page'}
+          onCancel={handleCancel}
+          updating={updating}
+        />
       </Modal.Body>
-      <Modal.Footer>
-        <Button
-          size={'sm'}
-          variant={"secondary"}
-          onClick={onCancel}
-        >
-          Cancel
-        </Button>
-        <Button
-          size={'sm'}
-          variant="primary"
-          disabled={!isDataValid()}
-          onClick={insertNewPage}
-        >
-          Create New Page
-        </Button>
-      </Modal.Footer>
     </Modal>
   );
 }

@@ -255,14 +255,12 @@ export default function GuestManagement({guestBookId, data}) {
           </tbody>
         </Table>
         <Modal show={guestData} onHide={() => setGuestIndex(-1)}>
-          <ModalHeader closeButton>
-            <h5>Guest Feedback</h5>
-          </ModalHeader>
           <ModalBody>
+            <h5>Guest Feedback</h5>
             <div
               style={{
                 height: '70dvh',
-                overflowY: 'scroll',
+                overflowY: 'auto',
               }}
             >
               {guestData && guestBookData && (<Container>
@@ -282,8 +280,6 @@ export default function GuestManagement({guestBookId, data}) {
 
               </Container>)}
             </div>
-          </ModalBody>
-          <ModalFooter>
             <Row className="container-fluid m-0 p-0">
               <Col className="d-flex justify-content-start m-0 p-0">
                 <Button
@@ -322,7 +318,7 @@ export default function GuestManagement({guestBookId, data}) {
                 </Button>
               </Col>
             </Row>
-          </ModalFooter>
+          </ModalBody>
         </Modal>
       </>)}
     </>)}

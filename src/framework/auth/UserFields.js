@@ -32,6 +32,8 @@ export default function UserFields({data, siteId, onCancel, onDelete, onUpdate})
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [sites, setSites] = useState();
   const [canAdmin, setCanAdmin] = useState(false);
+  const [updating, setUpdating] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (data?.UserID) {
@@ -66,21 +68,31 @@ export default function UserFields({data, siteId, onCancel, onDelete, onUpdate})
   }, [sites, Sites, showErrorAlert]);
 
   function handleUpdate(data) {
+    setUpdating(true);
     if (data.UserPhone) {
       // remove formatting from phone number
       data.UserPhone = data.UserPhone.replaceAll(/[^0-9+]/g, "");
     }
     Users.insertOrUpdateUser(data).then((result) => {
+      setUpdating(false);
       onUpdate?.(result);
       formData.update(result);
-    }).catch(err => showErrorAlert(err));
+    }).catch(err => {
+      setUpdating(false);
+      showErrorAlert(err);
+    });
   }
 
   function handleDelete() {
+    setDeleting(true);
     setShowDeleteConfirmation(false);
     Users.deleteUser(data.UserID).then(() => {
+      setDeleting(false);
       onDelete?.(data);
-    }).catch(err => showErrorAlert(err));
+    }).catch(err => {
+      setDeleting(false);
+      showErrorAlert(err);
+    });
   }
 
   function isDataValid(data) {
@@ -233,6 +245,8 @@ export default function UserFields({data, siteId, onCancel, onDelete, onUpdate})
         onCancel={onCancel}
         onDelete={onDelete ? () => setShowDeleteConfirmation(true) : undefined}
         isDataValid={isDataValid}
+        updating={updating}
+        deleting={deleting}
       />
       <Modal
         show={showDeleteConfirmation}

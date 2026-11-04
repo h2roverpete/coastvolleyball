@@ -101,7 +101,6 @@ export default function Site(props) {
   useEffect(() => {
     // get current page and breadcrumbs from new pathname
     if (outlineData) {
-      console.debug(`Update current page.`);
       if (location.pathname === '/') {
         if (redirect > 0) {
           // find redirect page
@@ -110,7 +109,6 @@ export default function Site(props) {
               setCurrentPage(page);
               const crumbs = buildBreadcrumbs(outlineData, page.ParentID);
               setBreadcrumbs(crumbs);
-              console.debug(`Redirect current page to ${page.PageID}.`);
               return;
             }
           }
@@ -118,14 +116,12 @@ export default function Site(props) {
         }
         // set home page
         setCurrentPage(outlineData[0]);
-        console.debug(`Set current page to home page.`);
       } else {
         for (const page of outlineData) {
           if (page.PageRoute === location.pathname || page.PageID === cfmPageId) {
             setCurrentPage(page);
             const crumbs = buildBreadcrumbs(outlineData, page.ParentID);
             setBreadcrumbs(crumbs);
-            console.debug(`Set current page to ${page.PageID}.`);
             return;
           }
         }
@@ -197,7 +193,6 @@ export default function Site(props) {
     if (!siteData) {
       // load site data
       Sites.getSite().then((data) => {
-        console.debug(`Loaded site ${data.SiteID}.`);
         setSiteData(data);
       }).catch(err => console.error(`Error loading site.`, err));
     }
@@ -207,7 +202,6 @@ export default function Site(props) {
     if (!outlineData) {
       // load site outline
       Sites.getSiteOutline().then((data) => {
-        console.debug(`Loaded site outline.`);
         setOutlineData(buildOutline(data));
       }).catch(err => console.error(`Error loading outline.`, err));
     }
@@ -218,7 +212,6 @@ export default function Site(props) {
       // search for page redirect matches
       for (const item of props.redirects) {
         if (item.hostname === window.location.hostname) {
-          console.debug(`Setting redirect ${item.hostname} to page ${item.pageId}.`);
           setRedirect(item.pageId)
         }
       }

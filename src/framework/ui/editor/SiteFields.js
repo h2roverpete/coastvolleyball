@@ -2,7 +2,7 @@ import {useSiteContext} from "../content/Site";
 import {Col, Form, Row} from "react-bootstrap";
 import {useRestApi} from "../../api/RestApi";
 import {useFormData} from "./FormEditor";
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import CrudButtons from "./CrudButtons";
 import {isValidUrl, isValidBucketName} from "../../util/Validators";
 
@@ -24,7 +24,7 @@ import {isValidUrl, isValidBucketName} from "../../util/Validators";
  * @returns {JSX.Element}
  * @constructor
  */
-export default function SiteConfig(props) {
+export default function SiteFields(props) {
 
   // imports
   const {siteData, setSiteData, showErrorAlert} = useSiteContext();
@@ -32,6 +32,9 @@ export default function SiteConfig(props) {
 
   /** @type FormDataAPI<SiteData> */
   const formData = useFormData();
+
+  const [updating, setUpdating] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (props.siteData) {
@@ -43,28 +46,32 @@ export default function SiteConfig(props) {
     }
   }, [siteData, formData, props.siteData]);
 
-  function onUpdate() {
-    console.debug(`Updating site properties...`);
+  function handleUpdate() {
+    setUpdating(true);
     Sites.insertOrUpdateSite(formData.edits).then((result) => {
-      console.debug(`Site updated.`);
       formData.update(result);
       if (!props.siteData) {
         // update if we are getting data from site context
         setSiteData(result);
       }
       props.onUpdate?.(result);
+      setUpdating(false);
     }).catch((err) => {
+      setUpdating(false);
       console.error(`Error updating site properties.`, err);
     })
   }
 
-  function onDelete() {
+  function handleDelete() {
+    setDeleting(true);
     Sites.deleteSite(formData.edits.SiteID)
       .then(result => {
         props.onDelete?.(result);
+        setDeleting(false);
       })
       .catch((err) => {
         showErrorAlert(err);
+        setDeleting(false);
       });
   }
 
@@ -77,7 +84,7 @@ export default function SiteConfig(props) {
   return (<>
     {siteData && (
       <div
-        className={`SiteConfig ${props.className ? props.className : ''}`}
+        className={`SiteConfig`}
         style={props.style}
       >
         <h5>Site Properties</h5>
@@ -186,9 +193,11 @@ export default function SiteConfig(props) {
           keyName={'SiteID'}
           type={'Site'}
           onCancel={props.onCancel}
-          onUpdate={onUpdate}
-          onDelete={props.onDelete ? onDelete : undefined}
+          onUpdate={handleUpdate}
+          onDelete={props.onDelete ? handleDelete : undefined}
           isDataValid={isDataValid}
+          updating={updating}
+          deleting={deleting}
         />
       </div>
     )}

@@ -15,21 +15,22 @@ export default function UserMenu({buttonRef, onClose}) {
   const [campaigns, setCampaigns] = useState(/** @type {[SMSCampaignData]} */ null);
   const [galleries, setGalleries] = useState(/** @type {[GalleryData]} */ null);
   const [livestreams, setLivestreams] = useState(/** @type {[LivestreamData]} */ null);
-  const [guestBooks, setGuestBooks] = useState(/** @type {[GuestBookData]} */ null);
-  const [hasSmsPermission, setHasSmsPermission] = useState(false);
-  const [hasUserPermission, setHasUserPermission] = useState(false);
-  const [hasGalleryPermission, setHasGalleryPermission] = useState(false);
-  const [hasLivestreamPermission, setHasLivestreamPermission] = useState(false);
-  const [hasGuestBookPermission, setHasGuestbookPermission] = useState(false);
+  const [guestBooks, setGuestBooks] = useState(/** @type {[GuestBookConfig]} */ null);
   const {SMS, Galleries, Livestreams, GuestBooks} = useRestApi();
   const {hasPermission} = useAuth();
+
+  const hasSmsPermission = hasPermission(Resource.SMS, Permission.SEND);
+  const hasUserPermission = hasPermission(Resource.USERS, Permission.ADMIN);
+  const hasGalleryPermission = hasPermission(Resource.GALLERY, Permission.ADMIN);
+  const hasLivestreamPermission = hasPermission(Resource.LIVESTREAM, Permission.ADMIN);
+  const hasGuestBookPermission = hasPermission(Resource.GUESTBOOK, Permission.ADMIN);
 
   useEffect(() => {
     if (siteData && hasSmsPermission && !campaigns) {
       SMS.getSmsCampaignsForSite(siteData.SiteID).then((response) => {
         setCampaigns(response);
       }).catch((err) => {
-        showErrorAlert(`Error getting messaging campaign list.`,err);
+        showErrorAlert(`Error getting messaging campaign list.`, err);
       })
     }
   }, [siteData, campaigns, setCampaigns, hasPermission, hasSmsPermission, SMS, showErrorAlert]);
@@ -39,7 +40,7 @@ export default function UserMenu({buttonRef, onClose}) {
       Galleries.getGalleriesForSite(siteData.SiteID).then((response) => {
         setGalleries(response);
       }).catch((err) => {
-        showErrorAlert(`Error getting gallery list.`,err);
+        showErrorAlert(`Error getting gallery list.`, err);
       })
     }
   }, [siteData, galleries, setGalleries, hasGalleryPermission, Galleries, showErrorAlert]);
@@ -49,7 +50,7 @@ export default function UserMenu({buttonRef, onClose}) {
       Livestreams.getLivestreamsForSite(siteData.SiteID).then((response) => {
         setLivestreams(response);
       }).catch((err) => {
-        showErrorAlert(`Error getting livestream list.`,err);
+        showErrorAlert(`Error getting livestream list.`, err);
       })
     }
   }, [siteData, livestreams, Livestreams, hasLivestreamPermission, setLivestreams, showErrorAlert]);
@@ -59,18 +60,10 @@ export default function UserMenu({buttonRef, onClose}) {
       GuestBooks.getGuestBooksForSite(siteData.SiteID).then((response) => {
         setGuestBooks(response);
       }).catch((err) => {
-        showErrorAlert(`Error getting guest book list.`,err);
+        showErrorAlert(`Error getting guest book list.`, err);
       })
     }
   }, [siteData, guestBooks, GuestBooks, hasGuestBookPermission, setGuestBooks, showErrorAlert]);
-
-  useEffect(() => {
-    setHasSmsPermission(hasPermission(Resource.SMS, Permission.SEND));
-    setHasUserPermission(hasPermission(Resource.USERS, Permission.ADMIN));
-    setHasGalleryPermission(hasPermission(Resource.GALLERY, Permission.ADMIN));
-    setHasLivestreamPermission(hasPermission(Resource.LIVESTREAM, Permission.ADMIN));
-    setHasGuestbookPermission(hasPermission(Resource.GUESTBOOK, Permission.ADMIN));
-  }, [hasPermission, setHasSmsPermission, setHasUserPermission, setHasGalleryPermission, setHasLivestreamPermission, setHasGuestbookPermission]);
 
   return (<>
     <div

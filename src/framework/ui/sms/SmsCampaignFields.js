@@ -24,6 +24,8 @@ export default function SmsCampaignFields({campaign, smsCampaignId, onAdd, onUpd
 
   const [sites, setSites] = useState();
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
     if (!sites) {
@@ -65,6 +67,7 @@ export default function SmsCampaignFields({campaign, smsCampaignId, onAdd, onUpd
    * Handle update event from CrudButtons.
    */
   function handleUpdate() {
+    setUpdating(true);
     SMS.insertOrUpdateSmsCampaign(formData.edits).then((result) => {
       formData.update(result);
       if (formData.edits.SMSCampaignID > 0) {
@@ -72,8 +75,10 @@ export default function SmsCampaignFields({campaign, smsCampaignId, onAdd, onUpd
       } else {
         onAdd?.(result);
       }
+      setUpdating(false);
     }).catch(error => {
       showErrorAlert(error);
+      setUpdating(false);
     })
   }
 
@@ -92,9 +97,14 @@ export default function SmsCampaignFields({campaign, smsCampaignId, onAdd, onUpd
    * Handle delete event from CrudButtons.
    */
   function handleDelete() {
+    setDeleting(true);
     setShowDeleteConfirmation(false);
     SMS.deleteSmsCampaign(formData.edits.SMSCampaignID).then((result) => {
+      setDeleting(false);
       onDelete?.(result);
+    }).catch(error => {
+      showErrorAlert(`Error deleting campaign.`, error);
+      setDeleting(false);
     });
   }
 
@@ -633,6 +643,8 @@ export default function SmsCampaignFields({campaign, smsCampaignId, onAdd, onUpd
       onCancel={onCancel && handleCancel}
       onDelete={onDelete && confirmDelete}
       isDataValid={isDataValid}
+      updating={updating}
+      deleting={deleting}
     />
     <Modal
       show={showDeleteConfirmation}

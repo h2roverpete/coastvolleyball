@@ -48,7 +48,6 @@ export default function Page({children, pageId}) {
       for (const page of outlineData) {
         if (page.PageID === pageId) {
           setPageData(page);
-          console.debug(`Loaded page ${pageId} data.`);
           return;
         }
       }
@@ -57,7 +56,6 @@ export default function Page({children, pageId}) {
       for (const page of metaPages) {
         if (page.id === pageId) {
           setPageData({PageID: page.id, PageTitle: page.title, PageContent: page.content});
-          console.debug(`Loaded meta-page ${pageId} data.`);
           return;
         }
       }
@@ -68,9 +66,7 @@ export default function Page({children, pageId}) {
     // load page sections from DynamoDB
     if (pageId && pageId !== pageData?.PageID) {
       Pages.getPageSections(pageId).then((sections) => {
-        console.debug(`Loaded page ${pageId} sections.`);
         Extras.getPageExtras(pageId).then((extras) => {
-          console.debug(`Loaded page ${pageId} extras.`);
           sections.forEach((section) => {
             section.Extras = extras.filter((extra) => extra.PageSectionID === section.PageSectionID).sort((a, b) => a.ExtraSeq - b.ExtraSeq)
           })

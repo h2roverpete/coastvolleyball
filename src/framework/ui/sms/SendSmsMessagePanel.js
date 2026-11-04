@@ -33,8 +33,6 @@ export default function SendSmsMessagePanel({campaign}) {
   const [messageSent, setMessageSent] = useState(false);
   const [successCount, setSuccessCount] = useState(0);
   const [messageLog, setMessageLog] = useState(/** @type [SMSLogData]*/[]);
-  const [failureCount, setFailureCount] = useState(null);
-  const [showLog, setShowLog] = useState(false);
   const [sendToAll, setSendToAll] = useState(true);
   const [sendTo, setSendTo] = useState(/** @type SMSSubscriberData[] */ []);
   const [siteData, setSiteData] = useState(/** @type SiteData */null);
@@ -86,19 +84,14 @@ export default function SendSmsMessagePanel({campaign}) {
   useEffect(() => {
     if (messageLog) {
       let successCount = 0;
-      let failureCount = 0;
       for (const logEntry of messageLog) {
-        if (logEntry.Error) {
-          failureCount++;
-        } else {
+        if (!logEntry.Error) {
           successCount++;
         }
       }
       setSuccessCount(successCount);
-      setFailureCount(failureCount);
     } else {
       setSuccessCount(0);
-      setFailureCount(0);
     }
   }, [messageLog]);
 
@@ -177,19 +170,8 @@ export default function SendSmsMessagePanel({campaign}) {
   return <>
     {campaign && hasSendPermission && <div className={'SendSmsMessagePanel'}>
       {messageSent ? <>
-        <Row className={'mt-2'}><Col><p>Your message was sent to {successCount} subscriber(s). {failureCount} error(s)
-          occurred.</p></Col></Row>
-        {showLog && <Row className={'mt-2'}>
-          <Col>
-            {messageLog.map((logEntry) => {
-              return <div key={logEntry.SMSLogID}
-                          className={logEntry.Error ? "text-danger" : "text-success"}>{logEntry.Subscriber} {logEntry.Error}</div>
-            })}
-          </Col>
-        </Row>}
+        <Row className={'mt-2'}><Col><p>Your message was sent to {successCount} subscriber(s).</p></Col></Row>
         <Row className={'mt-2'}><Col>
-          <Button variant={"secondary"} style={{marginRight: "10px"}} onClick={() => setShowLog(!showLog)}>{showLog ?
-            <span>Hide Details</span> : <span>Show Details</span>}</Button>
           <Button onClick={() => setMessageSent(false)}>Send Another
             Message</Button>
         </Col></Row>

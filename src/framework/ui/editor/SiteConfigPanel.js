@@ -3,7 +3,7 @@ import {BsChevronCompactLeft, BsChevronCompactRight, BsXLg} from "react-icons/bs
 import SiteOutline from "./SiteOutline";
 import FormEditor from "./FormEditor";
 import {useRef, useState} from "react";
-import SiteConfig from "./SiteConfig";
+import SiteFields from "./SiteFields";
 import {useTouchContext} from "../../util/TouchProvider";
 import EditorPanel, {Direction} from "./EditorPanel";
 
@@ -105,7 +105,7 @@ export default function SiteConfigPanel() {
           }}>
             <FormEditor>
               <EditorPanel hideButtons={true} hideCloseBox={true} direction={Direction.UP}>
-                <SiteConfig/>
+                <SiteFields/>
               </EditorPanel>
             </FormEditor>
           </div>

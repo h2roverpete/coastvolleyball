@@ -24,7 +24,7 @@ export default function PageSwiper({children}) {
 
   useEffect(() => {
     if (outlineData) {
-      setSwipePages(outlineData.filter((page) => !page.PageHidden && !page.HasChildren && (!page.RequiresLogin || hasPermission(Resource.PAGE, Permission.BROWSE_PROTECTED))));
+      setSwipePages(outlineData.filter((page) => (!page.PageHidden || currentPage?.PageID === page.PageID) && !page.HasChildren && (!page.RequiresLogin || hasPermission(Resource.PAGE, Permission.BROWSE_PROTECTED))));
     }
   }, [outlineData, setSwipePages, hasPermission]);
 

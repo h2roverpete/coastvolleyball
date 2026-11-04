@@ -51,12 +51,10 @@ function GuestBook({guestBookId, menuItems}) {
   // load guest book configuration when initialized
   useEffect(() => {
     if (!guestBookConfig && guestBookId) {
-      console.debug(`Loading guest book configuration...`)
       GuestBooks.getGuestBook(guestBookId).then(data => {
         if (!data.LabelCols) {
           data.LabelCols = 2;
         }
-        console.debug(`Guest book configuration loaded.`);
         setGuestBookConfig(data);
       }).catch(error => {
         showErrorAlert(`Error loading guest book.`, error);
@@ -70,7 +68,6 @@ function GuestBook({guestBookId, menuItems}) {
    */
   function handleSubmit(e) {
     e.preventDefault();
-    console.debug(`Updating guest. data=${JSON.stringify(guestData.edits)}`);
     GuestBooks.insertOrUpdateGuest(guestBookId, {GuestBookID: guestBookConfig.GuestBookID, ...guestData.edits}).then(data => {
       setSubmitted(true);
       guestData.update(data);

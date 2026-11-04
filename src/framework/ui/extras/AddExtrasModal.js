@@ -63,7 +63,6 @@ export default function AddExtrasModal({show, onHide, onSubmit, pageSectionId}) 
             siteGalleries.push(gallery);
           }
         }
-        console.debug(`List of ${siteGalleries.length} galleries loaded.`);
         setGalleryList(siteGalleries);
       }).catch((err) => {
         showErrorAlert(`Error getting gallery list.`, err);
@@ -81,7 +80,6 @@ export default function AddExtrasModal({show, onHide, onSubmit, pageSectionId}) 
             siteGuestBooks.push(guestBook);
           }
         }
-        console.debug(`List of ${siteGuestBooks.length} guest books loaded.`);
         setGuestBookList(siteGuestBooks);
       }).catch((err) => {
         showErrorAlert(`Error getting guest book list.`, err);
@@ -99,7 +97,6 @@ export default function AddExtrasModal({show, onHide, onSubmit, pageSectionId}) 
             siteCampaigns.push(campaign);
           }
         }
-        console.debug(`List of ${siteCampaigns.length} campaigns loaded.`);
         setSmsCampaignsList(siteCampaigns);
       }).catch((err) => {
         showErrorAlert(`Error getting campaigns list.`, err);
@@ -117,7 +114,6 @@ export default function AddExtrasModal({show, onHide, onSubmit, pageSectionId}) 
     switch (formData.edits.ExtraType) {
       case 'gallery':
         if (formData.edits.GalleryID) {
-          console.debug(`Adding gallery extra.`);
           Extras.insertOrUpdateExtra({
             ExtraType: formData.edits.ExtraType,
             SiteID: siteData.SiteID,
@@ -125,7 +121,6 @@ export default function AddExtrasModal({show, onHide, onSubmit, pageSectionId}) 
             PageSectionID: pageSectionId,
             GalleryID: formData.edits.GalleryID
           }).then((extra) => {
-            console.debug(`Extra added.`);
             onExtraAdded(extra);
           }).catch((err) => {
             showErrorAlert(`Error adding extra.`, err);
@@ -135,7 +130,6 @@ export default function AddExtrasModal({show, onHide, onSubmit, pageSectionId}) 
             SiteID: siteData.SiteID,
             GalleryName: formData.edits.GalleryName,
           }).then((result) => {
-            console.debug(`Gallery added.`);
             Extras.insertOrUpdateExtra({
               ExtraType: formData.edits.ExtraType,
               SiteID: siteData.SiteID,
@@ -143,7 +137,6 @@ export default function AddExtrasModal({show, onHide, onSubmit, pageSectionId}) 
               PageSectionID: pageSectionId,
               GalleryID: result.GalleryID
             }).then((extra) => {
-              console.debug(`Extra added.`);
               onExtraAdded(extra);
             }).catch((err) => {
               showErrorAlert(`Error adding extra.`, err);
@@ -164,7 +157,6 @@ export default function AddExtrasModal({show, onHide, onSubmit, pageSectionId}) 
             ShowPhone: true,
             ShowFeedback: true
           }).then((result) => {
-            console.debug(`Guest book added.`);
             Extras.insertOrUpdateExtra({
               ExtraType: formData.edits.ExtraType,
               SiteID: siteData.SiteID,
@@ -172,7 +164,6 @@ export default function AddExtrasModal({show, onHide, onSubmit, pageSectionId}) 
               PageSectionID: pageSectionId,
               GuestBookID: result.GuestBookID
             }).then((extra) => {
-              console.debug(`Extra added.`);
               onExtraAdded(extra);
             }).catch((err) => {
               showErrorAlert(`Error adding extra.`, err);
@@ -189,7 +180,6 @@ export default function AddExtrasModal({show, onHide, onSubmit, pageSectionId}) 
             PageSectionID: pageSectionId,
             GuestBookID: formData.edits.GuestBookID
           }).then((extra) => {
-            console.debug(`Extra added.`);
             onExtraAdded(extra);
           }).catch((err) => {
             showErrorAlert(`Error adding extra.`, err);
@@ -212,7 +202,6 @@ export default function AddExtrasModal({show, onHide, onSubmit, pageSectionId}) 
               PageSectionID: pageSectionId,
               SMSCampaignID: result.SMSCampaignID
             }).then((extra) => {
-              console.debug(`Extra added.`);
               onExtraAdded(extra);
             }).catch((err) => {
               showErrorAlert(`Error adding extra.`, err);
@@ -227,7 +216,6 @@ export default function AddExtrasModal({show, onHide, onSubmit, pageSectionId}) 
             PageSectionID: pageSectionId,
             SMSCampaignID: formData.edits.SMSCampaignID
           }).then((extra) => {
-            console.debug(`Extra added.`);
             onExtraAdded(extra);
           }).catch((err) => {
             showErrorAlert(`Error adding extra.`, err);
@@ -250,7 +238,6 @@ export default function AddExtrasModal({show, onHide, onSubmit, pageSectionId}) 
                 PageSectionID: pageSectionId,
                 LivestreamID: result.LivestreamID
               }).then((extra) => {
-                console.debug(`Extra added.`);
                 onExtraAdded(extra);
               }).catch((err) => {
                 showErrorAlert(`Error adding extra.`, err);
@@ -265,7 +252,6 @@ export default function AddExtrasModal({show, onHide, onSubmit, pageSectionId}) 
             PageSectionID: pageSectionId,
             LivestreamID: formData.edits.LivestreamID
           }).then((extra) => {
-            console.debug(`Extra added.`);
             onExtraAdded(extra);
           }).catch((err) => {
             showErrorAlert(`Error adding extra.`, err);
@@ -276,14 +262,12 @@ export default function AddExtrasModal({show, onHide, onSubmit, pageSectionId}) 
       case 'instagram':
       case 'youtube':
         uploadingRef.current?.classList.remove('d-none');
-        console.debug(`Adding extra.`);
         Extras.insertOrUpdateExtra({
           ...formData.edits,
           SiteID: siteData.SiteID,
           PageID: pageData.PageID,
           PageSectionID: pageSectionId,
         }).then((extra) => {
-          console.debug(`Extra added.`);
           onExtraAdded(extra);
         }).catch((err) => showErrorAlert(`Error adding extra.`, err));
         break;

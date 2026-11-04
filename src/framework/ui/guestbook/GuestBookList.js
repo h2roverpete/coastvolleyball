@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useState} from "react";
 import {useRestApi} from "framework/api/RestApi";
-import {BsPencil, BsSortDown, BsSortUp} from "react-icons/bs";
+import {BsPencil, BsSortDown, BsSortUp, BsX, BsXLg} from "react-icons/bs";
 import {Button, CloseButton, Col, OverlayTrigger, Row, Table, Tooltip} from "react-bootstrap";
 import FormEditor from "framework/ui/editor/FormEditor";
 import {useAuth} from "framework/auth/AuthProvider";
@@ -101,9 +101,9 @@ export default function GuestBookList({siteId}) {
   return <>
     {canEdit && listItems && <>
       {view !== null ? <div className="GuestBookList Editor position-relative mt-2">
-          <CloseButton
+          <BsXLg
             className={'position-absolute'}
-            style={{top: '0px', right: '0px'}}
+            style={{top: '0px', right: '0px', fontSize: '14pt', cursor: 'pointer'}}
             onClick={() => setView(null)}
           />
           <h5>{view.GuestBookName}</h5>

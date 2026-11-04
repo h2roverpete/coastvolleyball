@@ -57,12 +57,10 @@ export default function FormEditor({apiRef, children}) {
     const touchedCopy = [...touched];
     if (changes && Array.isArray(changes)) {
       for (const change of changes) {
-        console.debug(`Form data changed: {name: '${change.name}' value: '${change.value}}'.`);
         editsCopy[change.name] = change.value;
         touchedCopy.push(change.name);
       }
     } else if (name && edits[name] !== value) {
-      console.debug(`Form data changed: {name: '${name}' value: '${value}}'.`);
       if ((value === undefined || value === null) && edits[name]) {
         delete editsCopy[name];
       } else {

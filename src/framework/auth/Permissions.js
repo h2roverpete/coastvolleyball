@@ -118,11 +118,8 @@ const checkPermission = (user, resource, permission) => {
       default:
         break;
     }
-    const canEdit = userIndex >= 0 && requestedIndex >= 0 && userIndex <= requestedIndex;
-    console.debug(`Permission for ${resource}:${permission} = ${canEdit}.`);
-    return canEdit;
+    return userIndex >= 0 && requestedIndex >= 0 && userIndex <= requestedIndex;
   } else {
-    console.error(`Unknown resource ${resource}.`);
     return false;
   }
 }

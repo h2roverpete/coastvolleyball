@@ -25,7 +25,8 @@ export default function SmsSubscriberModal({subscriber, show, onHide, onUpdate, 
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const {SMS} = useRestApi();
   const {showErrorAlert} = useSiteContext();
-
+  const [deleting, setDeleting] = useState(false);
+  const [updating, setUpdating] = useState(false);
 
   /**
    * Handle validation event from CrudButtons.
@@ -40,6 +41,7 @@ export default function SmsSubscriberModal({subscriber, show, onHide, onUpdate, 
    * Handle update event from CrudButtons.
    */
   function handleUpdate(data) {
+    setUpdating(true);
     data.SubscriberMobileNumber = data.SubscriberMobileNumber?.replace(/[^/+0-9]/g, '');
     SMS.insertOrUpdateSmsSubscriber(data).then((result) => {
       if (!data.SubscriberID && result.SubscriberID) {
@@ -48,8 +50,10 @@ export default function SmsSubscriberModal({subscriber, show, onHide, onUpdate, 
         onUpdate?.(result);
       }
       onHide();
+      setUpdating(false);
     }).catch((error) => {
       showErrorAlert(error);
+      setUpdating(false);
     })
   }
 
@@ -64,12 +68,14 @@ export default function SmsSubscriberModal({subscriber, show, onHide, onUpdate, 
    * Handle delete event from CrudButtons.
    */
   function handleDelete() {
-    setShowDeleteConfirmation(false);
+    setDeleting(true);
     SMS.deleteSmsSubscriber(subscriber.SMSCampaignID, subscriber.SubscriberID).then((result) => {
       onDelete?.(result);
       onHide();
+      setDeleting(false);
     }).catch((error) => {
       showErrorAlert(error);
+      setDeleting(false);
     })
   }
 
@@ -87,6 +93,8 @@ export default function SmsSubscriberModal({subscriber, show, onHide, onUpdate, 
             onCancel={handleCancel}
             onDelete={() => setShowDeleteConfirmation(true)}
             isDataValid={isDataValid}
+            updating={updating}
+            deleting={deleting}
           />
         </Container>
       </ModalBody>

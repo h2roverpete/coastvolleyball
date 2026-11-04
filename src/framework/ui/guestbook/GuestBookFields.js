@@ -28,6 +28,8 @@ export default function GuestBookFields({data, guestBookId, siteId, onUpdate, on
 
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [siteList, setSiteList] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+  const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
     if (data) {
@@ -61,21 +63,31 @@ export default function GuestBookFields({data, guestBookId, siteId, onUpdate, on
   }
 
   function handleUpdate() {
+    setUpdating(true);
     GuestBooks.insertOrUpdateGuestBook(formData.edits)
       .then(result => {
         formData.update(result);
         onUpdate?.(result);
+        setUpdating(false);
       })
-      .catch(error => showErrorAlert(`Error updating guest book.`, error));
+      .catch(error => {
+        showErrorAlert(`Error updating guest book.`, error);
+        setUpdating(false);
+      });
   }
 
   function handleDelete() {
+    setDeleting(true);
     GuestBooks.deleteGuestBook(formData.edits.GuestBookID)
       .then(result => {
         setShowDeleteConfirmation(false);
         onDelete?.(result);
+        setDeleting(false);
       })
-      .catch(error => showErrorAlert(`Error deleting guest book.`, error));
+      .catch(error => {
+        showErrorAlert(`Error deleting guest book.`, error);
+        setDeleting(false);
+      });
   }
 
   function addCustomField() {
@@ -108,7 +120,7 @@ export default function GuestBookFields({data, guestBookId, siteId, onUpdate, on
     <Button
       size={"sm"}
       variant={"secondary"}
-      disabled={lastCustomField() > 7}
+      disabled={lastCustomField() > 7 || deleting || updating}
       onClick={addCustomField}
       className="me-2"
     >
@@ -406,6 +418,8 @@ export default function GuestBookFields({data, guestBookId, siteId, onUpdate, on
       onDelete={() => setShowDeleteConfirmation(true)}
       isDataValid={isDataValid}
       extraButtons={extraButtons}
+      deleting={deleting}
+      updating={updating}
     />
     <Modal
       show={showDeleteConfirmation}

@@ -39,7 +39,7 @@ export default function SmsMessagePanel({campaign, message, onDelete}) {
   }, [message, SMS, setFiles, showErrorAlert])
 
   useEffect(() => {
-    if (!subscribers && message) {
+    if (!subscribers && message && hasAdminPermission) {
       SMS.getSmsCampaignSubscribers(message.SMSCampaignID).then((result) => {
         setSubscribers(result);
       }).catch((err) => showErrorAlert(err));
@@ -98,43 +98,44 @@ export default function SmsMessagePanel({campaign, message, onDelete}) {
       <div className={'mb-4'}>
         <SmsMessagePreview message={message} campaign={campaign} files={files}/>
       </div>
-      <SmsLogEntryList
-        campaign={campaign}
-        message={message}
-        onItemChecked={handleItemChecked}
-        onAllItemsChecked={handleAllItemsChecked}
-        apiRef={listApi}
-      />
-      <div className={"mt-4 d-flex gap-3"}>
-        <Button
-          variant={'primary'}
-          disabled={checkedSubscribers.length === 0 || sending}
-          onClick={resendMessage}
-          style={{width: '300px'}}
-        >
-          {sending ?
-            <Spinner size={"sm"}/>
-            :
-            <>Resend to {checkedSubscribers.length} Subscriber{checkedSubscribers.length !== 1 && 's'}</>
-          }
-
-        </Button>
-        {onDelete && hasAdminPermission &&
+      {hasAdminPermission && <>
+        <SmsLogEntryList
+          campaign={campaign}
+          message={message}
+          onItemChecked={handleItemChecked}
+          onAllItemsChecked={handleAllItemsChecked}
+          apiRef={listApi}
+        />
+        <div className={"mt-4 d-flex gap-3"}>
           <Button
-            variant={'danger'}
-            onClick={() => setShowDeleteConfirmation(true)}
+            variant={'primary'}
+            disabled={checkedSubscribers.length === 0 || sending}
+            onClick={resendMessage}
+            style={{width: '300px'}}
           >
-            Delete Message
+            {sending ?
+              <Spinner size={"sm"}/>
+              :
+              <>Resend to {checkedSubscribers.length} Subscriber{checkedSubscribers.length !== 1 && 's'}</>
+            }
           </Button>
-        }
-      </div>
-      <Modal className={'Editor'} show={showDeleteConfirmation} onHide={() => setShowDeleteConfirmation(false)}>
-        <ModalBody>
-          <h5>Delete Message</h5>
-          <p>Are you sure you want to delete this message, all logs and related resources?</p>
-          <Button className={"me-3"} variant={'danger'} onClick={handleDelete}>Delete</Button>
-          <Button onClick={() => setShowDeleteConfirmation(false)}>Cancel</Button>
-        </ModalBody>
-      </Modal>
+          {onDelete && hasAdminPermission &&
+            <Button
+              variant={'danger'}
+              onClick={() => setShowDeleteConfirmation(true)}
+            >
+              Delete Message
+            </Button>
+          }
+        </div>
+        <Modal className={'Editor'} show={showDeleteConfirmation} onHide={() => setShowDeleteConfirmation(false)}>
+          <ModalBody>
+            <h5>Delete Message</h5>
+            <p>Are you sure you want to delete this message, all logs and related resources?</p>
+            <Button className={"me-3"} variant={'danger'} onClick={handleDelete}>Delete</Button>
+            <Button onClick={() => setShowDeleteConfirmation(false)}>Cancel</Button>
+          </ModalBody>
+        </Modal>
+      </>}
     </div>}</>;
 }

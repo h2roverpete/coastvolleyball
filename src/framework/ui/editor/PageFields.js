@@ -16,6 +16,8 @@ export default function PageFields({data, pageId, siteId, onUpdate, onDelete, on
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [routes, setRoutes] = useState([]);
   const [describing, setDescribing] = useState(false);
+  const [updating, setUpdating] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (data) {
@@ -51,22 +53,30 @@ export default function PageFields({data, pageId, siteId, onUpdate, onDelete, on
   }
 
   function handleUpdate() {
+    setUpdating(true);
     Pages.insertOrUpdatePage(formData.edits).then((result) => {
+      setUpdating(false);
       formData.update(result)
       Outline.updatePage(result);
       onUpdate?.(result);
     }).catch((error) => {
+      setUpdating(false);
       console.error(`Error updating page.`, error);
     });
   }
 
   function handleDelete() {
+    setDeleting(true);
     Pages.deletePage(formData.edits.PageID)
       .then((result) => {
+        setDeleting(false);
         Outline.deletePage(formData.edits.PageID);
         onDelete?.(result);
       })
-      .catch(e => console.error(`Error deleting page.`, e));
+      .catch(e => {
+        setDeleting(false);
+        console.error(`Error deleting page.`, e);
+      });
   }
 
   function handleDescribe() {
@@ -240,9 +250,11 @@ export default function PageFields({data, pageId, siteId, onUpdate, onDelete, on
       onDelete={() => setShowDeleteConfirmation(true)}
       extraButtons={extraButtons}
       onCancel={onCancel}
+      updating={updating}
+      deleting={deleting}
     />
-    <Modal show={showDeleteConfirmation} onHide={() => setShowDeleteConfirmation(false)} style={{zIndex: 1199}}>
-      <Modal.Body>
+    <Modal show={showDeleteConfirmation} onHide={() => setShowDeleteConfirmation(false)} style={{zIndex: 1199}} size={'sm'}>
+      <Modal.Body className={'Editor'}>
         <h5>Delete Page</h5>
         <div>Are you sure you want to delete this page? This action can't be undone.</div>
         <div className={'mt-4 d-flex justify-content-end align-items-center gap-4'}>

@@ -1,7 +1,7 @@
-import {TabPane, Tabs} from "react-bootstrap";
+import {Tab, Tabs} from "react-bootstrap";
 import {useAuth} from "../../auth/AuthProvider";
 import {Resource, Permission} from "../../auth/Permissions";
-import {lazy, Suspense, useEffect, useMemo, useState} from "react";
+import {lazy, Suspense, useEffect, useState} from "react";
 import {useRestApi} from "../../api/RestApi";
 import {useSiteContext} from "../content/Site";
 import {BsXLg} from "react-icons/bs";
@@ -24,8 +24,8 @@ export default function SmsCampaignPanel({campaignId, campaignData}) {
   const {showErrorAlert} = useSiteContext();
 
   const {hasPermission} = useAuth();
-  const hasSendPermission = useMemo(() => hasPermission(Resource.SMS, Permission.SEND), [hasPermission]);
-  const hasAdminPermission = useMemo(() => hasPermission(Resource.SMS, Permission.ADMIN), [hasPermission]);
+  const hasSendPermission = hasPermission?.(Resource.SMS, Permission.SEND);
+  const hasAdminPermission = hasPermission?.(Resource.SMS, Permission.ADMIN);
 
   useEffect(() => {
     if (campaignData && !campaign) {
@@ -40,7 +40,7 @@ export default function SmsCampaignPanel({campaignId, campaignData}) {
   }, [SMS, campaignId, campaign, campaignData, showErrorAlert]);
 
   function handleDeleteMessage(msg) {
-    SMS.deleteSmsMessage(msg.SMSCampaignID, msg.SMSMessageID).then((result) => {
+    SMS.deleteSmsMessage(msg.SMSCampaignID, msg.SMSMessageID).then(() => {
       setMessage(null);
     }).catch((err) => {
       showErrorAlert(err)
@@ -48,93 +48,101 @@ export default function SmsCampaignPanel({campaignId, campaignData}) {
     });
   }
 
-  return <Suspense>{campaign && hasSendPermission &&
+  return <>{campaign && hasSendPermission &&
     <div className={'Editor CampaignTabPanel'}>
       <Tabs
         defaultActiveKey={"send"}
         className="mt-2"
       >
-        <TabPane
+        <Tab
           title={'Send'}
           eventKey={"send"}
           className="p-3 border border-top-0"
         >
           <div className={'TabPaneContents'}>
-            <h4>Send a Message to {campaign.CampaignName} Subscribers</h4>
+            <h4>Send to {campaign.CampaignName} Subscribers</h4>
             <div className={'ScrollY'}>
-              <FormEditor>
-                <SendSmsMessagePanel campaign={campaign}/>
-              </FormEditor>
+              <Suspense>
+                <FormEditor>
+                  <SendSmsMessagePanel campaign={campaign}/>
+                </FormEditor>
+              </Suspense>
             </div>
           </div>
-        </TabPane>
-        <TabPane
-          title={'Subscribers'}
-          eventKey={"subscribers"}
+        </Tab>
+        <Tab
+          title={'Messages'}
+          eventKey={"messages"}
           className="p-3 border border-top-0"
         >
           <div className={'TabPaneContents'}>
-            <h4>{campaign.CampaignName} Subscribers</h4>
-            <SmsSubscriberList
-              campaign={campaign}
-              canAddSubscribers={hasAdminPermission}
-              canEditSubscribers={hasAdminPermission}
-              showFilter={true}
-            />
-          </div>
-        </TabPane>
-        {hasSendPermission &&
-          <TabPane
-            title={'Messages'}
-            eventKey={"messages"}
-            className="p-3 border border-top-0"
-          >
-            <div className={'TabPaneContents'}>
-              {message ? <>
-                  <BsXLg
-                    role={'button'}
-                    size={20}
-                    onClick={() => setMessage(null)}
-                    style={{position: "absolute", top: 0, right: 0}}
-                  />
-                  <h4>Message: {message.Title}</h4>
-                  <div className={'position-relative'}
-                       style={{height: '100%', overflowY: 'auto', overflowX: 'clip'}}
-                  >
+            {message ? <>
+                <BsXLg
+                  role={'button'}
+                  size={20}
+                  onClick={() => setMessage(null)}
+                  style={{position: "absolute", top: 0, right: 0}}
+                />
+                <h4>Message: {message.Title}</h4>
+                <div className={'position-relative'}
+                     style={{height: '100%', overflowY: 'auto', overflowX: 'clip'}}
+                >
+                  <Suspense>
                     <SmsMessagePanel
                       campaign={campaign}
                       message={message}
                       onDelete={handleDeleteMessage}
                     />
-                  </div>
-                </>
-                : <>
-                  <h4>{campaign.CampaignName} Messages</h4>
+                  </Suspense>
+                </div>
+              </>
+              : <>
+                <h4>{campaign.CampaignName} Messages</h4>
+                <Suspense>
                   <SmsMessageList
                     campaign={campaign}
                     onViewMessage={(message) => setMessage(message)}
                   />
-                </>
-              }
+                </Suspense>
+              </>
+            }
+          </div>
+        </Tab>
+        {hasAdminPermission &&
+          <Tab
+            title={'Subscribers'}
+            eventKey={"subscribers"}
+            className="p-3 border border-top-0"
+          >
+            <div className={'TabPaneContents'}>
+              <h4>{campaign.CampaignName} Subscribers</h4>
+              <Suspense>
+                <SmsSubscriberList
+                  campaign={campaign}
+                  showFilter={true}
+                />
+              </Suspense>
             </div>
-          </TabPane>
+          </Tab>
         }
         {hasAdminPermission &&
-          <TabPane
+          <Tab
             title={'Log'}
             eventKey={"log"}
             className="p-3 border border-light-subtle border-top-0"
           >
             <div className={'TabPaneContents'}>
               <h4>{campaign.CampaignName} Log</h4>
-              <FormEditor>
-                <SmsLogEntryList campaign={campaign}/>
-              </FormEditor>
+              <Suspense>
+                <FormEditor>
+                  <SmsLogEntryList campaign={campaign}/>
+                </FormEditor>
+              </Suspense>
             </div>
-          </TabPane>
+          </Tab>
         }
         {hasAdminPermission &&
-          <TabPane
+          <Tab
             title={'Config'}
             eventKey={"config"}
             className="p-3 border border-light-subtle border-top-0"
@@ -143,12 +151,14 @@ export default function SmsCampaignPanel({campaignId, campaignData}) {
             <div className={'TabPaneContents'}>
               <h4>{campaign.CampaignName} Config</h4>
               <div className={'ScrollY'}>
-                <SmsCampaignConfig campaign={campaign}/>
+                <Suspense>
+                  <SmsCampaignConfig campaign={campaign}/>
+                </Suspense>
               </div>
             </div>
-          </TabPane>
+          </Tab>
         }
       </Tabs>
     </div>
-  }</Suspense>
+  }</>;
 }

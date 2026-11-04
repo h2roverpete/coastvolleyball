@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState} from "react";
+import {useCallback, useEffect, useMemo, useState} from "react";
 import {Table, Form, Button, Row, Col} from "react-bootstrap";
 import {BsSortDown, BsSortUp} from "react-icons/bs";
 import {useRestApi} from "../../api/RestApi";
@@ -6,6 +6,8 @@ import {useSiteContext} from "../content/Site";
 import SmsSubscriberModal from "./SmsSubscriberModal";
 import FormEditor from "../editor/FormEditor";
 import './SmsSubscriberList.css';
+import {useAuth} from "../../auth/AuthProvider";
+import {Permission, Resource} from "../../auth/Permissions";
 
 /**
  * @typedef ListAPI<T>
@@ -22,8 +24,6 @@ import './SmsSubscriberList.css';
  * @param {function(SMSSubscriberData, Boolean)} [onItemChecked]          Callback when a list item is checked or unchecked
  * @param {function([SMSSubscriberData], Boolean)} [onAllItemsChecked]    Callback for check all / uncheck all items.
  * @param {RefObject<function(ListAPI<SMSSubscriberData>)>} [apiRef]      API for accessing list.
- * @param {Boolean} [canAddSubscribers]                                   Show a button for adding subscribers.
- * @param {Boolean} [canEditSubscribers]                                  Allow clicks in list to edit subscribers.
  * @param {Boolean} [showFilter]                                          Show the filter panel.
  * @constructor
  */
@@ -33,13 +33,14 @@ export default function SmsSubscriberList(
     onItemChecked,
     onAllItemsChecked,
     apiRef,
-    canAddSubscribers,
-    canEditSubscribers,
     showFilter,
   }) {
 
   const {SMS} = useRestApi();
   const {showErrorAlert} = useSiteContext();
+
+  const {hasPermission} = useAuth();
+  const hasAdminPermission = useMemo(() => hasPermission(Resource.SMS, Permission.ADMIN), [hasPermission]);
 
   const [listItems, setListItems] = useState(/** @type {[SMSSubscriberData]} */ null);
   const [editItem, setEditItem] = useState( /** @type {SMSSubscriberData} */ null);
@@ -155,7 +156,7 @@ export default function SmsSubscriberList(
     setListItems(listItems.map((item) => item.SubscriberID !== data.SubscriberID ? item : data));
   }
 
-  return <>{listItems?.length > 0 && <>
+  return <>{hasAdminPermission && listItems?.length > 0 && <>
     {showFilter && <Row className={'mb-3'}>
       <Col className={'d-flex text-nowrap align-items-center mt-3'}>
         <span className={'me-3'}>Filter by:</span>
@@ -177,7 +178,7 @@ export default function SmsSubscriberList(
     </Row>}
     <div className={'SmsSubscriberList'}>
       <Table
-        hover={canEditSubscribers}
+        hover={true}
         responsive
         className={"SmsSubscriberList"}
       >
@@ -247,8 +248,8 @@ export default function SmsSubscriberList(
         {listItems.filter(filterFunction).map((listItem) =>
           <tr
             key={listItem.SubscriberID}
-            onClick={() => canEditSubscribers && setEditItem(listItem)}
-            role={canEditSubscribers && 'button'}
+            onClick={() => setEditItem(listItem)}
+            role={'button'}
           >
             {onItemChecked && <td onClick={(e) => {
               e.stopPropagation()
@@ -281,14 +282,14 @@ export default function SmsSubscriberList(
         </tbody>
       </Table>
     </div>
-    {canAddSubscribers && <Row className={'mt-3'}><Col>
+    <Row className={'mt-3'}><Col>
       <Button
         variant={'primary'}
         onClick={() => setEditItem({SMSCampaignID: campaign.SMSCampaignID})}
       >
         Add Subscriber
       </Button>
-    </Col></Row>}
+    </Col></Row>
     <FormEditor>
       <SmsSubscriberModal
         show={editItem}
