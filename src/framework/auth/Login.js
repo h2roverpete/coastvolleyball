@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useMemo, useRef, useState} from "react";
 import '../ui/forms/Forms.css'
 import PasswordField from "../ui/forms/PasswordField";
 import {useSearchParams} from 'react-router';
@@ -26,39 +26,27 @@ export default function Login() {
   const {Auth} = useRestApi();
   const {showErrorAlert} = useSiteContext();
   const [searchParams] = useSearchParams();
-  const {token, setToken} = useAuth();
+  const {isAuthenticated, setToken} = useAuth();
   const navigate = useNavigate();
   const [cookies, setCookie, removeCookie] = useCookies();
-  const [loginResponse, setLoginResponse] = useState(/** @type {Boolean} */ null);
-  const [loginState, setLoginState] = useState(/** @type {String} */ null);
+  const state = useMemo(() => generateState(),[]);
 
   useEffect(() => {
-    if (!loginState) {
-      // generate a new login state to send to oauth server
-      setLoginState(generateState());
-    }
-  }, [loginState, setLoginState]);
-
-  useEffect(() => {
-    if (token) {
+    if (isAuthenticated) {
       // token already set
       navigate('/');
     }
-  }, [token, navigate])
-
-  useEffect(() => {
-    setLoginResponse(searchParams.get('state') !== null && searchParams.get('code') !== null);
-  }, [searchParams]);
+  }, [isAuthenticated, navigate])
 
   const fetchingToken = useRef(false); // prevent double fetch of token
   useEffect(() => {
-    if (loginResponse && !token && !fetchingToken.current) {
+    if (searchParams.get('state') !== null && searchParams.get('code') !== null && !isAuthenticated && !fetchingToken.current) {
       // process login response
       fetchingToken.current = true;
       // check received state against state originally sent
-      if (cookies.loginState !== searchParams.get('state')) {
+      const state = searchParams.get('state');
+      if (cookies.loginState !== state) {
         showErrorAlert("Couldn't verify login state.");
-        removeCookie("loginState");
       } else {
         Auth.getAuthToken(
           window.location.host,
@@ -77,66 +65,66 @@ export default function Login() {
         );
       }
     }
-  }, [Auth, cookies.loginState, navigate, searchParams, setCookie, showErrorAlert, setToken, token, loginResponse]);
+  }, [Auth, cookies.loginState, navigate, searchParams, setCookie, showErrorAlert, setToken, isAuthenticated]);
 
   return (
     <>
-      {loginResponse === true ? (
+      <h1>Log In</h1>
+      {searchParams.get('state') !== null && searchParams.get('code') !== null ? (
         // process login response
         <p>Processing login...</p>
       ) : <>
-        {loginResponse === false &&
-          // display login form
-          <div className="Login container-fluid">
-            <form
-              method="POST"
-              action={`${process.env.REACT_APP_BACKEND_HOST}/oauth/login`}
-              onSubmit={() => setCookie('loginState', loginState)}
-            >
-              <input type="hidden" name="response_type" value="code"/>
-              <input type="hidden" name="client_id" value={window.location.host}/>
-              <input type="hidden" name="redirect_uri"
-                     value={`${window.location.protocol}//${window.location.host}/login`}/>
-              <input type="hidden" name="state" value={loginState || ''}/>
-              <input type="hidden" name="scope" value={scope}/>
-              <Row className="mt-4">
-                <Form.Label className={'required'} htmlFor="email" column={true} sm={3}>
-                  Email
-                </Form.Label>
-                <Col sm={6}>
-                  <Form.Control
-                    name="email"
-                    id="email"
-                    autoComplete="email"
-                    isValid={email?.length > 0 && isValidEmail(email)}
-                    isInvalid={email?.length > 0 && !isValidEmail(email)}
-                    value={email || ''}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </Col>
-              </Row>
-              <Row className={'mt-2'}>
-                <Form.Label className={'required'} htmlFor="password" column={true} sm={3}>
-                  Password
-                </Form.Label>
-                <Col sm={6}>
-                  <PasswordField
-                    name={"password"}
-                    id={"password"}
-                    value={password || ''}
-                    isValid={password?.length > 0 && isValidPassword(password)}
-                    isInvalid={password?.length > 0 && !isValidPassword(password)}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                </Col>
-              </Row>
+        <div className="Login container-fluid">
+          <form
+            method="POST"
+            action={`${process.env.REACT_APP_BACKEND_HOST}/oauth/login`}
+            onSubmit={(e) => {
+              setCookie('loginState', state)
+            }}
+          >
+            <input type="hidden" name="response_type" value="code"/>
+            <input type="hidden" name="client_id" value={window.location.host}/>
+            <input type="hidden" name="redirect_uri"
+                   value={`${window.location.protocol}//${window.location.host}/login`}/>
+            <input type="hidden" name="state" value={state}/>
+            <input type="hidden" name="scope" value={scope}/>
+            <Row className="mt-4">
+              <Form.Label className={'required'} htmlFor="email" column={true} sm={3}>
+                Email
+              </Form.Label>
+              <Col sm={6}>
+                <Form.Control
+                  name="email"
+                  id="email"
+                  autoComplete="email"
+                  isValid={email?.length > 0 && isValidEmail(email)}
+                  isInvalid={email?.length > 0 && !isValidEmail(email)}
+                  value={email || ''}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </Col>
+            </Row>
+            <Row className={'mt-2'}>
+              <Form.Label className={'required'} htmlFor="password" column={true} sm={3}>
+                Password
+              </Form.Label>
+              <Col sm={6}>
+                <PasswordField
+                  name={"password"}
+                  id={"password"}
+                  value={password || ''}
+                  isValid={password?.length > 0 && isValidPassword(password)}
+                  isInvalid={password?.length > 0 && !isValidPassword(password)}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </Col>
+            </Row>
 
-              <div className="form-group mt-4">
-                <Button type="submit" variant="primary" disabled={!email || !password}>Log In</Button>
-              </div>
-            </form>
-          </div>
-        }
+            <div className="form-group mt-4">
+              <Button type="submit" variant="primary" disabled={!email || !password}>Log In</Button>
+            </div>
+          </form>
+        </div>
       </>}
     </>
   );

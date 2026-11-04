@@ -112,6 +112,7 @@ export default function DescribeContentModal(
           </Col>
         </Row>
         <CrudButtons
+          size={'sm'}
           keyName={'id'}
           onUpdate={handleUpdate}
           onCancel={handleCancel}

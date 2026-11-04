@@ -22,13 +22,11 @@ export default function LivestreamList({siteId}) {
   const [listItems, setListItems] = useState(/** @type {[LivestreamData]} */ null);
   const [sortKey, setSortKey] = useState('LivestreamName');
   const [sortAscending, setSortAscending] = useState(true);
-  const [canEdit, setCanEdit] = useState(false);
   const [edit, setEdit] = useState(/** @type {LivestreamData} */null);
   const [view, setView] = useState(/** @type {LivestreamData} */null);
 
-  useEffect(() => {
-    setCanEdit(hasPermission?.(Resource.SITE, Permission.ADMIN));
-  }, [setCanEdit, hasPermission]);
+  const canEdit = hasPermission(Resource.LIVESTREAM, Permission.ADMIN);
+  const canView = hasPermission(Resource.LIVESTREAM, Permission.BROADCAST);
 
   const sortFunction = useCallback((a, b) => {
     switch (typeof a[sortKey]) {
@@ -42,7 +40,7 @@ export default function LivestreamList({siteId}) {
   }, [sortKey, sortAscending]);
 
   useEffect(() => {
-    if (!listItems && canEdit) {
+    if (!listItems && canView) {
       if (siteId > 0) {
         Livestreams.getLivestreamsForSite(siteId).then(result => {
           result.sort(sortFunction);
@@ -103,7 +101,7 @@ export default function LivestreamList({siteId}) {
   }
 
   return <>
-    {canEdit && listItems && <>
+    {canView && <>
       {view !== null ? <div className="LivestreamList Editor position-relative mt-2">
           <CloseButton
             className={'position-absolute'}
@@ -173,46 +171,50 @@ export default function LivestreamList({siteId}) {
                   {item.SiteID}
                 </td>}
                 <td className={'d-flex align-items-center position-relative'}>
-                  <OverlayTrigger
-                    delay={{show: 1000, hide: 500}}
-                    overlay={<Tooltip>Edit livestream</Tooltip>}
-                  >
-                    <BsPencil
-                      className={'EditPencil me-2 position-absolute'}
-                      style={{left: '-20px'}}
-                      onClick={(e) => {
-                        setEdit(item);
-                        e.stopPropagation();
-                      }}
-                    />
-                  </OverlayTrigger>
+                  {canEdit &&
+                    <OverlayTrigger
+                      delay={{show: 1000, hide: 500}}
+                      overlay={<Tooltip>Edit livestream</Tooltip>}
+                    >
+                      <BsPencil
+                        className={'EditPencil me-2 position-absolute'}
+                        style={{left: '-20px'}}
+                        onClick={(e) => {
+                          setEdit(item);
+                          e.stopPropagation();
+                        }}
+                      />
+                    </OverlayTrigger>
+                  }
                   {item.LivestreamName}
                 </td>
               </tr>
             ))}
             </tbody>
           </Table>
-          <Row className="mt-2">
-            <Col>
-              <Button
-                size="sm"
-                variant="primary"
-                onClick={() => setEdit({})}
-              >
-                Add Livestream
-              </Button>
-            </Col>
-          </Row>
-          <FormEditor>
-            <LivestreamModal
-              data={edit}
-              siteId={siteId}
-              show={edit !== null}
-              onHide={() => setEdit(null)}
-              onUpdate={handleUpdate}
-              onDelete={handleDelete}
-            />
-          </FormEditor>
+          {canEdit && <>
+            <Row className="mt-2">
+              <Col>
+                <Button
+                  size="sm"
+                  variant="primary"
+                  onClick={() => setEdit({})}
+                >
+                  Add Livestream
+                </Button>
+              </Col>
+            </Row>
+            <FormEditor>
+              <LivestreamModal
+                data={edit}
+                siteId={siteId}
+                show={edit !== null}
+                onHide={() => setEdit(null)}
+                onUpdate={handleUpdate}
+                onDelete={handleDelete}
+              />
+            </FormEditor>
+          </>}
         </>}
     </>}
   </>;

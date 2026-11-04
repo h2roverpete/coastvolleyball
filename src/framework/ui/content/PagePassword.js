@@ -60,39 +60,50 @@ export default function PagePassword({pageData, onSuccess, apiRef}) {
 
   return <div className="PageContent">
     <h1 className={'SectionTitle'}>Restricted Content</h1>
-    <Row>
-      <Form.Label
-        htmlFor={'PagePassword'}
-        column={'sm'}
-        className='col-sm-12'
-      >
-        Please enter the password to view this page.
-      </Form.Label>
-      <Col sm={4} className={'mt-3'}>
-        <Form.Control
-          type={'password'}
-          name={'PagePassword'}
-          isInvalid={passwordError?.length}
-          value={password}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter') {
-              onSubmit();
-            }
-          }}
-          onChange={(event) => {setPassword(event.target.value)}}
-        />
-        <div className={'small text-danger mt-1'}>{passwordError}</div>
-      </Col>
-      <Col sm={2} className="mt-3">
-        <Button
-          size={'sm'}
-          style={{width: '75px'}}
-          onClick={() => onSubmit()}
-          disabled={!password.length}
-        >
-          {busy ? <Spinner size={'sm'}/> : <>Log In</>}
-        </Button>
-      </Col>
-    </Row>
+    <div className={'PageSection'}>
+      Please enter the password to view this page.
+    </div>
+    <Form>
+      <Row>
+        <Col sm={4} className={'mt-2'}>
+          <Form.Control
+            type={'password'}
+            autoComplete={'password'}
+            name={'PagePassword'}
+            isInvalid={passwordError?.length}
+            value={password}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                onSubmit();
+              } else {
+                setPasswordError(null);
+              }
+            }}
+            disabled={busy}
+            onChange={(event) => {
+              setPassword(event.target.value)
+            }}
+          />
+          <div className={'small text-danger mt-1'}>{passwordError}</div>
+        </Col>
+        <Col sm={2} className={'mt-2'}>
+          <Button
+            className="me-2"
+            variant="primary"
+            onClick={() => onSubmit()}
+            disabled={!password.length || busy}
+          >
+            <div style={{display: 'grid', placeItems: 'center'}}>
+              <div style={{
+                gridArea: '1/1',
+                visibility: !busy ? 'visible' : 'hidden'
+              }}>Log In
+              </div>
+              <Spinner size="sm" style={{gridArea: '1/1', visibility: busy ? 'visible' : 'hidden'}}/>
+            </div>
+          </Button>
+        </Col>
+      </Row>
+    </Form>
   </div>
 }

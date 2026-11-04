@@ -146,17 +146,28 @@ export default function SmsSubscriberList(
 
   function handleDelete(data) {
     setListItems(listItems.filter((item) => item.SubscriberID !== data.SubscriberID));
+    setEditItem(null);
   }
 
-  function handleAdd(data) {
-    setListItems([...listItems, data]);
+  function handleUpdate(newData) {
+    let updated = false;
+    listItems.forEach((item, index) => {
+      if (item.SubscriberID === newData.SubscriberID) {
+        // update data
+        listItems[index] = {...newData};
+        updated = true;
+      }
+    });
+    if (!updated) {
+      // item was added, not updated
+      listItems.push(newData);
+    }
+    listItems.sort(sortFunction);
+    setListItems([...listItems]);
+    setEditItem(null);
   }
 
-  function handleUpdate(data) {
-    setListItems(listItems.map((item) => item.SubscriberID !== data.SubscriberID ? item : data));
-  }
-
-  return <>{hasAdminPermission && listItems?.length > 0 && <>
+  return <>{hasAdminPermission && <>
     {showFilter && <Row className={'mb-3'}>
       <Col className={'d-flex text-nowrap align-items-center mt-3'}>
         <span className={'me-3'}>Filter by:</span>
@@ -245,7 +256,7 @@ export default function SmsSubscriberList(
         </tr>
         </thead>
         <tbody>
-        {listItems.filter(filterFunction).map((listItem) =>
+        {listItems?.filter(filterFunction).map((listItem) =>
           <tr
             key={listItem.SubscriberID}
             onClick={() => setEditItem(listItem)}
@@ -295,7 +306,6 @@ export default function SmsSubscriberList(
         show={editItem}
         subscriber={editItem}
         onHide={() => setEditItem(null)}
-        onAdd={handleAdd}
         onUpdate={handleUpdate}
         onDelete={handleDelete}
       />

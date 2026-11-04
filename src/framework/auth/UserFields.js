@@ -19,10 +19,11 @@ const PhoneNumberField = lazy(() => import("../ui/forms/PhoneNumberField"));
  * @param {function()} [onCancel]                 Callback when Cancel button is pressed
  * @param {function({NewUserData})} [onDelete]    Callback when user is deleted
  * @param {function({NewUserData})} [onUpdate]    Callback when user is updated
+ * @param {'sm'|'lg'} [size]                      Control size
  * @returns {JSX.Element}
  * @constructor
  */
-export default function UserFields({data, siteId, onCancel, onDelete, onUpdate}) {
+export default function UserFields({data, siteId, onCancel, onDelete, onUpdate, size}) {
 
   const formData = useFormData();
   const {showErrorAlert} = useSiteContext();
@@ -106,7 +107,7 @@ export default function UserFields({data, siteId, onCancel, onDelete, onUpdate})
     <div className={'UserFields'}>
       <Row className={'mt-4'}>
         <Form.Label
-          column={'sm'}
+          column={size?.length ? size : true}
           sm={labelCols}
           className={'required'}
           htmlFor={'UserName'}
@@ -115,7 +116,7 @@ export default function UserFields({data, siteId, onCancel, onDelete, onUpdate})
         </Form.Label>
         <Col>
           <Form.Control
-            size={'sm'}
+            size={size}
             name={'UserName'}
             isValid={formData.isTouched('UserName') && formData.edits.UserName?.length > 0}
             isInvalid={formData.isTouched('UserName') && !(formData.edits.UserName?.length > 0)}
@@ -126,7 +127,7 @@ export default function UserFields({data, siteId, onCancel, onDelete, onUpdate})
       </Row>
       <Row className={'mt-2'}>
         <Form.Label
-          column={'sm'}
+          column={size?.length ? size : true}
           sm={labelCols}
           className={'required'}
           htmlFor={'UserEmail'}
@@ -135,7 +136,7 @@ export default function UserFields({data, siteId, onCancel, onDelete, onUpdate})
         </Form.Label>
         <Col>
           <Form.Control
-            size={'sm'}
+            size={size}
             name={'UserEmail'}
             isValid={formData.isTouched('UserEmail') && isValidEmail(formData.edits.UserEmail)}
             isInvalid={formData.isTouched('UserEmail') && !isValidEmail(formData.edits.UserEmail)}
@@ -146,7 +147,7 @@ export default function UserFields({data, siteId, onCancel, onDelete, onUpdate})
       </Row>
       <Row className={'mt-2'}>
         <Form.Label
-          column={'sm'}
+          column={size?.length ? size : true}
           sm={labelCols}
           className={formData.edits.UserID ? '' : 'required'}
           htmlFor={'Password'}
@@ -155,7 +156,7 @@ export default function UserFields({data, siteId, onCancel, onDelete, onUpdate})
         </Form.Label>
         <Col className={'d-flex align-items-center justify-content-center'}>
           <Form.Control
-            size={'sm'}
+            size={size}
             id={'Password'}
             type='password'
             autoComplete={'new-password'}
@@ -168,7 +169,7 @@ export default function UserFields({data, siteId, onCancel, onDelete, onUpdate})
       </Row>
       <Row className={'mt-2'}>
         <Form.Label
-          column={'sm'}
+          column={size?.length ? size : true}
           sm={labelCols}
           htmlFor={'UserPhone'}
         >
@@ -176,7 +177,7 @@ export default function UserFields({data, siteId, onCancel, onDelete, onUpdate})
         </Form.Label>
         <Col sm={7}>
           <PhoneNumberField
-            size={'sm'}
+            size={size}
             name={'UserPhone'}
             id={'UserPhone'}
             value={formData.edits?.UserPhone || ''}
@@ -188,7 +189,7 @@ export default function UserFields({data, siteId, onCancel, onDelete, onUpdate})
         {!siteId &&
           <Row className={'mt-2'}>
             <Form.Label
-              column={'sm'}
+              column={size?.length ? size : true}
               sm={labelCols}
               htmlFor={'SiteID'}
             >
@@ -196,7 +197,7 @@ export default function UserFields({data, siteId, onCancel, onDelete, onUpdate})
             </Form.Label>
             <Col>
               <Form.Select
-                size={'sm'}
+                size={size}
                 name={'SiteID'}
                 value={formData.edits?.SiteID || 0}
                 onChange={(e) => formData.onDataChanged({name: 'SiteID', value: parseInt(e.target.value)})}
@@ -214,7 +215,7 @@ export default function UserFields({data, siteId, onCancel, onDelete, onUpdate})
         {Object.entries(ResourcePermissions).map((entry) =>
           <Row className={'mt-2'} key={entry[0]}>
             <Form.Label
-              column={'sm'}
+              column={size?.length ? size : true}
               sm={labelCols}
               htmlFor={`${entry[0]}Permission`}
             >
@@ -222,7 +223,7 @@ export default function UserFields({data, siteId, onCancel, onDelete, onUpdate})
             </Form.Label>
             <Col className={'d-flex align-items-center justify-content-center'}>
               <Form.Select
-                size={'sm'}
+                size={size}
                 name={`${entry[0]}Permission`}
                 value={formData.edits?.[`${entry[0]}Permission`] || ''}
                 onChange={(e) => formData.onDataChanged({name: `${entry[0]}Permission`, value: e.target.value})}
@@ -238,6 +239,7 @@ export default function UserFields({data, siteId, onCancel, onDelete, onUpdate})
         )}
       </>}
       <CrudButtons
+        size={size}
         data={formData.edits}
         type="User"
         keyName={'UserID'}
@@ -252,7 +254,7 @@ export default function UserFields({data, siteId, onCancel, onDelete, onUpdate})
         show={showDeleteConfirmation}
         onHide={() => setShowDeleteConfirmation(false)}
         className={'Editor'}
-        size={'sm'}
+        size={size}
       >
         <Modal.Body>
           <h5>Delete User</h5>

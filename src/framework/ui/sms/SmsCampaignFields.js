@@ -636,6 +636,7 @@ export default function SmsCampaignFields({campaign, smsCampaignId, onAdd, onUpd
       </Accordion.Item>
     </Accordion>
     <CrudButtons
+      size={'sm'}
       data={formData.edits}
       type="Campaign"
       keyName={'SMSCampaignID'}

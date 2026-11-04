@@ -11,7 +11,7 @@ import {useAuth} from "./AuthProvider";
 export default function RestrictedContent() {
   const {isAuthenticated} = useAuth();
   return (
-    <div className="PageContent container-fluid">
+    <div>
       <PageTitle text={"Restricted Content"}/>
       <div className="PageSection">
         <p>You don't have permission to access this page.</p>

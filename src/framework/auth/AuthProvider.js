@@ -38,6 +38,9 @@ export default function AuthProvider(props) {
    * @returns {boolean} True if the user is logged in and has permission.
    */
   const hasPermission = useCallback((resource, permission) => {
+    if (!cookies.token) {
+      return false;
+    }
     if (currentUser) {
       if (currentUser.SiteID !== 0 && currentUser.SiteID !== siteId) {
         return false;

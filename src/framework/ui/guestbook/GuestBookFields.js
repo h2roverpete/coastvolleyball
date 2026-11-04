@@ -411,6 +411,7 @@ export default function GuestBookFields({data, guestBookId, siteId, onUpdate, on
     )}
     <CustomFieldsConfig guestBookConfig={formData.edits} onChange={(data) => formData.onDataChanged(data)}/>
     <CrudButtons
+      size={'sm'}
       data={formData.edits}
       keyName={'GuestBookID'}
       onUpdate={handleUpdate}

@@ -89,6 +89,7 @@ export default function ClientConfig({className, style, clientData, onCancel, on
         </Col>
       </Row>
       <CrudButtons
+        size={'sm'}
         data={clientData}
         keyName={'client_id'}
         type={'Client'}

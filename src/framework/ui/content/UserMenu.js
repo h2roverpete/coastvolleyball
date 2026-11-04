@@ -21,8 +21,8 @@ export default function UserMenu({buttonRef, onClose}) {
 
   const hasSmsPermission = hasPermission(Resource.SMS, Permission.SEND);
   const hasUserPermission = hasPermission(Resource.USERS, Permission.ADMIN);
-  const hasGalleryPermission = hasPermission(Resource.GALLERY, Permission.ADMIN);
-  const hasLivestreamPermission = hasPermission(Resource.LIVESTREAM, Permission.ADMIN);
+  const hasGalleryPermission = hasPermission(Resource.GALLERY, Permission.ADD);
+  const hasLivestreamPermission = hasPermission(Resource.LIVESTREAM, Permission.BROADCAST);
   const hasGuestBookPermission = hasPermission(Resource.GUESTBOOK, Permission.ADMIN);
 
   useEffect(() => {
@@ -85,39 +85,79 @@ export default function UserMenu({buttonRef, onClose}) {
           }}>User Profile</span>
         )}
         {hasGalleryPermission && galleries?.length > 0 && <>
-            <span className="dropdown-item" onClick={() => {
-              navigate(`/admin/galleries`);
-              onClose?.();
-            }}>Manage Photo Galleries</span>
+          {galleries.length === 1 ?
+            <div>
+              <span className="dropdown-item" onClick={() => {
+                navigate(`/admin/galleries?galleryId=${galleries[0].GalleryID}`);
+                onClose?.();
+              }}>Manage Photo Gallery</span>
+            </div>
+            :
+            <div>
+              <span className="dropdown-item" onClick={() => {
+                navigate(`/admin/galleries`);
+                onClose?.();
+              }}>Manage Photo Galleries</span>
+            </div>
+          }
         </>}
         {hasSmsPermission && campaigns?.length > 0 && <>
-          {campaigns.map((campaign) =>
-            <div key={campaign.SMSCampaignID}>{campaign.SiteID === siteData.SiteID &&
+          {campaigns.length === 1 ?
+            <div>
               <span className="dropdown-item" onClick={() => {
-                navigate(`/admin/sms?campaignId=${campaign.SMSCampaignID}`);
+                navigate(`/admin/sms?campaignId=${campaigns[0].SMSCampaignID}`);
                 onClose?.();
-              }}>Manage {campaign.CampaignName}</span>}
+              }}>Manage Messaging</span>
             </div>
-          )}
+            :
+            <div>
+              <span className="dropdown-item" onClick={() => {
+                navigate(`/admin/sms`);
+                onClose?.();
+              }}>Manage Messaging</span>
+            </div>
+          }
         </>}
         {hasLivestreamPermission && livestreams?.length > 0 && <>
-            <span className="dropdown-item" onClick={() => {
-              navigate(`/admin/livestreams`);
-              onClose?.();
-            }}>Manage Livestreams</span>
+          {livestreams.length === 1 ?
+            <div>
+              <span className="dropdown-item" onClick={() => {
+                navigate(`/admin/livestreams?livestreamId=${livestreams[0].LivestreamID}`);
+                onClose?.();
+              }}>Manage Livestream</span>
+            </div>
+            :
+            <div>
+              <span className="dropdown-item" onClick={() => {
+                navigate(`/admin/livestreams`);
+                onClose?.();
+              }}>Manage Livestreams</span>
+            </div>
+          }
         </>}
         {hasGuestBookPermission && guestBooks?.length > 0 && <>
-            <span className="dropdown-item" onClick={() => {
-              navigate(`/admin/guestbooks`);
-              onClose?.();
-            }}>Manage Guest Books</span>
+          {guestBooks.length === 1 ?
+            <div>
+              <span className="dropdown-item" onClick={() => {
+                navigate(`/admin/guestbooks?guestBookId=${guestBooks[0].GuestBookID}`);
+                onClose?.();
+              }}>Manage Guest Book</span>
+            </div>
+            :
+            <div>
+              <span className="dropdown-item" onClick={() => {
+                navigate(`/admin/guestbooks`);
+                onClose?.();
+              }}>Manage Guest Books</span>
+            </div>
+          }
         </>}
         {hasUserPermission &&
           <span className="dropdown-item" onClick={() => {
             navigate(`/admin/users`);
             onClose?.();
           }}>
-            Manage Site Users
+            Manage Users
           </span>
         }
         {!isAuthenticated && (

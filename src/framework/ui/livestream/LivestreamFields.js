@@ -21,6 +21,8 @@ export default function LivestreamFields({data, livestreamId, siteId, onUpdate, 
 
   const [sites, setSites] = useState();
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
     if (siteId && !formData.edits.SiteID) {
@@ -57,11 +59,14 @@ export default function LivestreamFields({data, livestreamId, siteId, onUpdate, 
    * Handle update event from CrudButtons.
    */
   function handleUpdate() {
+    setUpdating(true);
     Livestreams.insertOrUpdateLivestream(formData.edits).then((result) => {
       formData.update(result);
       onUpdate?.(result);
+      setUpdating(false);
     }).catch(error => {
       showErrorAlert(error);
+      setUpdating(false);
     })
   }
 
@@ -70,10 +75,13 @@ export default function LivestreamFields({data, livestreamId, siteId, onUpdate, 
    */
   function handleDelete() {
     setShowDeleteConfirmation(false);
+    setDeleting(true);
     Livestreams.deleteLivestream(formData.edits.LivestreamID).then((result) => {
-      onDelete(result);
+      onDelete?.(result);
+      setDeleting(false);
     }).catch(error => {
       showErrorAlert(error);
+      setDeleting(false);
     });
   }
 
@@ -123,13 +131,16 @@ export default function LivestreamFields({data, livestreamId, siteId, onUpdate, 
       </Col>
     </Row>}
     <CrudButtons
+      size={'sm'}
       data={formData.edits}
       type="Livestream"
       keyName={'LivestreamID'}
       onUpdate={handleUpdate}
       onCancel={onCancel}
-      onDelete={()=>setShowDeleteConfirmation(true)}
+      onDelete={() => setShowDeleteConfirmation(true)}
       isDataValid={isDataValid}
+      updating={updating}
+      deleting={deleting}
     />
     <Modal
       show={showDeleteConfirmation}

@@ -143,6 +143,7 @@ export default function SmsWhitelistEntryFields({entry, onAdd, onDelete, onUpdat
     </Row>
 
     <CrudButtons
+      size={'sm'}
       data={formData.edits}
       keyName={'WhitelistEntryID'}
       type={'Entry'}

@@ -24,19 +24,12 @@ const GuestBook = lazy(() => import("../guestbook/GuestBook"));
  */
 export default function Extras({extras}) {
 
-  // imports
   const {hasPermission} = useAuth();
   const {Extras} = useRestApi();
   const {moveExtraUp, moveExtraDown, removeExtraFromPage} = usePageContext();
   const {showErrorAlert} = useSiteContext();
 
-  // states
-  const [canEdit, setCanEdit] = useState(false);
-
-  useEffect(() => {
-    setCanEdit(hasPermission?.(Resource.PAGE, Permission.EDIT));
-  }, [setCanEdit, hasPermission]);
-
+  const canEdit= hasPermission?.(Resource.PAGE, Permission.EDIT);
 
   function handleMoveUp(extraData) {
     Extras.moveUp(extraData.ExtraID)
@@ -61,7 +54,8 @@ export default function Extras({extras}) {
       }).catch((err) => showErrorAlert(err));
   }
 
-  const menuItemList = extras?.map((item, index, array) => {
+  // build admin menu for panels
+  const menuItemList = canEdit && extras?.map((item, index, array) => {
     let menuItems = [{label: `Remove from Page`, action: () => handleDelete(item)}];
     if (index > 0) {
       menuItems.push({label: `Move Up`, action: () => moveExtraUp(item)})

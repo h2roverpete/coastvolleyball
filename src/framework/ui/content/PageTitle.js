@@ -31,7 +31,7 @@ export default function PageTitle({text, alwaysShow}) {
   const [canEdit, setCanEdit] = useState(false);
 
   useEffect(() => {
-    setCanEdit(hasPermission?.(Resource.PAGE, Permission.EDIT));
+    setCanEdit(hasPermission?.(Resource.PAGE, Permission.EDIT) && pageData?.PageID > 0);
   }, [setCanEdit, hasPermission]);
 
   useEffect(() => {
@@ -70,7 +70,7 @@ export default function PageTitle({text, alwaysShow}) {
       data-testid="PageTitle"
       ref={titleRef}
     >
-      {titleText ? titleText : (<>&nbsp;</>)}
+      {titleText}
     </h1>
   )
 

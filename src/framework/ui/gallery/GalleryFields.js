@@ -136,6 +136,7 @@ export default function GalleryFields({data, galleryId, siteId, onCancel, onUpda
       </Col>
     </Row>
     <CrudButtons
+      size={'sm'}
       keyName={'GalleryID'}
       type={'Gallery'}
       onCancel={onCancel}

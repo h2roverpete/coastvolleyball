@@ -244,6 +244,7 @@ export default function PageFields({data, pageId, siteId, onUpdate, onDelete, on
       </Col>
     </Row>
     <CrudButtons
+      size={'sm'}
       keyName={'PageID'}
       onUpdate={handleUpdate}
       isDataValid={isDataValid}

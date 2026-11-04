@@ -14,6 +14,7 @@ import {useFormData} from "./FormEditor";
  * @param onDelete {function(T)}              Delete button was pressed. (Delete button hidden if this prop is missing.)
  * @param isDataValid{function(T):boolean}    Callback to check if form data is valid.
  * @param extraButtons {JSX.Element}          Extra buttons to add to UI.
+ * @param [size] {'sm'|'lg'|null}             Button size.
  *
  * @returns {JSX.Element} Returns a Bootstrap <Row> containing the button UI.
  * @constructor
@@ -28,7 +29,8 @@ export default function CrudButtons(
     onDelete,
     deleting,
     isDataValid,
-    extraButtons
+    extraButtons,
+    size
   }
 ) {
 
@@ -39,7 +41,7 @@ export default function CrudButtons(
       {onUpdate && isDataValid && (
         <Button
           className="me-2"
-          size={'sm'}
+          size={size}
           variant="primary"
           onClick={() => onUpdate(formData.edits)}
           disabled={!isDataValid(formData.edits) || !formData.isDataChanged() || updating || deleting}
@@ -54,7 +56,7 @@ export default function CrudButtons(
         </Button>
       )}
       <Button
-        size={'sm'}
+        size={size}
         variant="secondary"
         onClick={() => formData.revert()}
         disabled={!formData?.isDataChanged() || deleting || updating}
@@ -64,21 +66,10 @@ export default function CrudButtons(
     </Col>
     <Col style={{textAlign: 'end'}} className={'ps-0'}>
       {extraButtons}
-      {onCancel && (
-        <Button
-          className="me-2"
-          size={'sm'}
-          variant="secondary"
-          onClick={onCancel}
-          disabled={deleting||updating}
-        >
-          Cancel
-        </Button>
-      )}
       {onDelete && formData?.edits[keyName] && (
         <Button
           className="me-2"
-          size={'sm'}
+          size={size}
           variant="danger"
           onClick={() => onDelete(formData.edits)}
           disabled={deleting||updating}
@@ -92,6 +83,18 @@ export default function CrudButtons(
           </div>
         </Button>
       )}
+      {onCancel && (
+        <Button
+          className="me-2"
+          size={size}
+          variant="secondary"
+          onClick={onCancel}
+          disabled={deleting||updating}
+        >
+          Cancel
+        </Button>
+      )}
+
     </Col>
   </Row>);
 }

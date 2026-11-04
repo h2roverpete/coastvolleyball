@@ -189,6 +189,7 @@ export default function SiteFields(props) {
           </Col>
         </Row>
         <CrudButtons
+          size={'sm'}
           data={formData.edits}
           keyName={'SiteID'}
           type={'Site'}

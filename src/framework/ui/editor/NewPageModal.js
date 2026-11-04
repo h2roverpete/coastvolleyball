@@ -173,6 +173,7 @@ export default function NewPageModal({show, setShow}) {
           </Col>
         </Row>
         <CrudButtons
+          size={'sm'}
           isDataValid={isDataValid}
           onUpdate={insertNewPage}
           type={'Page'}
