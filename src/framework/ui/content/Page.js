@@ -26,7 +26,7 @@ export const PageContext = createContext(
 export default function Page({children, pageId}) {
 
   // imports
-  const {metaPages, outlineData, buildBreadcrumbs} = useSiteContext();
+  const {metaPages, outlineData} = useSiteContext();
   const {Pages, Extras} = useRestApi();
   const {hasPermission} = useAuth();
 
@@ -36,18 +36,28 @@ export default function Page({children, pageId}) {
   const [sectionData, setSectionData] = useState(/** @type {PageSectionData[]} */ null);
   const [showAddExtraModal, setShowAddExtraModal] = useState(false);
   const [extraPageSectionId, setExtraPageSectionId] = useState(0);
-  const [canEdit, setCanEdit] = useState(false);
 
-  useEffect(() => {
-    setCanEdit(hasPermission?.(Resource.PAGE, Permission.EDIT));
-  }, [setCanEdit, hasPermission]);
+  const canEdit = hasPermission(Resource.PAGE, Permission.EDIT);
 
   useEffect(() => {
     if (outlineData && pageId > 0 && pageId !== pageData?.PageID) {
       // page ID > 0 is a content page, refresh from outline data
       for (const page of outlineData) {
         if (page.PageID === pageId) {
+          // update page data
           setPageData(page);
+          setBreadcrumbs(buildBreadcrumbs(outlineData, page.ParentID));
+          // clear section data while loading
+          setSectionData(null);
+          Pages.getPageSections(pageId).then((sections) => {
+            Extras.getPageExtras(pageId).then((extras) => {
+              sections.forEach((section) => {
+                section.Extras = extras.filter((extra) => extra.PageSectionID === section.PageSectionID).sort((a, b) => a.ExtraSeq - b.ExtraSeq)
+              })
+              // set new page content
+              setSectionData(sections);
+            })
+          })
           return;
         }
       }
@@ -56,36 +66,13 @@ export default function Page({children, pageId}) {
       for (const page of metaPages) {
         if (page.id === pageId) {
           setPageData({PageID: page.id, PageContent: page.content});
+          setSectionData(null);
+          setBreadcrumbs([]);
           return;
         }
       }
     }
   }, [pageId, pageData, metaPages, outlineData]);
-
-  useEffect(() => {
-    // load page sections from DynamoDB
-    if (pageId && pageId !== pageData?.PageID) {
-      Pages.getPageSections(pageId).then((sections) => {
-        Extras.getPageExtras(pageId).then((extras) => {
-          sections.forEach((section) => {
-            section.Extras = extras.filter((extra) => extra.PageSectionID === section.PageSectionID).sort((a, b) => a.ExtraSeq - b.ExtraSeq)
-          })
-          // set new page content
-          setSectionData(sections);
-        })
-      })
-      // clear page until data loads
-      setSectionData(null);
-    }
-  }, [pageId, pageData, Pages, sectionData, Extras]);
-
-  useEffect(() => {
-    // build breadcrumbs at the page level for slider pages
-    if (!breadcrumbs && pageData && outlineData) {
-      // build breadcrumb data
-      setBreadcrumbs(buildBreadcrumbs(outlineData, pageData.ParentID));
-    }
-  }, [pageData, outlineData, breadcrumbs, buildBreadcrumbs]);
 
   const addPageSection = useCallback((newData) => {
     /** @type {PageSectionData[]} */
@@ -257,4 +244,23 @@ export default function Page({children, pageId}) {
 
 export function usePageContext() {
   return useContext(PageContext)
+}
+
+/**
+ * Build breadcrumb array from site outline.
+ *
+ * @param outlineData {[OutlineData]}
+ * @param parentId {number}
+ */
+function buildBreadcrumbs(outlineData, parentId) {
+  const breadcrumbs = [];
+  if (outlineData && parentId) {
+    for (let i = outlineData.length - 1; i >= 0; i--) {
+      if (outlineData[i].PageID === parentId) {
+        breadcrumbs.push(outlineData[i]);
+        parentId = outlineData[i].ParentID;
+      }
+    }
+  }
+  return breadcrumbs.reverse();
 }

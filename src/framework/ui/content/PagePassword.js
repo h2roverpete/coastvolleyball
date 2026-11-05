@@ -59,7 +59,7 @@ export default function PagePassword({pageData, onSuccess, apiRef}) {
   }
 
   return <div className="PageContent">
-    <h1 className={'SectionTitle'}>Restricted Content</h1>
+    <h1 className={'PageTitle'}>Restricted Content</h1>
     <div className={'PageSection'}>
       Please enter the password to view this page.
     </div>

@@ -68,18 +68,47 @@ export default function Site(props) {
   const [currentPage, setCurrentPage] = useState(null);
   const [prevPage, setPrevPage] = useState(null);
   const [nextPage, setNextPage] = useState(null);
-  const [breadcrumbs, setBreadcrumbs] = useState([]);
   const [canEdit, setCanEdit] = useState(false);
   const [canBrowseProtected, setCanBrowseProtected] = useState(false);
   const [metaPages] = useState([
-    {name: 'user', id: -1, title: 'User Profile', path: '/admin/user', content: <Suspense><UserProfilePanel/></Suspense>},
+    {
+      name: 'user',
+      id: -1,
+      title: 'User Profile',
+      path: '/admin/user',
+      content: <Suspense><UserProfilePanel/></Suspense>
+    },
     {name: 'users', id: -2, title: 'Site Users', path: '/admin/users', content: <Suspense><UserAdminPage/></Suspense>},
-    {name: 'sms', id: -3, title: 'Messaging Campaigns', path: '/admin/sms', content: <Suspense><SmsAdminPage/></Suspense>},
+    {
+      name: 'sms',
+      id: -3,
+      title: 'Messaging Campaigns',
+      path: '/admin/sms',
+      content: <Suspense><SmsAdminPage/></Suspense>
+    },
     {name: 'login', id: -4, title: 'Log In', path: '/login', content: <Suspense><Login/></Suspense>},
     {name: 'logout', id: -5, title: 'Log Out', path: '/logout', content: <Suspense><Logout/></Suspense>},
-    {name: 'galleries', id: -6, title: 'Photo Galleries', path: '/admin/galleries', content: <Suspense><GalleryAdminPage siteId={siteData?.SiteID}/></Suspense>},
-    {name: 'livestreams', id: -7, title: 'Livestreams', path: '/admin/livestreams', content: <Suspense><LivestreamAdminPage siteId={siteData?.SiteID}/></Suspense>},
-    {name: 'guestbooks', id: -8, title: 'Guest Books', path: '/admin/guestbooks', content: <Suspense><GuestBookAdminPage siteId={siteData?.SiteID}/></Suspense>},
+    {
+      name: 'galleries',
+      id: -6,
+      title: 'Photo Galleries',
+      path: '/admin/galleries',
+      content: <Suspense><GalleryAdminPage siteId={siteData?.SiteID}/></Suspense>
+    },
+    {
+      name: 'livestreams',
+      id: -7,
+      title: 'Livestreams',
+      path: '/admin/livestreams',
+      content: <Suspense><LivestreamAdminPage siteId={siteData?.SiteID}/></Suspense>
+    },
+    {
+      name: 'guestbooks',
+      id: -8,
+      title: 'Guest Books',
+      path: '/admin/guestbooks',
+      content: <Suspense><GuestBookAdminPage siteId={siteData?.SiteID}/></Suspense>
+    },
     {name: 'error', id: -9, title: 'Error 404 - Not Found', path: '*', content: <Suspense><Error404/></Suspense>}
   ]);
   const [redirect, setRedirect] = useState(0);
@@ -99,7 +128,7 @@ export default function Site(props) {
   }, [siteData]);
 
   useEffect(() => {
-    // get current page and breadcrumbs from new pathname
+    // get current page from new pathname
     if (outlineData) {
       if (location.pathname === '/') {
         if (redirect > 0) {
@@ -107,8 +136,6 @@ export default function Site(props) {
           for (const page of outlineData) {
             if (page.PageID === redirect) {
               setCurrentPage(page);
-              const crumbs = buildBreadcrumbs(outlineData, page.ParentID);
-              setBreadcrumbs(crumbs);
               return;
             }
           }
@@ -120,8 +147,6 @@ export default function Site(props) {
         for (const page of outlineData) {
           if (page.PageRoute === location.pathname || page.PageID === cfmPageId) {
             setCurrentPage(page);
-            const crumbs = buildBreadcrumbs(outlineData, page.ParentID);
-            setBreadcrumbs(crumbs);
             return;
           }
         }
@@ -309,8 +334,6 @@ export default function Site(props) {
     currentPage: currentPage,
     prevPage: prevPage,
     nextPage: nextPage,
-    breadcrumbs: breadcrumbs,
-    buildBreadcrumbs: buildBreadcrumbs,
   };
 
   if (canEdit) {
@@ -382,21 +405,3 @@ function setCharAt(str, index, chr) {
   return str.substring(0, index) + chr + str.substring(index + 1);
 }
 
-/**
- * Build breadcrumb array from site outline.
- *
- * @param outlineData {[OutlineData]}
- * @param parentId {number}
- */
-function buildBreadcrumbs(outlineData, parentId) {
-  const breadcrumbs = [];
-  if (outlineData && parentId) {
-    for (let i = outlineData.length - 1; i >= 0; i--) {
-      if (outlineData[i].PageID === parentId) {
-        breadcrumbs.push(outlineData[i]);
-        parentId = outlineData[i].ParentID;
-      }
-    }
-  }
-  return breadcrumbs.reverse();
-}

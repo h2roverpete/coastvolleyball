@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState} from "react";
+import {useCallback, useEffect, useMemo, useState} from "react";
 import {useRestApi} from "framework/api/RestApi";
 import {BsPencil, BsSortDown, BsSortUp} from "react-icons/bs";
 import {Button, CloseButton, Col, OverlayTrigger, Row, Table, Tooltip} from "react-bootstrap";
@@ -10,13 +10,15 @@ import '../ui/css/EditableRow.css'
 import {useSiteContext} from "../ui/content/Site";
 import UserModal from "./UserModal";
 import UserPanel from "./UserPanel";
+import {usePageContext} from "../ui/content/Page";
 
-export default function UserList({siteId}) {
+export default function UserList({siteId, pageId}) {
 
   // imports
   const {Users} = useRestApi();
   const {hasPermission} = useAuth();
   const {showErrorAlert} = useSiteContext();
+  const {pageData} = usePageContext();
 
   // states
   const [listItems, setListItems] = useState(/** @type {[NewUserData]} */ null);
@@ -25,6 +27,15 @@ export default function UserList({siteId}) {
   const [canEdit, setCanEdit] = useState(false);
   const [edit, setEdit] = useState(/** @type {NewUserData} */null);
   const [view, setView] = useState(/** @type {NewUserData} */null);
+
+  const show = useMemo(()=>{
+    // restrict display to a specific page ID
+    if (pageId) {
+      return pageData?.PageID === pageId;
+    } else {
+      return true;
+    }
+  },[pageId, pageData])
 
   useEffect(() => {
     setCanEdit(hasPermission?.(Resource.SITE, Permission.ADMIN));
@@ -108,7 +119,7 @@ export default function UserList({siteId}) {
   }
 
   return <>
-    {canEdit && listItems && <>
+    {show && canEdit && listItems && <>
       {view !== null ? <div className="UserList position-relative mt-2">
           <CloseButton
             className={'position-absolute'}

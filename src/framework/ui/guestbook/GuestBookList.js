@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState} from "react";
+import {useCallback, useEffect, useMemo, useState} from "react";
 import {useRestApi} from "framework/api/RestApi";
 import {BsPencil, BsSortDown, BsSortUp, BsX, BsXLg} from "react-icons/bs";
 import {Button, CloseButton, Col, OverlayTrigger, Row, Table, Tooltip} from "react-bootstrap";
@@ -9,25 +9,33 @@ import '../css/EditableRow.css';
 import {useSiteContext} from "../content/Site";
 import GuestBookConfigModal from "./GuestBookConfigModal";
 import GuestManagement from "./GuestManagement";
+import {usePageContext} from "../content/Page";
 
-export default function GuestBookList({siteId}) {
+export default function GuestBookList({siteId, pageId}) {
 
   // imports
   const {GuestBooks} = useRestApi();
   const {hasPermission} = useAuth();
   const {showErrorAlert} = useSiteContext();
+  const {pageData} = usePageContext();
 
   // states
   const [listItems, setListItems] = useState(/** @type {[GuestBookConfig]} */ null);
   const [sortKey, setSortKey] = useState('GuestBookName');
   const [sortAscending, setSortAscending] = useState(true);
-  const [canEdit, setCanEdit] = useState(false);
   const [edit, setEdit] = useState(/** @type {GuestBookConfig} */null);
   const [view, setView] = useState(/** @type {GuestBookConfig} */null);
 
-  useEffect(() => {
-    setCanEdit(hasPermission?.(Resource.GUESTBOOK, Permission.ADMIN));
-  }, [setCanEdit, hasPermission]);
+  const canEdit = hasPermission?.(Resource.GUESTBOOK, Permission.ADMIN);
+
+  const show = useMemo(()=>{
+    // restrict display to a specific page ID
+    if (pageId) {
+      return pageData?.PageID === pageId;
+    } else {
+      return true;
+    }
+  },[pageId, pageData])
 
   const sortFunction = useCallback((a, b) => {
     switch (typeof a[sortKey]) {
@@ -99,7 +107,7 @@ export default function GuestBookList({siteId}) {
   }
 
   return <>
-    {canEdit && listItems && <>
+    {show && canEdit && listItems && <>
       {view !== null ? <div className="GuestBookList Editor position-relative mt-2">
           <BsXLg
             className={'position-absolute'}

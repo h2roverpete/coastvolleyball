@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState} from "react";
+import {useCallback, useEffect, useMemo, useState} from "react";
 import {useRestApi} from "framework/api/RestApi";
 import {BsPencil, BsSortDown, BsSortUp} from "react-icons/bs";
 import {Button, CloseButton, Col, OverlayTrigger, Row, Table, Tooltip} from "react-bootstrap";
@@ -10,13 +10,15 @@ import './LivestreamList.css';
 import {useSiteContext} from "../content/Site";
 import LivestreamPanel from "./LivestreamPanel";
 import LivestreamModal from "./LivestreamModal";
+import {usePageContext} from "../content/Page";
 
-export default function LivestreamList({siteId}) {
+export default function LivestreamList({siteId, pageId}) {
 
   // imports
   const {Livestreams} = useRestApi();
   const {hasPermission} = useAuth();
   const {showErrorAlert} = useSiteContext();
+  const {pageData} = usePageContext();
 
   // states
   const [listItems, setListItems] = useState(/** @type {[LivestreamData]} */ null);
@@ -27,6 +29,15 @@ export default function LivestreamList({siteId}) {
 
   const canEdit = hasPermission(Resource.LIVESTREAM, Permission.ADMIN);
   const canView = hasPermission(Resource.LIVESTREAM, Permission.BROADCAST);
+
+  const show = useMemo(()=>{
+    // restrict display to a specific page ID
+    if (pageId) {
+      return pageData?.PageID === pageId;
+    } else {
+      return true;
+    }
+  },[pageId, pageData])
 
   const sortFunction = useCallback((a, b) => {
     switch (typeof a[sortKey]) {
@@ -101,7 +112,7 @@ export default function LivestreamList({siteId}) {
   }
 
   return <>
-    {canView && <>
+    {show && canView && <>
       {view !== null ? <div className="LivestreamList Editor position-relative mt-2">
           <CloseButton
             className={'position-absolute'}

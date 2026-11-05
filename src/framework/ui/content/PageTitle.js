@@ -28,17 +28,16 @@ export default function PageTitle({text, alwaysShow}) {
   const {hasPermission} = useAuth();
 
   const [titleText, setTitleText] = useState(null);
-  const [canEdit, setCanEdit] = useState(false);
 
-  useEffect(() => {
-    setCanEdit(hasPermission?.(Resource.PAGE, Permission.EDIT) && pageData?.PageID > 0);
-  }, [setCanEdit, hasPermission]);
+  const canEdit = hasPermission?.(Resource.PAGE, Permission.EDIT) && pageData?.PageID > 0;
 
   useEffect(() => {
     if (text) {
       setTitleText(text);
     } else if (pageData?.PageTitle) {
       setTitleText(pageData.PageTitle);
+    } else {
+      setTitleText(null);
     }
   }, [pageData, setTitleText, text]);
 
@@ -75,19 +74,22 @@ export default function PageTitle({text, alwaysShow}) {
   )
 
   return (<>
-    {canEdit ? <Suspense>
-      <EditableField
-        field={title}
-        fieldRef={titleRef}
-        callback={onTitleChanged}
-        textContent={titleText}
-        textAlign={pageData?.PageTitleAlign}
-        showEditButton={true}
-        editTooltip={'Edit page title'}
-        alwaysShow={alwaysShow === true}
-        canEdit={canEdit}
-      />
-    </Suspense> : (<>{title}</>)
+    {canEdit ?
+      <Suspense>
+        <EditableField
+          field={title}
+          fieldRef={titleRef}
+          callback={onTitleChanged}
+          textContent={titleText}
+          textAlign={pageData?.PageTitleAlign}
+          showEditButton={true}
+          editTooltip={'Edit page title'}
+          alwaysShow={alwaysShow === true}
+          canEdit={canEdit}
+        />
+      </Suspense>
+      :
+      <>{title}</>
     }
   </>)
 }

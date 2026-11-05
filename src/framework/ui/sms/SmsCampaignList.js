@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState} from "react";
+import {useCallback, useEffect, useMemo, useState} from "react";
 import {useRestApi} from "framework/api/RestApi";
 import {BsPencil, BsSortDown, BsSortUp} from "react-icons/bs";
 import {Button, CloseButton, Col, OverlayTrigger, Row, Table, Tooltip} from "react-bootstrap";
@@ -9,12 +9,14 @@ import SmsCampaignModal from "./SmsCampaignModal";
 import '../css/EditableRow.css';
 import SmsCampaignPanel from "./SmsCampaignPanel";
 import './SmsCampaignList.css';
+import {usePageContext} from "../content/Page";
 
-export default function SmsCampaignList({siteId}) {
+export default function SmsCampaignList({siteId, pageId}) {
 
   // imports
   const {SMS} = useRestApi();
   const {hasPermission} = useAuth();
+  const {pageData} = usePageContext();
 
   // states
   const [listItems, setListItems] = useState(/** @type {[SMSCampaignData]} */ null);
@@ -25,6 +27,14 @@ export default function SmsCampaignList({siteId}) {
 
   const canSend = hasPermission(Resource.SMS, Permission.SEND);
   const canEdit = hasPermission(Resource.SMS, Permission.ADMIN);
+  const show = useMemo(()=>{
+    // restrict display to a specific page ID
+    if (pageId) {
+      return pageData?.PageID === pageId;
+    } else {
+      return true;
+    }
+  },[pageId, pageData])
 
   const sortFunction = useCallback((a, b) => {
     switch (typeof a[sortKey]) {
@@ -124,7 +134,7 @@ export default function SmsCampaignList({siteId}) {
   }
 
   return <>
-    {canSend && <>
+    {show && canSend && <>
       {viewCampaign !== null ? <div className="CampaignList position-relative mt-2">
           <CloseButton
             className={'position-absolute'}

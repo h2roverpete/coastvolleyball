@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState} from "react";
+import {useCallback, useEffect, useMemo, useState} from "react";
 import {useRestApi} from "framework/api/RestApi";
 import {BsPencil, BsSortDown, BsSortUp} from "react-icons/bs";
 import {Button, CloseButton, Col, OverlayTrigger, Row, Table, Tooltip} from "react-bootstrap";
@@ -9,25 +9,32 @@ import '../css/EditableRow.css';
 import {useSiteContext} from "../content/Site";
 import GalleryPanel from "./GalleryPanel";
 import GalleryModal from "./GalleryModal";
+import {usePageContext} from "../content/Page";
 
-export default function GalleryList({siteId}) {
+export default function GalleryList({siteId, pageId}) {
 
   // imports
   const {Galleries} = useRestApi();
   const {hasPermission} = useAuth();
   const {showErrorAlert} = useSiteContext();
+  const {pageData} = usePageContext();
 
   // states
   const [listItems, setListItems] = useState(/** @type {[GalleryData]} */ null);
   const [sortKey, setSortKey] = useState('GalleryName');
   const [sortAscending, setSortAscending] = useState(true);
-  const [canEdit, setCanEdit] = useState(false);
   const [edit, setEdit] = useState(/** @type {GalleryData} */null);
   const [view, setView] = useState(/** @type {GalleryData} */null);
 
-  useEffect(() => {
-    setCanEdit(hasPermission?.(Resource.GALLERY, Permission.ADMIN));
-  }, [setCanEdit, hasPermission]);
+  const canEdit = hasPermission(Resource.GALLERY, Permission.ADMIN);
+  const show = useMemo(()=>{
+    // restrict display to a specific page ID
+    if (pageId) {
+      return pageData?.PageID === pageId;
+    } else {
+      return true;
+    }
+  },[pageId, pageData])
 
   const sortFunction = useCallback((a, b) => {
     switch (typeof a[sortKey]) {
@@ -99,7 +106,7 @@ export default function GalleryList({siteId}) {
   }
 
   return <>
-    {canEdit && listItems && <>
+    {show && canEdit && listItems && <>
       {view !== null ? <div className="GalleryList Editor position-relative mt-2">
           <CloseButton
             className={'position-absolute'}
