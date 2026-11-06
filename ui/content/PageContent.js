@@ -121,8 +121,10 @@ export default function PageContent({children}) {
         pageData?.RequiresPassword ?
           <Suspense><PagePassword onSuccess={() => setCanView(true)} pageData={pageData}
                                   apiRef={passwordApi}/></Suspense>
-          : pageData?.RequiresLogin &&
+          : pageData?.RequiresLogin && <div className={'PageContent container-fluid'}>
+          <h1>Restricted Content</h1>
           <Suspense><RestrictedContent/></Suspense>
+        </div>
       }
     </>}
   </>);

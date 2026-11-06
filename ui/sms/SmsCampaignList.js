@@ -48,7 +48,7 @@ export default function SmsCampaignList({siteId, pageId}) {
   }, [sortKey, sortAscending]);
 
   useEffect(() => {
-    if (!listItems) {
+    if (!listItems && canSend) {
       if (siteId) {
         SMS.getSmsCampaignsForSite(siteId).then(result => {
           result.sort(sortFunction);

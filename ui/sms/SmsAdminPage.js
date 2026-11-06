@@ -30,7 +30,7 @@ export default function SmsAdminPage() {
     }
   }, [location, setCampaignId]);
 
-  return <>{canView ? <div className={'PageContent'}>
+  return <>{canView ? <div className={'PageSection'}>
       {campaignId ?
         <div className="PageSection">
           <Suspense><SmsCampaignPanel campaignId={campaignId}/></Suspense>

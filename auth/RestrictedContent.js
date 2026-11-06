@@ -1,20 +1,21 @@
-import PageTitle from "../ui/content/PageTitle";
 import {Button} from "react-bootstrap";
 import {useAuth} from "./AuthProvider";
+import {useNavigate} from "react-router";
 
 /**
- * Display message that the user doesn't have permission to view the content.
+ * Display a page section div displaying that the user doesn't have permission to view the content.
  *
  * @returns {JSX.Element}
  * @constructor
  */
 export default function RestrictedContent() {
+  const navigate = useNavigate();
   const {isAuthenticated} = useAuth();
   return (
-    <div>
-      <div className="PageContent">
-        <p>You don't have permission to access this page.</p>
-        {!isAuthenticated && (<Button href={'/login'}>Log In</Button>)}
+    <div className="PageSection">
+      <p>You don't have permission to access this page.</p>
+      <div className={'d-flex'}>
+        {!isAuthenticated && (<Button onClick={() => navigate('/login')}>Log In</Button>)}
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import {useSiteContext} from "../content/Site";
 import {Resource, Permission} from "../../auth/Permissions";
 import {useAuth} from "../../auth/AuthProvider";
 import RestrictedContent from "../../auth/RestrictedContent";
+import PageContent from "../content/PageContent";
 
 const LivestreamPanel = lazy(() => import("./LivestreamPanel"));
 const LivestreamList = lazy(() => import("./LivestreamList"));
@@ -26,7 +27,7 @@ export default function LivestreamAdminPage() {
     }
   }, [location, setLivestreamId]);
 
-  return <>{canView ? <div className={'PageSection'}>
+  return <PageContent>{canView ? <div className={'PageSection'}>
       {livestreamId > 0 ?
         <Suspense><LivestreamPanel livestreamId={livestreamId}/></Suspense>
         : <>{livestreamId === 0 &&
@@ -36,5 +37,5 @@ export default function LivestreamAdminPage() {
     </div>
     :
     <RestrictedContent/>
-  }</>;
+  }</PageContent>;
 }

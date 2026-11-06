@@ -25,7 +25,7 @@ export default function GuestBookAdminPage() {
   }, [location]);
 
   return <>{canView ?
-    <div className={'PageContent'}>
+    <div className={'PageSection'}>
       {guestBookId ?
         <Suspense><GuestManagement guestBookId={guestBookId}/></Suspense>
         :
