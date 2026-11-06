@@ -7,7 +7,6 @@ import {Button, Spinner} from "react-bootstrap";
 import {useRestApi} from "../../api/RestApi";
 import {useSiteContext} from "./Site";
 import {jwtDecode} from "jwt-decode";
-import Pages from "../../../admin/Pages";
 import {useCookies} from "react-cookie";
 
 const RestrictedContent = lazy(() => import("../../auth/RestrictedContent"));
