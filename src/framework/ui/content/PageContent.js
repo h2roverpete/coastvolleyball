@@ -6,6 +6,9 @@ import './PageContent.css';
 import {Button, Spinner} from "react-bootstrap";
 import {useRestApi} from "../../api/RestApi";
 import {useSiteContext} from "./Site";
+import {jwtDecode} from "jwt-decode";
+import Pages from "../../../admin/Pages";
+import {useCookies} from "react-cookie";
 
 const RestrictedContent = lazy(() => import("../../auth/RestrictedContent"));
 const PagePassword = lazy(() => import("./PagePassword"));
@@ -25,9 +28,40 @@ export default function PageContent({children}) {
   const {pageData, sectionData, setSectionData} = usePageContext();
   const passwordApi = useRef(null);
   const [canView, setCanView] = useState(false);
-  const [canEdit, setCanEdit] = useState(false);
   const [busy, setBusy] = useState(false);
-  const {PageSections} = useRestApi();
+  const {PageSections, Pages} = useRestApi();
+  const [cookies, setCookie, removeCookie] = useCookies();
+  const canEdit = hasPermission(Resource.PAGE, Permission.EDIT);
+
+  async function checkPassword(pageId) {
+    if (pageId && cookies && Pages) {
+      const token = cookies[`page${pageId}token`];
+      if (token) {
+        // decode token and validate
+        const decoded = await jwtDecode(token.access_token);
+        if (decoded) {
+          const t = Math.floor(Date.now() / 1000);
+          if (decoded.exp > t) {
+            // token is current, check page ID
+            return decoded.PageID === pageId
+          } else {
+            console.warn(`Expired page token, refreshing...`);
+            try {
+              const newToken = await Pages.refreshPageToken(pageId, token.refresh_token);
+              console.debug(`Page token refreshed successfully.`);
+              setCookie(`page${pageId}token`, newToken);
+              return true;
+            } catch (err) {
+              console.error(`Error refreshing page token.`);
+              removeCookie(`page${pageId}token`);
+              return false;
+            }
+          }
+        }
+      }
+    }
+    return false;
+  }
 
   useEffect(() => {
     if (!canView && pageData && hasPermission) {
@@ -35,9 +69,9 @@ export default function PageContent({children}) {
         // check if user is logged in with admin permission
         if (hasPermission(Resource.PAGE, Permission.BROWSE_PROTECTED)) {
           setCanView(true);
-        } else if (passwordApi.current) {
+        } else {
           // not admin, check page password
-          passwordApi.current.canView().then((result) => {
+          checkPassword(pageData.PageID).then((result) => {
             setCanView(result);
           });
         }
@@ -49,8 +83,7 @@ export default function PageContent({children}) {
         setCanView(true);
       }
     }
-    setCanEdit(hasPermission(Resource.PAGE, Permission.EDIT));
-  }, [pageData, hasPermission, setCanView, setCanEdit, canView]);
+  }, [pageData, hasPermission, setCanView, canView]);
 
   function addPageSection() {
     setBusy(true);
@@ -87,7 +120,8 @@ export default function PageContent({children}) {
         </div>
         :
         pageData?.RequiresPassword ?
-          <Suspense><PagePassword onSuccess={() => setCanView(true)} pageData={pageData} apiRef={passwordApi}/></Suspense>
+          <Suspense><PagePassword onSuccess={() => setCanView(true)} pageData={pageData}
+                                  apiRef={passwordApi}/></Suspense>
           : pageData?.RequiresLogin &&
           <Suspense><RestrictedContent/></Suspense>
       }

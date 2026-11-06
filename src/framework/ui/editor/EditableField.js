@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useState} from "react";
 import EditButtons, {EditAction} from "./EditButtons";
-import {Button, Modal, ModalBody, ModalFooter, ModalHeader} from "react-bootstrap";
+import {Button, Modal, ModalBody} from "react-bootstrap";
 import AlignButtons, {AlignAction} from "./AlignButtons";
 import {useTouchContext} from "../../util/TouchProvider";
 
@@ -271,15 +271,16 @@ export default function EditableField(
           show={showConfirmation}
           onHide={onHideConfirmation}
           className={'Editor'}
+          size={'sm'}
         >
-          <ModalHeader>
+          <ModalBody>
             <h5>Leaving Edit Mode</h5>
-          </ModalHeader>
-          <ModalBody>Do you want to save your changes?</ModalBody>
-          <ModalFooter>
-            <Button size={'sm'} variant="secondary" onClick={() => cancelEditing()}>Cancel</Button>
-            <Button size={'sm'} variant="primary" onClick={() => commitEdits()}>Save</Button>
-          </ModalFooter>
+            <div>Do you want to save your changes?</div>
+            <div className={'d-flex justify-content-end align-items-center gap-3 mt-3'}>
+              <Button size={'sm'} variant="secondary" onClick={() => cancelEditing()}>Cancel</Button>
+              <Button size={'sm'} variant="primary" onClick={() => commitEdits()}>Save</Button>
+            </div>
+          </ModalBody>
         </Modal>
       </>
     ) : (

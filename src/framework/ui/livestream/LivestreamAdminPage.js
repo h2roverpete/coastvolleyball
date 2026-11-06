@@ -27,7 +27,6 @@ export default function LivestreamAdminPage() {
   }, [location, setLivestreamId]);
 
   return <>{canView ? <div className={'PageSection'}>
-      <h1>Manage Livestream{!livestreamId && 's'}</h1>
       {livestreamId > 0 ?
         <Suspense><LivestreamPanel livestreamId={livestreamId}/></Suspense>
         : <>{livestreamId === 0 &&

@@ -12,12 +12,13 @@ export default function UserMenu({buttonRef, onClose}) {
   const {isAuthenticated, currentUser} = useAuth();
   const navigate = useNavigate();
   const {siteData, showErrorAlert} = useSiteContext();
+  const {hasPermission} = useAuth();
+  const {SMS, Galleries, Livestreams, GuestBooks} = useRestApi();
+
   const [campaigns, setCampaigns] = useState(/** @type {[SMSCampaignData]} */ null);
   const [galleries, setGalleries] = useState(/** @type {[GalleryData]} */ null);
   const [livestreams, setLivestreams] = useState(/** @type {[LivestreamData]} */ null);
   const [guestBooks, setGuestBooks] = useState(/** @type {[GuestBookConfig]} */ null);
-  const {SMS, Galleries, Livestreams, GuestBooks} = useRestApi();
-  const {hasPermission} = useAuth();
 
   const hasSmsPermission = hasPermission(Resource.SMS, Permission.SEND);
   const hasUserPermission = hasPermission(Resource.USERS, Permission.ADMIN);
@@ -157,7 +158,7 @@ export default function UserMenu({buttonRef, onClose}) {
             navigate(`/admin/users`);
             onClose?.();
           }}>
-            Manage Users
+            Manage Site Users
           </span>
         }
         {!isAuthenticated && (
