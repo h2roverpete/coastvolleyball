@@ -29,47 +29,45 @@ export default function PagePassword({pageData, onSuccess}) {
     <div className={'PageSection'}>
       Please enter the password to view this page.
     </div>
-    <Form>
-      <Row>
-        <Col sm={4} className={'mt-2'}>
-          <Form.Control
-            type={'password'}
-            autoComplete={'password'}
-            name={'PagePassword'}
-            isInvalid={passwordError?.length}
-            value={password}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter') {
-                onSubmit();
-              } else {
-                setPasswordError(null);
-              }
-            }}
-            disabled={busy}
-            onChange={(event) => {
-              setPassword(event.target.value)
-            }}
-          />
-          <div className={'small text-danger mt-1'}>{passwordError}</div>
-        </Col>
-        <Col sm={2} className={'mt-2'}>
-          <Button
-            className="me-2"
-            variant="primary"
-            onClick={() => onSubmit()}
-            disabled={!password.length || busy}
-          >
-            <div style={{display: 'grid', placeItems: 'center'}}>
-              <div style={{
-                gridArea: '1/1',
-                visibility: !busy ? 'visible' : 'hidden'
-              }}>Log In
-              </div>
-              <Spinner size="sm" style={{gridArea: '1/1', visibility: busy ? 'visible' : 'hidden'}}/>
+    <Row>
+      <Col sm={4} className={'mt-2'}>
+        <Form.Control
+          type={'password'}
+          autoComplete={'password'}
+          name={'PagePassword'}
+          isInvalid={passwordError?.length}
+          value={password}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') {
+              onSubmit();
+            } else {
+              setPasswordError(null);
+            }
+          }}
+          disabled={busy}
+          onChange={(event) => {
+            setPassword(event.target.value)
+          }}
+        />
+        <div className={'small text-danger mt-1'}>{passwordError}</div>
+      </Col>
+      <Col sm={2} className={'mt-2'}>
+        <Button
+          className="me-2"
+          variant="primary"
+          onClick={() => onSubmit()}
+          disabled={!password.length || busy}
+        >
+          <div style={{display: 'grid', placeItems: 'center'}}>
+            <div style={{
+              gridArea: '1/1',
+              visibility: !busy ? 'visible' : 'hidden'
+            }}>Log In
             </div>
-          </Button>
-        </Col>
-      </Row>
-    </Form>
+            <Spinner size="sm" style={{gridArea: '1/1', visibility: busy ? 'visible' : 'hidden'}}/>
+          </div>
+        </Button>
+      </Col>
+    </Row>
   </div>
 }
