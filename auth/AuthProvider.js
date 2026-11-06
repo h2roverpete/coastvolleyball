@@ -3,6 +3,7 @@ import {useCookies} from 'react-cookie';
 import {useRestApi} from "../api/RestApi";
 import {jwtDecode} from 'jwt-decode';
 import {checkPermission} from "./Permissions";
+import {useConcurrentMutex} from "../util/ConcurrentMutex";
 
 export const AuthContext = createContext({});
 
@@ -65,15 +66,20 @@ export default function AuthProvider(props) {
     }
   }, [setCookie, setCurrentUser]);
 
+  const runMutex = useConcurrentMutex();
+
   /**
    * Refresh expired auth token.
    * @type {(function(): Promise<*|null>)|*}
    */
   const refreshAuthToken = useCallback(async () => {
     if (cookies.token?.refresh_token) {
-      const newToken = await Auth.refreshToken(cookies.token.refresh_token, window.location.host);
-      setToken(newToken);
-      return newToken;
+      // use a concurrent mutex to return the same result to concurrent refresh calls
+      return await runMutex(async () => {
+        const newToken = await Auth.refreshToken(cookies.token.refresh_token, window.location.host);
+        setToken(newToken);
+        return newToken;
+      });
     } else {
       return null;
     }

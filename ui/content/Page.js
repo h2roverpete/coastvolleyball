@@ -65,7 +65,7 @@ export default function Page({children, pageId}) {
       // page ID < 0 is a meta page, refresh from metas list
       for (const page of metaPages) {
         if (page.id === pageId) {
-          setPageData({PageID: page.id, PageContent: page.content});
+          setPageData({PageID: page.id, PageTitle: page.title, PageContent: page.content});
           setSectionData(null);
           setBreadcrumbs([]);
           return;

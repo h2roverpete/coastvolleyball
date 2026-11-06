@@ -12,8 +12,7 @@ export default function RestrictedContent() {
   const {isAuthenticated} = useAuth();
   return (
     <div>
-      <PageTitle text={"Restricted Content"}/>
-      <div className="PageSection">
+      <div className="PageContent">
         <p>You don't have permission to access this page.</p>
         {!isAuthenticated && (<Button href={'/login'}>Log In</Button>)}
       </div>

@@ -11,7 +11,7 @@ import {Outline} from "framework/util/OutlineUtil"
 import './Site.css';
 
 const SiteEditor = lazy(() => import("../editor/SiteEditor"));
-const UserProfilePanel = lazy(() => import("../../auth/UserProfilePanel"));
+const UserProfilePage = lazy(() => import("../../auth/UserProfilePage"));
 const UserAdminPage = lazy(() => import("../../auth/UserAdminPage"));
 const Login = lazy(() => import("../../auth/Login"));
 const Logout = lazy(() => import("../../auth/Logout"));
@@ -76,13 +76,19 @@ export default function Site(props) {
       id: -1,
       title: 'User Profile',
       path: '/admin/user',
-      content: <Suspense><UserProfilePanel/></Suspense>
+      content: <Suspense><UserProfilePage/></Suspense>
     },
-    {name: 'users', id: -2, title: 'Site Users', path: '/admin/users', content: <Suspense><UserAdminPage/></Suspense>},
+    {
+      name: 'users',
+      id: -2,
+      title: 'Manage Site Users',
+      path: '/admin/users',
+      content: <Suspense><UserAdminPage/></Suspense>
+    },
     {
       name: 'sms',
       id: -3,
-      title: 'Messaging Campaigns',
+      title: 'Manage Messaging',
       path: '/admin/sms',
       content: <Suspense><SmsAdminPage/></Suspense>
     },
@@ -91,21 +97,21 @@ export default function Site(props) {
     {
       name: 'galleries',
       id: -6,
-      title: 'Photo Galleries',
+      title: 'Manage Photo Galleries',
       path: '/admin/galleries',
       content: <Suspense><GalleryAdminPage siteId={siteData?.SiteID}/></Suspense>
     },
     {
       name: 'livestreams',
       id: -7,
-      title: 'Livestreams',
+      title: 'Manage Livestreams',
       path: '/admin/livestreams',
       content: <Suspense><LivestreamAdminPage siteId={siteData?.SiteID}/></Suspense>
     },
     {
       name: 'guestbooks',
       id: -8,
-      title: 'Guest Books',
+      title: 'Manage Guest Books',
       path: '/admin/guestbooks',
       content: <Suspense><GuestBookAdminPage siteId={siteData?.SiteID}/></Suspense>
     },

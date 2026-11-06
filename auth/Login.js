@@ -69,7 +69,7 @@ export default function Login() {
 
   return (
     <>
-      <h1>Log In</h1>
+      {/*<h1>Log In</h1>*/}
       {searchParams.get('state') !== null && searchParams.get('code') !== null ? (
         // process login response
         <p>Processing login...</p>

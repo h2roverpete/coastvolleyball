@@ -2,48 +2,14 @@ import {Button, Col, Form, Row, Spinner} from "react-bootstrap";
 import {useState} from "react";
 import {useCookies} from "react-cookie";
 import {useRestApi} from "../../api/RestApi";
-import {jwtDecode} from "jwt-decode";
 
-export default function PagePassword({pageData, onSuccess, apiRef}) {
+export default function PagePassword({pageData, onSuccess}) {
 
   const {Pages} = useRestApi();
   const [cookies, setCookie] = useCookies();
   const [password, setPassword] = useState('');
   const [passwordError, setPasswordError] = useState(null);
   const [busy, setBusy] = useState(false);
-
-  async function canView() {
-    if (pageData && cookies && Pages) {
-      const token = cookies[`page${pageData.PageID}token`];
-      if (token) {
-        // decode token and validate
-        const decoded = await jwtDecode(token.access_token);
-        if (decoded) {
-          const t = Math.floor(Date.now() / 1000);
-          if (decoded.exp > t) {
-            // token is current, check page ID
-            return decoded.PageID === pageData.PageID
-          } else {
-            try {
-              const newToken = await Pages.refreshPageToken(pageData.PageID, token.refresh_token);
-              setCookie(`page${pageData.PageID}token`, newToken);
-              return true;
-            } catch (err) {
-              // refresh error
-              return false;
-            }
-          }
-        }
-      }
-    }
-    return false;
-  }
-
-  if (apiRef) {
-    apiRef.current = {
-      canView: canView,
-    }
-  }
 
   function onSubmit() {
     setBusy(true);

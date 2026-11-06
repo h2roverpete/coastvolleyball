@@ -24,8 +24,7 @@ export default function GuestBookAdminPage() {
     }
   }, [location, setGalleryId]);
 
-  return <>{canView ? <div className={'PageSection'}>
-      <h1>Manage Photo Galler{galleryId ? 'y' : 'ies'}</h1>
+  return <>{canView ? <div className={'PageContent'}>
       {galleryId ?
         <Suspense><GalleryPanel galleryId={galleryId}/></Suspense>
         :

@@ -74,7 +74,7 @@ export default function PageTitle({text, alwaysShow}) {
   )
 
   return (<>
-    {canEdit ?
+    {canEdit && titleText ?
       <Suspense>
         <EditableField
           field={title}

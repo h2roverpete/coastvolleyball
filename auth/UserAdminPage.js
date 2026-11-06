@@ -19,10 +19,9 @@ export default function SmsAdminPage() {
 
   const canView = hasPermission(Resource.USERS, Permission.ADMIN); // minimum permission for admin panel
 
-  return <>{canView ? <>
-      <h1>Manage Users</h1>
+  return <>{canView ? <div className={'PageContent'}>
       <Suspense><UserList siteId={siteData?.SiteID}/></Suspense>
-    </>
+    </div>
     :
     <RestrictedContent/>
   }</>;
