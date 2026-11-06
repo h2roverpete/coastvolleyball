@@ -3,19 +3,25 @@ import {useCookies} from 'react-cookie';
 import {useRestApi} from "../api/RestApi";
 import {jwtDecode} from 'jwt-decode';
 import {checkPermission} from "./Permissions";
+import {useConcurrentMutex} from "../util/ConcurrentMutex";
 
 export const AuthContext = createContext({});
 
 export default function AuthProvider(props) {
 
-  const [cookies, setCookie] = useCookies();
-  const [user, setUser] = useState(null);
+  const [cookies, setCookie, removeCookie] = useCookies();
+  const [currentUser, setCurrentUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const {Auth} = useRestApi();
+  const siteId = parseInt(process.env.REACT_APP_SITE_ID);
 
   useEffect(() => {
-    setIsAuthenticated(cookies.token && user);
-  }, [cookies.token, user, setIsAuthenticated]);
+    if (cookies.token && !currentUser) {
+      // set up initial state
+      setIsAuthenticated(true);
+      setCurrentUser(jwtDecode(cookies.token.access_token));
+    }
+  },[]);
 
   useImperativeHandle(Auth.refreshAuthTokenRef, () => {
     return {
@@ -33,33 +39,34 @@ export default function AuthProvider(props) {
    * @returns {boolean} True if the user is logged in and has permission.
    */
   const hasPermission = useCallback((resource, permission) => {
-    console.debug(`Check permission '${resource}:${permission}' for current user.`);
-    if (user) {
-      if (user.SiteID !== '0' && user.SiteID !== process.env.REACT_APP_SITE_ID) {
-        console.error(`User not authorized for this site.`);
-        return false;
-      } else {
-        return checkPermission(user, resource, permission);
-      }
-    } else {
-      console.debug(`User not logged in.`);
+    if (!cookies.token) {
       return false;
     }
-  }, [user]);
+    if (currentUser) {
+      if (currentUser.SiteID !== 0 && currentUser.SiteID !== siteId) {
+        return false;
+      } else {
+        return checkPermission(currentUser, resource, permission);
+      }
+    } else {
+      return false;
+    }
+  }, [currentUser, siteId]);
 
   const setToken = useCallback((newToken) => {
-    console.debug(`Set token: ${JSON.stringify(newToken)}`);
     // update token value
-    setCookie('token', newToken);
     if (newToken) {
-      // decode token and set user
-      const decoded = jwtDecode(newToken.access_token);
-      setUser(decoded);
+      setCookie('token', newToken);
+      setCurrentUser(jwtDecode(newToken.access_token));
+      setIsAuthenticated(true);
     } else {
-      // clear user
-      setUser(null);
+      removeCookie('token', newToken);
+      setCurrentUser(null);
+      setIsAuthenticated(false);
     }
-  }, [setCookie, setUser]);
+  }, [setCookie, setCurrentUser]);
+
+  const runMutex = useConcurrentMutex();
 
   /**
    * Refresh expired auth token.
@@ -67,10 +74,12 @@ export default function AuthProvider(props) {
    */
   const refreshAuthToken = useCallback(async () => {
     if (cookies.token?.refresh_token) {
-      console.debug(`Refreshing auth token...`);
-      const newToken = await Auth.refreshToken(cookies.token.refresh_token, window.location.host);
-      setToken(newToken);
-      return newToken;
+      // use a concurrent mutex to return the same result to concurrent refresh calls
+      return await runMutex(async () => {
+        const newToken = await Auth.refreshToken(cookies.token.refresh_token, window.location.host);
+        setToken(newToken);
+        return newToken;
+      });
     } else {
       return null;
     }
@@ -78,11 +87,9 @@ export default function AuthProvider(props) {
 
   const validateToken = useCallback(async () => {
     try {
-      console.debug(`Validating access token...`);
       await Auth.checkToken();
       const decoded = jwtDecode(cookies.token.access_token);
-      setUser(decoded);
-      console.debug(`Access token is valid, setting user.`);
+      setCurrentUser(decoded);
     } catch (error) {
       if (error.status === 401) {
         try {
@@ -95,14 +102,7 @@ export default function AuthProvider(props) {
         console.error(`Unknown error checking token: ${JSON.stringify(error)}`);
       }
     }
-  }, [Auth, setUser, refreshAuthToken, cookies.token?.access_token]);
-
-  useEffect(() => {
-    if (cookies.token) {
-      validateToken().then();
-    }
-  }, [cookies.token, validateToken]);
-
+  }, [Auth, setCurrentUser, refreshAuthToken, cookies.token?.access_token]);
 
   return (
     <AuthContext
@@ -112,7 +112,7 @@ export default function AuthProvider(props) {
         hasPermission: hasPermission,
         isAuthenticated: isAuthenticated,
         refreshAuthToken: refreshAuthToken,
-        currentUser: user,
+        currentUser: currentUser,
       }}>
       {props.children}
     </AuthContext>

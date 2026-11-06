@@ -1,26 +1,24 @@
 import LodgingFields from "./LodgingFields";
 import CustomFields from "./CustomFields";
 import {Col, Form, Row} from "react-bootstrap";
+import {useFormData} from "../editor/FormEditor"
 
 /**
  * Fields for entering guest feedback.
  *
  * @param guestBookConfig {GuestBookConfig}
- * @param guestFeedbackData {GuestFeedbackData}
- * @param onChange {DataCallback}
  * @param labelCols {Number}
  * @returns {JSX.Element}
  * @constructor
  */
-function GuestFeedbackFields({guestBookConfig, guestFeedbackData, onChange, labelCols}) {
+function GuestFeedbackFields({guestBookConfig, labelCols}) {
+  const formData = useFormData();
   return (<>
     {guestBookConfig.ShowLodgingFields && (
-      <LodgingFields lodgingData={guestFeedbackData} onChange={onChange} labelCols={labelCols}/>
+      <LodgingFields labelCols={labelCols}/>
     )}
     <CustomFields
       guestBookConfig={guestBookConfig}
-      feedbackData={guestFeedbackData}
-      onChange={onChange}
       labelCols={labelCols}
     />
     {guestBookConfig.ShowFeedback && (
@@ -37,13 +35,8 @@ function GuestFeedbackFields({guestBookConfig, guestFeedbackData, onChange, labe
             name="FeedbackText"
             id="FeedbackText"
             rows={5}
-            value={guestFeedbackData.FeedbackText}
-            onChange={e => {
-              onChange({
-                name: 'FeedbackText',
-                value: e.target.value
-              })
-            }}
+            value={formData.edits.FeedbackText || ''}
+            onChange={e => formData.onDataChanged({name: 'FeedbackText', value: e.target.value})}
           />
         </Col>
       </Row>

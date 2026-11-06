@@ -16,6 +16,7 @@ export default function RestApi(props) {
   if (cookies.token) {
     axios.defaults.headers.common["Authorization"] = `Bearer ${cookies.token.access_token}`;
   }
+  axios.defaults.timeout = 5 * 60 * 1000;
 
   const getSites = useCallback(async (data) => {
     return await adminApiCall(() => {
@@ -51,6 +52,16 @@ export default function RestApi(props) {
 
   const describePage = useCallback(async (pageId) => {
     const response = await axios.get(`${host}/api/v1/content/pages/${pageId}/describe`);
+    return response.data;
+  }, []);
+
+  const loginToPage = useCallback(async (pageId, password) => {
+    const response = await axios.post(`${host}/api/v1/content/pages/${pageId}/login`, {password: password});
+    return response.data;
+  }, []);
+
+  const refreshPageToken = useCallback(async (pageId, refreshToken) => {
+    const response = await axios.post(`${host}/api/v1/content/pages/${pageId}/token`, {refresh_token: refreshToken});
     return response.data;
   }, []);
 
@@ -217,6 +228,15 @@ export default function RestApi(props) {
     });
   }, []);
 
+  const getGuestBooksForSite = useCallback(async (siteId) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.get(`${host}/api/v1/content/sites/${siteId}/guestbooks`);
+        return response.data;
+      }
+    });
+  }, []);
+
   const getGuestBook = useCallback(async (guestBookId) => {
     const response = await axios.get(`${host}/api/v1/guestbook/${guestBookId}`);
     return response.data;
@@ -288,6 +308,15 @@ export default function RestApi(props) {
     return await adminApiCall(() => {
       return async () => {
         const response = await axios.get(`${host}/api/v1/galleries`);
+        return response.data;
+      }
+    });
+  }, []);
+
+  const getGalleriesForSite = useCallback(async (siteId) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.get(`${host}/api/v1/content/sites/${siteId}/galleries`);
         return response.data;
       }
     });
@@ -471,6 +500,24 @@ export default function RestApi(props) {
     });
   }, []);
 
+  const getSiteUsers = useCallback(async (siteId) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.get(`${host}/api/v1/content/sites/${siteId}/users`);
+        return response.data;
+      }
+    });
+  }, []);
+
+  const getUser = useCallback(async (userId) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.get(`${host}/api/v1/users/${userId}`);
+        return response.data;
+      }
+    });
+  }, []);
+
   const insertOrUpdateUser = useCallback(async (data) => {
     return await adminApiCall(() => {
       return async () => {
@@ -517,6 +564,389 @@ export default function RestApi(props) {
   const deleteAuthClient = useCallback(async (client_id) => {
     const response = await axios.delete(`${host}/oauth/clients/${client_id}`);
     return response.data;
+  }, []);
+
+  const getSmsCampaigns = useCallback(async () => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.get(`${host}/api/v1/sms/campaigns`);
+        return response.data;
+      }
+    });
+  }, []);
+
+  const getSmsCampaignsForSite = useCallback(async (siteId) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.get(`${host}/api/v1/content/sites/${siteId}/campaigns`);
+        return response.data;
+      }
+    });
+  }, []);
+
+  const getSmsCampaign = useCallback(async (smsCampaignId) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.get(`${host}/api/v1/sms/campaigns/${smsCampaignId}`);
+        return response.data;
+      }
+    });
+  }, []);
+
+  const insertOrUpdateSmsCampaign = useCallback(async (data) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.post(`${host}/api/v1/sms/campaigns`, data);
+        return response.data;
+      }
+    });
+  }, []);
+
+  const deleteSmsCampaign = useCallback(async (campaignId) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.delete(`${host}/api/v1/sms/campaigns/${campaignId}`);
+        return response.data;
+      }
+    });
+  }, []);
+
+  const getSmsSubscriber = useCallback(async (campaignId, subscriberId) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.get(`${host}/api/v1/sms/campaigns/${campaignId}/subscribers/${subscriberId}`);
+        return response.data;
+      }
+    });
+  }, []);
+
+  const getSmsCampaignSubscribers = useCallback(async (campaignId) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.get(`${host}/api/v1/sms/campaigns/${campaignId}/subscribers`);
+        return response.data;
+      }
+    });
+  }, []);
+
+  const insertOrUpdateSmsSubscriber = useCallback(async (data) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.post(`${host}/api/v1/sms/campaigns/${data.SMSCampaignID}/subscribers`, data);
+        return response.data;
+      }
+    });
+  }, []);
+
+  const deleteSmsSubscriber = useCallback(async (campaignId, subscriberId) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.delete(`${host}/api/v1/sms/campaigns/${campaignId}/subscribers/${subscriberId}`);
+        return response.data;
+      }
+    });
+  }, []);
+
+  const getSmsMessages = useCallback(async (campaignId) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.get(`${host}/api/v1/sms/campaigns/${campaignId}/messages`);
+        return response.data;
+      }
+    });
+  }, []);
+
+  const getSmsMessage = useCallback(async (campaignId, messageId) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.get(`${host}/api/v1/sms/campaigns/${campaignId}/messages/${messageId}`);
+        return response.data;
+      }
+    });
+  }, []);
+
+  /**
+   * Insert or update an SMS message and send to all subscribers.
+   *
+   * To limit the recipients to specific subscribers, include a Subscribers array in the message data.
+   *
+   * @type {function(SMSMessageData): Promise<SMSMessageData>}
+   */
+  const sendSmsMessage = useCallback(async (data) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.post(`${host}/api/v1/sms/campaigns/${data.SMSCampaignID}/send`, data);
+        return response.data;
+      }
+    });
+  }, []);
+
+  /**
+   * Insert or update SMS message without sending anything.
+   *
+   * @type {function(SMSMessageData): Promise<SMSMessageData>}
+   */
+  const insertOrUpdateSmsMessage = useCallback(async (data) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.post(`${host}/api/v1/sms/campaigns/${data.SMSCampaignID}/messages`, data);
+        return response.data;
+      }
+    });
+  }, []);
+
+  const deleteSmsMessage = useCallback(async (campaignId, messageId) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.delete(`${host}/api/v1/sms/campaigns/${campaignId}/messages/${messageId}`);
+        return response.data;
+      }
+    });
+  }, []);
+
+  const getMmsFiles = useCallback(async (campaignId, messageId) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.get(`${host}/api/v1/sms/campaigns/${campaignId}/messages/${messageId}/files`);
+        return response.data;
+      }
+    });
+  }, []);
+
+  /**
+   * Upload a file and attach to a message.
+   *
+   * @type {function(Number, Number, Number, File): Promise<MMSFileData>}
+   */
+  const uploadMmsFile = useCallback(async (siteId, campaignId, messageId, file) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const data = {
+          SiteID: siteId,
+          SMSCampaignID: campaignId,
+          SMSMessageID: messageId,
+        };
+        if (file.name) {
+          // resize image file to max 1024 pixels
+          const resizedFile = await resizeImageFile(file, 1080, 1920);
+          resizedFile.name = `${crypto.randomUUID()}.jpg`;
+          // upload file to S3 and set name
+          data.MMSFileName = await uploadFileToS3({
+            siteId: siteId,
+            file: resizedFile,
+            path: 'mms/',
+            invalidate: true,
+          });
+          data.MMSFileMimeType = file.type;
+        }
+        const response = await axios.post(`${host}/api/v1/sms/campaigns/${campaignId}/messages/${messageId}/files`, data);
+        return response.data;
+      }
+    });
+  }, []);
+
+  const deleteMmsFile = useCallback(async (campaignId, messageId, fileId) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.delete(`${host}/api/v1/sms/campaigns/${campaignId}/messages/${messageId}/files/${fileId}`);
+        return response.data;
+      }
+    });
+  }, []);
+
+
+  /**
+   * Resizes an image file maintaining aspect ratio.
+   * @param {File} file - The original image file from an input field.
+   * @param {number} maxWidth - The maximum width target.
+   * @param {number} maxHeight - The maximum height target.
+   * @returns {Promise<Blob>} A promise that resolves to the resized Blob.
+   */
+  function resizeImageFile(file, maxWidth, maxHeight) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      // Read file as Data URL (base64 string)
+      reader.readAsDataURL(file);
+
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+
+        img.onload = () => {
+          let width = img.width;
+          let height = img.height;
+
+          // Calculate new dimensions preserving the aspect ratio
+          if (width > height) {
+            if (width > maxWidth) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            }
+          } else {
+            if (height > maxHeight) {
+              width = Math.round((width * maxHeight) / height);
+              height = maxHeight;
+            }
+          }
+
+          // Create an off-screen canvas
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+
+          // Draw the image onto the canvas at new dimensions
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Convert canvas back to a Blob object (JPEG format, 85% quality)
+          canvas.toBlob(
+            (blob) => {
+              if (blob) {
+                resolve(blob);
+              } else {
+                reject(new Error('Canvas to Blob conversion failed.'));
+              }
+            },
+            'image/jpeg',
+            0.85
+          );
+        };
+
+        img.onerror = (err) => reject(err);
+      };
+
+      reader.onerror = (err) => reject(err);
+    });
+  }
+
+
+  const getSmsWhitelist = useCallback(async (campaignId) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.get(`${host}/api/v1/sms/campaigns/${campaignId}/whitelist`);
+        return response.data;
+      }
+    });
+  }, []);
+
+  const insertOrUpdateSmsWhitelistEntry = useCallback(async (data) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.post(`${host}/api/v1/sms/campaigns/${data.SMSCampaignID}/whitelist/`, data);
+        return response.data;
+      }
+    });
+  }, []);
+
+  const deleteSmsWhitelistEntry = useCallback(async (smsCampaignId, entryId) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.delete(`${host}/api/v1/sms/campaigns/${smsCampaignId}/whitelist/${entryId}`);
+        return response.data;
+      }
+    });
+  }, []);
+
+  const getSmsCampaignLog = useCallback(async (campaignId) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.get(`${host}/api/v1/sms/campaigns/${campaignId}/log`);
+        return response.data;
+      }
+    });
+  }, []);
+
+  const getSmsMessageLog = useCallback(async (campaignId, messageId) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.get(`${host}/api/v1/sms/campaigns/${campaignId}/messages/${messageId}/log`);
+        return response.data;
+      }
+    });
+  }, []);
+
+  /**
+   * Return paginated log data.
+   *
+   * @param {Number} campaignId   Campaign ID
+   * @param {Object} startKey     Start key, use empty string "" to scan from beginning
+   * @param {Number} limit        Maximum records to return
+   * @return {{Items: [SMSLogData], LastEvaluatedKey: Object}}
+   */
+  const getSmsLogData = useCallback(async (campaignId, startKey, limit) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.post(`${host}/api/v1/sms/campaigns/${campaignId}/log`, {
+          startKey: startKey,
+          limit: limit
+        });
+        return response.data;
+      }
+    });
+  }, []);
+
+  const getLivestreams = useCallback(async () => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.get(`${host}/api/v1/livestreams`);
+        return response.data;
+      }
+    });
+  }, []);
+
+  const getLivestreamsForSite = useCallback(async (siteId) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.get(`${host}/api/v1/content/sites/${siteId}/livestreams`);
+        return response.data;
+      }
+    });
+  }, []);
+
+  const getLivestream = useCallback(async (livestreamId) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.get(`${host}/api/v1/livestreams/${livestreamId}`);
+        return response.data;
+      }
+    });
+  }, []);
+
+  const insertOrUpdateLivestream = useCallback(async (data) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.post(`${host}/api/v1/livestreams`, data);
+        return response.data;
+      }
+    });
+  }, []);
+
+  const deleteLivestream = useCallback(async (livestreamId) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.delete(`${host}/api/v1/livestreams/${livestreamId}`);
+        return response.data;
+      }
+    });
+  }, []);
+
+  const getStreamInfo = useCallback(async (livestreamId) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.get(`${host}/api/v1/livestreams/${livestreamId}/stream`);
+        return response.data;
+      }
+    });
+  }, []);
+
+  const getConfigurationXml = useCallback(async (livestreamId) => {
+    return await adminApiCall(() => {
+      return async () => {
+        const response = await axios.get(`${host}/api/v1/livestreams/${livestreamId}/config`);
+        return response.data;
+      }
+    });
   }, []);
 
 
@@ -592,6 +1022,8 @@ export default function RestApi(props) {
         insertOrUpdatePage: insertOrUpdatePage,
         getPageSections: getPageSections,
         describePage: describePage,
+        loginToPage: loginToPage,
+        refreshPageToken: refreshPageToken,
       },
       PageSections: {
         insertOrUpdatePageSection: insertOrUpdatePageSection,
@@ -605,6 +1037,7 @@ export default function RestApi(props) {
       GuestBooks: {
         getGuestBook: getGuestBook,
         getGuestBooks: getGuestBooks,
+        getGuestBooksForSite: getGuestBooksForSite,
         insertOrUpdateGuestBook: insertOrUpdateGuestBook,
         deleteGuestBook: deleteGuestBook,
         getGuest: getGuest,
@@ -617,6 +1050,7 @@ export default function RestApi(props) {
       Galleries: {
         getGallery: getGallery,
         getGalleries: getGalleries,
+        getGalleriesForSite: getGalleriesForSite,
         getPhotos: getPhotos,
         insertOrUpdateGallery: insertOrUpdateGallery,
         deleteGallery: deleteGallery,
@@ -645,8 +1079,44 @@ export default function RestApi(props) {
       },
       Users: {
         getUsers: getUsers,
+        getUser: getUser,
+        getSiteUsers: getSiteUsers,
         insertOrUpdateUser: insertOrUpdateUser,
         deleteUser: deleteUser,
+      },
+      SMS: {
+        getSmsCampaigns: getSmsCampaigns,
+        getSmsCampaignsForSite: getSmsCampaignsForSite,
+        getSmsCampaign: getSmsCampaign,
+        deleteSmsCampaign: deleteSmsCampaign,
+        getSmsCampaignSubscribers: getSmsCampaignSubscribers,
+        insertOrUpdateSmsCampaign: insertOrUpdateSmsCampaign,
+        getSmsSubscriber: getSmsSubscriber,
+        insertOrUpdateSmsSubscriber: insertOrUpdateSmsSubscriber,
+        deleteSmsSubscriber: deleteSmsSubscriber,
+        insertOrUpdateSmsMessage: insertOrUpdateSmsMessage,
+        getMmsFiles: getMmsFiles,
+        uploadMmsFile: uploadMmsFile,
+        deleteMmsFile: deleteMmsFile,
+        sendSmsMessage: sendSmsMessage,
+        deleteSmsMessage: deleteSmsMessage,
+        getSmsWhitelist: getSmsWhitelist,
+        insertOrUpdateSmsWhitelistEntry: insertOrUpdateSmsWhitelistEntry,
+        deleteSmsWhitelistEntry: deleteSmsWhitelistEntry,
+        getSmsMessages: getSmsMessages,
+        getSmsMessage: getSmsMessage,
+        getSmsMessageLog: getSmsMessageLog,
+        getSmsCampaignLog: getSmsCampaignLog,
+        getSmsLogData: getSmsLogData,
+      },
+      Livestreams: {
+        getLivestreams: getLivestreams,
+        getLivestreamsForSite: getLivestreamsForSite,
+        getLivestream: getLivestream,
+        insertOrUpdateLivestream: insertOrUpdateLivestream,
+        deleteLivestream: deleteLivestream,
+        getStreamInfo: getStreamInfo,
+        getConfigurationXml: getConfigurationXml,
       }
     }}>
       {props.children}

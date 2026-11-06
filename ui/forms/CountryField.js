@@ -1,13 +1,6 @@
 import {getData} from 'country-list'
 import SelectField from "./SelectField";
-
-const options = [];
-for (const data of getData()) {
-  options.push({
-    value: data.code,
-    label: data.name.replace(/\([^)]+\)/g, ''),
-  })
-}
+import {useMemo} from "react";
 
 /**
  * @typedef CountryFieldProps
@@ -27,6 +20,18 @@ for (const data of getData()) {
  * @constructor
  */
 function CountryField(props) {
+
+  const options = useMemo(() => {
+    const options = [];
+    for (const data of getData()) {
+      options.push({
+        value: data.code,
+        label: data.name.replace(/\([^)]+\)/g, ''),
+      })
+    }
+    return options;
+  },[]);
+
   return (
     <SelectField
       {...props}

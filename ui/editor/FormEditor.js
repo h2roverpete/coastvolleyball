@@ -1,4 +1,4 @@
-import {createContext, useCallback, useContext, useState} from "react";
+import {createContext, useCallback, useContext, useEffect, useMemo, useState} from "react";
 import './Editor.css';
 
 const FormEditContext = createContext(null);
@@ -35,7 +35,14 @@ const FormEditContext = createContext(null);
  * @property {T} edits
  */
 
-export default function FormEditor({children}) {
+/**
+ *
+ * @param {function(FormDataAPI)} [apiRef]
+ * @param children
+ * @returns {JSX.Element}
+ * @constructor
+ */
+export default function FormEditor({apiRef, children}) {
 
   const [originalData, setOriginalData] = useState(null);
   const [edits, setEdits] = useState({});
@@ -45,17 +52,15 @@ export default function FormEditor({children}) {
    * Receive changes to form data.
    * @type DataCallback
    */
-  function onDataChanged({name, value, changes}) {
+  const onDataChanged = useCallback(({name, value, changes}) => {
     const editsCopy = {...edits};
     const touchedCopy = [...touched];
     if (changes && Array.isArray(changes)) {
       for (const change of changes) {
-        console.debug(`Form data changed: {name: '${change.name}' value: '${change.value}}'.`);
         editsCopy[change.name] = change.value;
         touchedCopy.push(change.name);
       }
     } else if (name && edits[name] !== value) {
-      console.debug(`Form data changed: {name: '${name}' value: '${value}}'.`);
       if ((value === undefined || value === null) && edits[name]) {
         delete editsCopy[name];
       } else {
@@ -65,20 +70,7 @@ export default function FormEditor({children}) {
     }
     setEdits(editsCopy);
     setTouched(touchedCopy);
-    console.debug(`Form edits: ${JSON.stringify(editsCopy)}`);
-  }
-
-  /**
-   * Set initial form data. Can only be called once per use of <FormEditor>
-   * @template T
-   * @type {function(T): void}
-   */
-  function setData(data) {
-    if (data && !originalData) {
-      // protect from null data & multiple initialization
-      update(data);
-    }
-  }
+  }, [edits, touched]);
 
   /**
    * Update the original form data and clear edits, i.e. after a DynamoDB update.
@@ -90,6 +82,20 @@ export default function FormEditor({children}) {
     setOriginalData({...data});
     setTouched([]);
   }, [setEdits, setOriginalData, setTouched]);
+
+  /**
+   * Set initial form data. Can only be called once per use of <FormEditor>
+   * @template T
+   * @type {function(T): void}
+   */
+  const setData = useCallback((data) => {
+    if (data && !originalData) {
+      // protect from null data & multiple initialization
+      update(data);
+    }
+  },[originalData, update]);
+
+
 
   /**
    * Check if a given key/field has been edited.
@@ -125,16 +131,24 @@ export default function FormEditor({children}) {
   }, [setOriginalData, setEdits, setTouched]);
 
   /** @type FormDataAPI */
-  const context = {
-    setData: setData,
-    isTouched: isTouched,
-    isDataChanged: isDataChanged,
-    revert: revert,
-    reset: reset,
-    update: update,
-    onDataChanged: onDataChanged,
-    edits: edits,
-  }
+  const context = useMemo(() => {
+    return {
+      setData: setData,
+      isTouched: isTouched,
+      isDataChanged: isDataChanged,
+      revert: revert,
+      reset: reset,
+      update: update,
+      onDataChanged: onDataChanged,
+      edits: edits,
+    }
+  }, [setData, isTouched, isDataChanged, revert, reset, update, onDataChanged, edits]);
+
+  useEffect(() => {
+    if (apiRef) {
+      apiRef(context);
+    }
+  }, [edits, touched, apiRef, context]);
 
   return (
     <FormEditContext.Provider value={context}>

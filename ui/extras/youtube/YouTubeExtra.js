@@ -1,10 +1,11 @@
-import {YouTubeEmbed} from "react-social-media-embed";
 import "./YouTubeExtra.css"
-import FormEditor from "../../editor/FormEditor";
-import {useRef} from "react";
+import {lazy, Suspense, useRef} from "react";
 import {useTouchContext} from "../../../util/TouchProvider";
-import YouTubeExtraConfig from "./YouTubeExtraConfig";
-import MoveExtraMenu from "../MoveExtraMenu";
+
+const FormEditor = lazy(() => import("../../editor/FormEditor"));
+const YouTubeExtraConfig = lazy(() => import("./YouTubeExtraConfig"));
+const MoveExtraMenu = lazy(() => import("../MoveExtraMenu"));
+const YouTubeEmbed = lazy(() => import("react-social-media-embed").then((module)=>({default: module.YouTubeEmbed})));
 
 /**
  * Insert a YouTube video
@@ -48,12 +49,12 @@ export default function YouTubeExtra({extraData, sectionExtras, canEdit = false}
       >
         <YouTubeEmbed url={extraData.YouTubeVideoUrl} width={'100%'} height={'100%'}/>
       </div>
-      {canEdit && (<>
+      {canEdit && (<Suspense>
         <FormEditor>
           <YouTubeExtraConfig data={extraData} buttonRef={buttonRef}/>
         </FormEditor>
         <MoveExtraMenu extraData={extraData} sectionExtras={sectionExtras} buttonRef={menuRef}/>
-      </>)}
+      </Suspense>)}
     </div>
   );
 }

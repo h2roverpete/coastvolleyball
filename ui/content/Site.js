@@ -1,19 +1,25 @@
-import React, {createContext, useCallback, useContext, useEffect, useState} from 'react';
+import React, {createContext, lazy, Suspense, useCallback, useContext, useEffect, useState} from 'react';
 import ReactGA from 'react-ga4';
 import 'bootstrap/dist/js/bootstrap.bundle.js';
-import {Route, Routes, useLocation, useNavigate} from "react-router";
+import {Route, Routes, useLocation} from "react-router";
 import {useRestApi} from "../../api/RestApi";
-import Logout from '../../auth/Logout';
-import SiteEditor from "../editor/SiteEditor";
-import {Alert} from "react-bootstrap";
+import {Alert, Spinner} from "react-bootstrap";
 import Head from "./Head";
 import {useAuth} from "../../auth/AuthProvider";
 import {Permission, Resource} from "../../auth/Permissions";
-import Login from "../../auth/Login";
-import Error404 from "../../util/Error404";
-import SiteUsers from "../../auth/SiteUsers";
-import UserProfilePanel from "../../auth/UserProfilePanel";
 import {Outline} from "framework/util/OutlineUtil"
+import './Site.css';
+
+const SiteEditor = lazy(() => import("../editor/SiteEditor"));
+const UserProfilePage = lazy(() => import("../../auth/UserProfilePage"));
+const UserAdminPage = lazy(() => import("../../auth/UserAdminPage"));
+const Login = lazy(() => import("../../auth/Login"));
+const Logout = lazy(() => import("../../auth/Logout"));
+const Error404 = lazy(() => import("../../util/Error404"));
+const SmsAdminPage = lazy(() => import("../sms/SmsAdminPage"));
+const LivestreamAdminPage = lazy(() => import("../livestream/LivestreamAdminPage"));
+const GuestBookAdminPage = lazy(() => import("../guestbook/GuestBookAdminPage"));
+const GalleryAdminPage = lazy(() => import("../gallery/GalleryAdminPage"));
 
 /**
  * @typedef ErrorData
@@ -51,29 +57,67 @@ export const SiteContext = createContext({});
 export default function Site(props) {
 
   // imports
-  const navigate = useNavigate();
   const location = useLocation();
   const {Sites} = useRestApi();
   const {hasPermission} = useAuth();
 
   // states
-  const [siteData, setSiteData] = useState(null);
+  const [siteData, setSiteData] = useState(/** @type SiteData */ null);
   const [outlineData, setOutlineData] = useState(/** @type {[OutlineData]|null} */ null);
-  const [error, __setError__] = useState(null); // use public setter, not __setError__
   const [alert, setAlert] = useState('');
   const [currentPage, setCurrentPage] = useState(null);
   const [prevPage, setPrevPage] = useState(null);
   const [nextPage, setNextPage] = useState(null);
-  const [breadcrumbs, setBreadcrumbs] = useState([]);
   const [canEdit, setCanEdit] = useState(false);
   const [canBrowseProtected, setCanBrowseProtected] = useState(false);
-  const [MetaPages] = useState([
-    {name: 'user', path: '/admin/user', content: <UserProfilePanel/>},
-    {name: 'users', path: '/admin/users', content: <SiteUsers/>},
-    {name: 'login', path: '/login', content: <Login/>},
-    {name: 'logout', path: '/logout', content: <Logout/>},
-    {name: 'error', path: '*', content: <Error404/>},
+  const [metaPages] = useState([
+    {
+      name: 'user',
+      id: -1,
+      title: 'User Profile',
+      path: '/admin/user',
+      content: <Suspense><UserProfilePage/></Suspense>
+    },
+    {
+      name: 'users',
+      id: -2,
+      title: 'Manage Site Users',
+      path: '/admin/users',
+      content: <Suspense><UserAdminPage/></Suspense>
+    },
+    {
+      name: 'sms',
+      id: -3,
+      title: 'Manage Messaging',
+      path: '/admin/sms',
+      content: <Suspense><SmsAdminPage/></Suspense>
+    },
+    {name: 'login', id: -4, title: 'Log In', path: '/login', content: <Suspense><Login/></Suspense>},
+    {name: 'logout', id: -5, title: 'Log Out', path: '/logout', content: <Suspense><Logout/></Suspense>},
+    {
+      name: 'galleries',
+      id: -6,
+      title: 'Manage Photo Galleries',
+      path: '/admin/galleries',
+      content: <Suspense><GalleryAdminPage siteId={siteData?.SiteID}/></Suspense>
+    },
+    {
+      name: 'livestreams',
+      id: -7,
+      title: 'Manage Livestreams',
+      path: '/admin/livestreams',
+      content: <Suspense><LivestreamAdminPage siteId={siteData?.SiteID}/></Suspense>
+    },
+    {
+      name: 'guestbooks',
+      id: -8,
+      title: 'Manage Guest Books',
+      path: '/admin/guestbooks',
+      content: <Suspense><GuestBookAdminPage siteId={siteData?.SiteID}/></Suspense>
+    },
+    {name: 'error', id: -9, title: 'Error 404 - Not Found', path: '*', content: <Suspense><Error404/></Suspense>}
   ]);
+  const [redirect, setRedirect] = useState(0);
 
   useEffect(() => {
     setCanEdit(hasPermission?.(Resource.SITE, Permission.EDIT));
@@ -90,25 +134,40 @@ export default function Site(props) {
   }, [siteData]);
 
   useEffect(() => {
-    // get current page and breadcrumbs from new pathname
+    // get current page from new pathname
     if (outlineData) {
-      console.debug(`Update current page.`);
       if (location.pathname === '/') {
+        if (redirect > 0) {
+          // find redirect page
+          for (const page of outlineData) {
+            if (page.PageID === redirect) {
+              setCurrentPage(page);
+              return;
+            }
+          }
+          // redirect not found, fall through to home page
+        }
+        // set home page
         setCurrentPage(outlineData[0]);
-        console.debug(`Set current page to home page.`);
       } else {
         for (const page of outlineData) {
           if (page.PageRoute === location.pathname || page.PageID === cfmPageId) {
             setCurrentPage(page);
-            const crumbs = buildBreadcrumbs(outlineData, page.ParentID);
-            setBreadcrumbs(crumbs);
-            console.debug(`Set current page to ${page.PageID}.`);
-            break;
+            return;
           }
         }
+        for (const page of metaPages) {
+          if (page.path === location.pathname || page.path === "*") {
+            // current page or fallback page
+            setCurrentPage({PageID: page.id, PageTitle: page.title, PageContent: page.content});
+            return;
+          }
+        }
+        // page not found in outline or meta pages
+        setCurrentPage({PageID: 0});
       }
     }
-  }, [location.pathname, outlineData, setCurrentPage, cfmPageId]);
+  }, [location.pathname, metaPages, outlineData, setCurrentPage, cfmPageId, redirect]);
 
   useEffect(() => {
     // Google Analytics, if provided.
@@ -118,28 +177,28 @@ export default function Site(props) {
   }, [siteData]);
 
   /**
-   * Display the site in an error state.
-   * @param {ErrorData} errorData
-   */
-  const setError = useCallback((errorData) => {
-    // use stringify for deep compare
-    if (JSON.stringify(errorData) !== JSON.stringify(error)) {
-      __setError__(errorData);
-      if (errorData) {
-        // if setting non-null error, then redirect navigation
-        navigate('/error');
-      }
-    }
-  }, [navigate, error]);
-
-  /**
    * Display an error alert.
-   * @param {ErrorData} errorData
+   *
+   * Meant to be a replacement for console.error(text,Error)
+   * or just pass the Error.
+   *
+   * @param {Error | String} error    Prompt string or Error.
+   * @param {Error} exception         Error to show after prompt string.
    */
-  const showErrorAlert = useCallback((text, error) => {
-    // use stringify for deep compare
-    if (alert !== text) {
-      setAlert(`${text} ${error ? error.message : ''}`);
+  const showErrorAlert = useCallback((error, exception) => {
+    let msg;
+    if (typeof error === 'string' || error instanceof String) {
+      if (alert !== error) {
+        msg = `${error} ${exception?.response?.data?.message ? exception.response.data.message : exception?.message ? exception.message : ''}`;
+      }
+    } else if (error?.response?.data?.message) {
+      //
+      msg = error.response.data.message;
+    } else if (error.message) {
+      msg = error.message;
+    }
+    if (msg && alert !== msg) {
+      setAlert(msg);
     }
   }, [alert]);
 
@@ -161,18 +220,10 @@ export default function Site(props) {
     </Alert>
     : <></>;
 
-  // set error from props if defined
-  useEffect(() => {
-    if (props.error) {
-      setError(props.error)
-    }
-  }, [props.error, setError]);
-
   useEffect(() => {
     if (!siteData) {
       // load site data
       Sites.getSite().then((data) => {
-        console.debug(`Loaded site ${data.SiteID}.`);
         setSiteData(data);
       }).catch(err => console.error(`Error loading site.`, err));
     }
@@ -182,22 +233,22 @@ export default function Site(props) {
     if (!outlineData) {
       // load site outline
       Sites.getSiteOutline().then((data) => {
-        console.debug(`Loaded site outline.`);
         setOutlineData(buildOutline(data));
       }).catch(err => console.error(`Error loading outline.`, err));
     }
   }, [Sites, outlineData]);
 
-  let redirect;
-  if (props.redirects && window.location.pathname === '/') {
-    // search for page redirect matches
-    for (const item of props.redirects) {
-      if (item.hostname === window.location.hostname) {
-        console.debug(`Redirecting ${item.hostname} to page ${item.pageId}.`);
-        redirect = item;
+  useEffect(() => {
+    if (props.redirects && window.location.pathname === '/') {
+      // search for page redirect matches
+      for (const item of props.redirects) {
+        if (item.hostname === window.location.hostname) {
+          setRedirect(item.pageId)
+        }
       }
     }
-  }
+  }, [props.redirects, setRedirect])
+
 
   useEffect(() => {
     // build next & prev page for navigation
@@ -252,10 +303,10 @@ export default function Site(props) {
             element={<props.pageElement pageId={page.PageID}/>}
           />
         ))}
-        {MetaPages.map((meta) => (
+        {metaPages.map((meta) => (
           <Route
             path={meta.path}
-            element={<props.pageElement content={meta.content}/>}
+            element={<props.pageElement pageId={meta.id}/>}
           />
         ))}
       </>)}
@@ -283,27 +334,26 @@ export default function Site(props) {
       updatePage: (pageData) => setOutlineData(Outline.updatePage(pageData, outlineData))
     },
     outlineData: outlineData,
-    error: error,
-    setError: setError,
+    metaPages: metaPages,
     showErrorAlert: showErrorAlert,
     getChildren: (pageId) => Outline.getChildren(pageId, outlineData, false, canBrowseProtected),
     currentPage: currentPage,
     prevPage: prevPage,
     nextPage: nextPage,
-    breadcrumbs: breadcrumbs,
-    buildBreadcrumbs: buildBreadcrumbs,
   };
 
   if (canEdit) {
     return (
       <SiteContext value={siteContext}>
         <Head/>
-        <SiteEditor>
-          <div className="Site" data-testid="Site">
-            {content}
-            {alertElement}
-          </div>
-        </SiteEditor>
+        <Suspense fallback={<div className={'PageLoading'}><Spinner/></div>}>
+          <SiteEditor>
+            <div className="Site" data-testid="Site">
+              {content}
+              {alertElement}
+            </div>
+          </SiteEditor>
+        </Suspense>
       </SiteContext>
     );
   } else {
@@ -361,21 +411,3 @@ function setCharAt(str, index, chr) {
   return str.substring(0, index) + chr + str.substring(index + 1);
 }
 
-/**
- * Build breadcrumb array from site outline.
- *
- * @param outlineData {[OutlineData]}
- * @param parentId {number}
- */
-function buildBreadcrumbs(outlineData, parentId) {
-  const breadcrumbs = [];
-  if (outlineData && parentId) {
-    for (let i = outlineData.length - 1; i >= 0; i--) {
-      if (outlineData[i].PageID === parentId) {
-        breadcrumbs.push(outlineData[i]);
-        parentId = outlineData[i].ParentID;
-      }
-    }
-  }
-  return breadcrumbs.reverse();
-}

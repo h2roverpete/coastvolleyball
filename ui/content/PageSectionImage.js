@@ -1,10 +1,11 @@
 import {useSiteContext} from "./Site";
-import FileDropTarget, {DropState} from "../editor/FileDropTarget";
-import {useRef} from "react";
+import {lazy, useRef, Suspense} from "react";
 import {useTouchContext} from "../../util/TouchProvider";
-import PageSectionImageMenu from "./PageSectionImageMenu";
-import {motion, useScroll, useTransform} from 'motion/react';
-import {usePageContext} from "./Page";
+import './PageSectionImage.css';
+
+const FileDropTarget = lazy(() => import("../editor/FileDropTarget"));
+const {DropState} = lazy(() => import("../editor/FileDropTarget"));
+const PageSectionImageMenu = lazy(() => import("./PageSectionImageMenu"));
 
 /**
  * Display a page section image.
@@ -33,15 +34,9 @@ export default function PageSectionImage(
   // imports
   const {supportsHover} = useTouchContext();
   const {siteData, showErrorAlert} = useSiteContext();
-  const {scrollRef} = usePageContext();
-
 
   // refs
   const editButtonRef = useRef(null);
-
-  // scroll calculation for parallax
-  const {scrollYProgress} = useScroll({container: scrollRef, target: imageRef, offset: ["start end", "end start"]});
-  const y = useTransform(scrollYProgress, [0, 1], ['0', '100%']);
 
   if (!pageSectionData.SectionImage) {
     return <></>;
@@ -103,35 +98,32 @@ export default function PageSectionImage(
 
   return (
     <>
-      {pageSectionData.ImagePosition === 'parallax' ? (
+      {pageSectionData.ImagePosition === 'parallax' ? (<Suspense>
         <div
           style={{position: 'relative'}}
           ref={imageRef}
           onMouseOver={() => {
-            if (canEdit && supportsHover) editButtonRef.current.hidden = false;
+            if (canEdit && supportsHover && editButtonRef.current) editButtonRef.current.hidden = false;
           }}
           onMouseLeave={() => {
-            if (canEdit && supportsHover) editButtonRef.current.hidden = true;
+            if (canEdit && supportsHover && editButtonRef.current) editButtonRef.current.hidden = true;
           }}>
-          <motion.div
-            className={`SectionImage col-sm-12 mb-3 parallax`}
+          <div
+            className={`SectionImage col-sm-12 mb-3 parallax-image`}
             style={{
-              width: '100%',
-              paddingBottom: '50%',
-              backgroundSize: 'cover',
-              backgroundPositionX: 'center',
-              backgroundPositionY: y,
-              backgroundRepeat: 'no-repeat',
               backgroundImage: `url(${siteData?.SiteRootUrl}/images/${pageSectionData.SectionImage})`,
+              "animation": "linear move-background",
+              "animationDuration": "auto",
+              "animationTimeline": "scroll()"
             }}
             onMouseOver={() => {
-              if (canEdit && supportsHover) editButtonRef.current.hidden = false;
+              if (canEdit && supportsHover && editButtonRef.current) editButtonRef.current.hidden = false;
             }}
             onMouseLeave={() => {
-              if (canEdit && supportsHover) editButtonRef.current.hidden = true;
+              if (canEdit && supportsHover && editButtonRef.current) editButtonRef.current.hidden = true;
             }}
           />
-          {canEdit && (<>
+          {canEdit && (<Suspense>
             <FileDropTarget
               ref={dropRef}
               onFileSelected={onFileSelected}
@@ -142,18 +134,19 @@ export default function PageSectionImage(
               }}
             />
             <PageSectionImageMenu pageSectionData={pageSectionData} buttonRef={editButtonRef}/>
-          </>)}
-        </div>) : (<>
+          </Suspense>)}
+        </div>
+      </Suspense>) : (<>
         {pageSectionData?.SectionImage && (
           <div
             style={imageDivStyle}
             className={imageDivClassName}
             data-testid={`SectionImageDiv-${pageSectionData.PageSectionID}`}
             onMouseOver={() => {
-              if (canEdit && supportsHover) editButtonRef.current.hidden = false;
+              if (canEdit && supportsHover && editButtonRef.current) editButtonRef.current.hidden = false;
             }}
             onMouseLeave={() => {
-              if (canEdit && supportsHover) editButtonRef.current.hidden = true;
+              if (canEdit && supportsHover && editButtonRef.current) editButtonRef.current.hidden = true;
             }}
           >
             <img
@@ -165,7 +158,7 @@ export default function PageSectionImage(
               ref={imageRef}
             />
 
-            {canEdit && (<>
+            {canEdit && (<Suspense>
               <FileDropTarget
                 ref={dropRef}
                 onFileSelected={onFileSelected}
@@ -176,7 +169,7 @@ export default function PageSectionImage(
                 }}
               />
               <PageSectionImageMenu pageSectionData={pageSectionData} buttonRef={editButtonRef}/>
-            </>)}
+            </Suspense>)}
           </div>
         )}
       </>)}

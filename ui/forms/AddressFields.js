@@ -35,7 +35,7 @@ function AddressFields({address, onChange}) {
           <Form.Control
             type="text"
             id="Address1"
-            value={address?.Address1}
+            value={address?.Address1 || ''}
             onChange={e => {
               onChange?.({name: 'Address1', value: e.target.value});
             }}

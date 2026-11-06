@@ -1,9 +1,10 @@
-import {createContext, lazy, Suspense, useCallback, useContext, useEffect, useRef, useState} from "react";
+import {createContext, lazy, Suspense, useCallback, useContext, useEffect, useState} from "react";
 import {useSiteContext} from "./Site";
 import {useRestApi} from "../../api/RestApi";
 import FormEditor from "../editor/FormEditor";
 import {useAuth} from "../../auth/AuthProvider";
 import {Permission, Resource} from "../../auth/Permissions";
+import './Page.css';
 
 const AddExtrasModal = lazy(() => import("../extras/AddExtrasModal"));
 
@@ -17,16 +18,15 @@ export const PageContext = createContext(
  * Provides page related data in a PageContext to children.
  *
  * @property {[JSX.Element]} children   Child elements.
- * @property {JSX.Element} [content]    Display provided content instead of children.
  * @property {number} [pageId]          Specific page ID to display.
  *
  * @returns {JSX.Element}
  * @constructor
  */
-export default function Page({children, pageId, content, overflow}) {
+export default function Page({children, pageId}) {
 
   // imports
-  const {outlineData, buildBreadcrumbs} = useSiteContext();
+  const {metaPages, outlineData} = useSiteContext();
   const {Pages, Extras} = useRestApi();
   const {hasPermission} = useAuth();
 
@@ -36,54 +36,43 @@ export default function Page({children, pageId, content, overflow}) {
   const [sectionData, setSectionData] = useState(/** @type {PageSectionData[]} */ null);
   const [showAddExtraModal, setShowAddExtraModal] = useState(false);
   const [extraPageSectionId, setExtraPageSectionId] = useState(0);
-  const [canEdit, setCanEdit] = useState(false);
 
-  // refs
-  const scrollRef = useRef();
+  const canEdit = hasPermission(Resource.PAGE, Permission.EDIT);
 
   useEffect(() => {
-    setCanEdit(hasPermission?.(Resource.PAGE, Permission.EDIT));
-  }, [setCanEdit, hasPermission]);
-
-  useEffect(() => {
-    // extract this page from outline data, don't load from DynamoDB
-    if (pageId !== pageData?.PageID && outlineData) {
+    if (outlineData && pageId > 0 && pageId !== pageData?.PageID) {
+      // page ID > 0 is a content page, refresh from outline data
       for (const page of outlineData) {
         if (page.PageID === pageId) {
+          // update page data
           setPageData(page);
-          console.debug(`Loaded page ${pageId} data.`);
-          break;
+          setBreadcrumbs(buildBreadcrumbs(outlineData, page.ParentID));
+          // clear section data while loading
+          setSectionData(null);
+          Pages.getPageSections(pageId).then((sections) => {
+            Extras.getPageExtras(pageId).then((extras) => {
+              sections.forEach((section) => {
+                section.Extras = extras.filter((extra) => extra.PageSectionID === section.PageSectionID).sort((a, b) => a.ExtraSeq - b.ExtraSeq)
+              })
+              // set new page content
+              setSectionData(sections);
+            })
+          })
+          return;
+        }
+      }
+    } else if (metaPages && pageId < 0 && pageId !== pageData?.PageID) {
+      // page ID < 0 is a meta page, refresh from metas list
+      for (const page of metaPages) {
+        if (page.id === pageId) {
+          setPageData({PageID: page.id, PageTitle: page.title, PageContent: page.content});
+          setSectionData(null);
+          setBreadcrumbs([]);
+          return;
         }
       }
     }
-  }, [pageId, pageData, outlineData]);
-
-  useEffect(() => {
-    // load page sections from DynamoDB
-    if (pageId && pageId !== pageData?.PageID) {
-      Pages.getPageSections(pageId).then((sections) => {
-        console.debug(`Loaded page ${pageId} sections.`);
-        Extras.getPageExtras(pageId).then((extras) => {
-          console.debug(`Loaded page ${pageId} extras.`);
-          sections.forEach((section) => {
-            section.Extras = extras.filter((extra) => extra.PageSectionID === section.PageSectionID).sort((a, b) => a.ExtraSeq - b.ExtraSeq)
-          })
-          // set new page content
-          setSectionData(sections);
-        })
-      })
-      // clear page until data loads
-      setSectionData([]);
-    }
-  }, [pageId, pageData, Pages, sectionData, Extras]);
-
-  useEffect(() => {
-    // build breadcrumbs at the page level for slider pages
-    if (!breadcrumbs && pageData && outlineData) {
-      // build breadcrumb data
-      setBreadcrumbs(buildBreadcrumbs(outlineData, pageData.ParentID));
-    }
-  }, [pageData, outlineData, breadcrumbs, buildBreadcrumbs]);
+  }, [pageId, pageData, metaPages, outlineData]);
 
   const addPageSection = useCallback((newData) => {
     /** @type {PageSectionData[]} */
@@ -233,12 +222,11 @@ export default function Page({children, pageId, content, overflow}) {
         updateExtra: updateExtra,
         moveExtraUp: moveExtraUp,
         moveExtraDown: moveExtraDown,
-        scrollRef: scrollRef,
       }}
     >
       {canEdit && showAddExtraModal && (
         <FormEditor>
-          <Suspense fallback={<></>}>
+          <Suspense>
             <AddExtrasModal
               show={showAddExtraModal}
               onHide={() => setShowAddExtraModal(false)}
@@ -247,8 +235,8 @@ export default function Page({children, pageId, content, overflow}) {
           </Suspense>
         </FormEditor>
       )}
-      <div className="Page" data-testid="Page" ref={scrollRef}>
-        {content ? <>{content}</> : <>{children}</>}
+      <div className="Page" data-testid="Page">
+        {children}
       </div>
     </PageContext>
   );
@@ -256,4 +244,23 @@ export default function Page({children, pageId, content, overflow}) {
 
 export function usePageContext() {
   return useContext(PageContext)
+}
+
+/**
+ * Build breadcrumb array from site outline.
+ *
+ * @param outlineData {[OutlineData]}
+ * @param parentId {number}
+ */
+function buildBreadcrumbs(outlineData, parentId) {
+  const breadcrumbs = [];
+  if (outlineData && parentId) {
+    for (let i = outlineData.length - 1; i >= 0; i--) {
+      if (outlineData[i].PageID === parentId) {
+        breadcrumbs.push(outlineData[i]);
+        parentId = outlineData[i].ParentID;
+      }
+    }
+  }
+  return breadcrumbs.reverse();
 }

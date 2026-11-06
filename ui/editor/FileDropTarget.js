@@ -51,7 +51,7 @@ const IMAGE_MIME_TYPES = [
 /**
  * Display UI for file drag, drop and uploading.
  *
- * @param ref {RefObject<DropFunctions>}      Reference to functions
+ * @param ref {React.RefObject<{selectFile: (function()), onDragEnter: (function(Event, String)), setDropState: (function(String)), setProgress: (function((ProgressData|void)): (ProgressData|void))}>}      Reference to functions
  * @param onFileSelected {function(File)}     Callback to receive one selected file after uploadFile() is called.
  * @param onFilesSelected  {function(File[])} Callback to receive multiple selected files after uploadFile() is called.
  * @param onError  {function(Error)}          Callback to receive drag and drop errors.

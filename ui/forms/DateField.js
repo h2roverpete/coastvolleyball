@@ -16,6 +16,8 @@ import DatePicker from "react-datepicker";
  */
 export default function DateField({name, id, size, style, value, endDate, onChange, minDate}) {
 
+  const formData = useFormData();
+
   return (
     <DatePicker
       className={`form-control${size ? "-" + size : ''}`}

@@ -1,5 +1,6 @@
 import {useNavigate} from "react-router";
 import {useSiteContext} from "./Site";
+import './PageNavigation.css';
 
 /**
  * Display next/previous page navigation elements.
@@ -7,7 +8,7 @@ import {useSiteContext} from "./Site";
  * @returns {JSX.Element}
  * @constructor
  */
-export default function PageNavigation() {
+export default function PageNavigation({html}) {
 
   const {nextPage, prevPage} = useSiteContext();
   const navigate = useNavigate();
@@ -15,12 +16,8 @@ export default function PageNavigation() {
   return (
     <div
       className="PageNavigation"
-      style={{
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "end",
-      }}
     >
+      {html && <div dangerouslySetInnerHTML={{__html: html}} className={'nav-text'}/>}
       {prevPage && (
         <div
           className="nav nav-item nav-link previous"

@@ -10,11 +10,13 @@
  * @enum {string}
  */
 const Resource = {
-  SITE: "site",
-  PAGE: "page",
-  GALLERY: "gallery",
-  GUESTBOOK: "guestbook",
-  USERS: "users",
+  SITE: "Site",
+  PAGE: "Page",
+  GALLERY: "Gallery",
+  GUESTBOOK: "GuestBook",
+  USERS: "User",
+  SMS: "Sms",
+  LIVESTREAM: "Livestream",
 }
 
 /**
@@ -25,10 +27,11 @@ const Permission = {
   ADMIN: "admin",
   EDIT: "edit",
   BROWSE_PROTECTED: "browse_protected",
-  BROWSE: "browse",
   UPDATE: "update",
   ADD: "add",
   DELETE: "delete",
+  SEND: "send",
+  BROADCAST: "broadcast",
   NONE: "none",
 }
 
@@ -41,26 +44,36 @@ const ResourcePermissions = {
   [Resource.SITE]: [
     {permission: Permission.ADMIN, description: 'Administrator'},
     {permission: Permission.EDIT, description: 'Edit Site Outline'},
-    {permission: Permission.BROWSE, description: 'Browse Only'},
+    {permission: Permission.NONE, description: 'None'},
   ],
   [Resource.PAGE]: [
     {permission: Permission.ADMIN, description: 'Administrator'},
     {permission: Permission.EDIT, description: 'Edit Page Contents'},
     {permission: Permission.BROWSE_PROTECTED, description: 'Browse Protected Pages'},
-    {permission: Permission.BROWSE, description: 'Browse Only'},
+    {permission: Permission.NONE, description: 'None'},
   ],
   [Resource.GALLERY]: [
     {permission: Permission.ADMIN, description: 'Administrator'},
     {permission: Permission.EDIT, description: 'Edit Gallery Contents'},
     {permission: Permission.ADD, description: 'Add Photos'},
-    {permission: Permission.BROWSE, description: 'Browse Only'},
+    {permission: Permission.NONE, description: 'None'},
   ],
   [Resource.GUESTBOOK]: [
     {permission: Permission.ADMIN, description: 'Administrator'},
-    {permission: Permission.BROWSE, description: 'Browse Only'},
+    {permission: Permission.NONE, description: 'None'},
   ],
   [Resource.USERS]: [
     {permission: Permission.ADMIN, description: 'Administrator'},
+    {permission: Permission.NONE, description: 'None'},
+  ],
+  [Resource.SMS]: [
+    {permission: Permission.ADMIN, description: 'Administrator'},
+    {permission: Permission.SEND, description: 'Send Messages'},
+    {permission: Permission.NONE, description: 'None'},
+  ],
+  [Resource.LIVESTREAM]: [
+    {permission: Permission.ADMIN, description: 'Administrator'},
+    {permission: Permission.BROADCAST, description: 'Broadcaster'},
     {permission: Permission.NONE, description: 'None'},
   ]
 }
@@ -96,14 +109,17 @@ const checkPermission = (user, resource, permission) => {
       case Resource.USERS:
         userIndex = permissionList.findIndex((item) => item.permission === user.UserPermission);
         break;
+      case Resource.SMS:
+        userIndex = permissionList.findIndex((item) => item.permission === user.SmsPermission);
+        break;
+      case Resource.LIVESTREAM:
+        userIndex = permissionList.findIndex((item) => item.permission === user.LivestreamPermission);
+        break;
       default:
         break;
     }
-    const canEdit = userIndex >= 0 && requestedIndex >= 0 && userIndex <= requestedIndex;
-    console.debug(`Permission for ${resource}:${permission} = ${canEdit}.`);
-    return canEdit;
+    return userIndex >= 0 && requestedIndex >= 0 && userIndex <= requestedIndex;
   } else {
-    console.error(`Unknown resource ${resource}.`);
     return false;
   }
 }

@@ -2,7 +2,7 @@ import {useEffect} from "react";
 import {useAuth} from "./AuthProvider";
 import {useNavigate} from "react-router";
 
-export default function Logout(props) {
+export default function Logout() {
   const {token,  setToken} = useAuth();
   const navigate = useNavigate();
   useEffect(() => {

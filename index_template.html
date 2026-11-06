@@ -5,6 +5,7 @@
     <link rel="icon" href="%PUBLIC_URL%/images/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
+    <meta name="robots" content="{{Robots}}" />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/images/favicon.png" />
     <!--
       manifest.json provides metadata used when your web app is installed on a
@@ -21,8 +22,8 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>{{title}}</title>
-    <meta name="description" content="{{PageMetaDescription}}"/>
-    <meta name="keywords" content="{{PageMetaKeywords}}"/>
+    {{#PageMetaDescription}}<meta name="description" content="{{PageMetaDescription}}"/>{{/PageMetaDescription}}
+    {{#PageMetaKeywords}}<meta name="keywords" content="{{PageMetaKeywords}}"/>{{/PageMetaKeywords}}
     <link rel="stylesheet" href="https://resources.h2rover.net/css/{{SiteStyle}}">
   </head>
   <body>

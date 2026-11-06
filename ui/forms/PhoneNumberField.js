@@ -1,11 +1,7 @@
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
 import './PhoneNumberField.css'
-
-/**
- * @callback StringCallback
- * @param value{String}
- */
+import {useFormData} from "../editor/FormEditor";
 
 /**
  * Form field for phone number input
@@ -13,23 +9,23 @@ import './PhoneNumberField.css'
  * @param name{String}
  * @param id{String}
  * @param value{String}
- * @param onChange{StringCallback}
  * @constructor
  */
-function PhoneNumberField({name, id, value, onChange}) {
+function PhoneNumberField({name, id, value}) {
+  const formData = useFormData();
   return (
     <PhoneInput
       inputProps={{
         name: name,
-        required: false
+        id: id,
+        required: true,
       }}
-      id={id}
       value={value}
       country={'us'}
       onChange={(value, country, e, formattedValue) => {
-        onChange({
+        formData.onDataChanged({
           name: name,
-          value: formattedValue
+          value: formattedValue,
         })
       }}
       dropdownClass={'dropdown'}

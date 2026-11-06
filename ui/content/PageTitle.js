@@ -1,10 +1,11 @@
 import {usePageContext} from "./Page";
-import {useEffect, useRef, useState} from "react";
+import {lazy, Suspense, useEffect, useRef, useState} from "react";
 import {useRestApi} from "../../api/RestApi";
-import EditableField from "../editor/EditableField";
 import {useSiteContext} from "./Site";
 import {Permission, Resource} from "../../auth/Permissions";
 import {useAuth} from "../../auth/AuthProvider";
+
+const EditableField = lazy(() => import("../editor/EditableField"));
 
 /**
  * Display the page title in an <h1> tag.
@@ -22,24 +23,24 @@ import {useAuth} from "../../auth/AuthProvider";
 export default function PageTitle({text, alwaysShow}) {
 
   const {pageData} = usePageContext();
-  const {Outline, currentPage} = useSiteContext();
+  const {currentPage} = useSiteContext();
+  const {Outline} = useSiteContext();
   const {Pages} = useRestApi();
   const {hasPermission} = useAuth();
 
   const [titleText, setTitleText] = useState(null);
-  const [canEdit, setCanEdit] = useState(false);
 
-  useEffect(() => {
-    setCanEdit(hasPermission?.(Resource.PAGE, Permission.EDIT));
-  }, [setCanEdit, hasPermission]);
+  const canEdit = hasPermission?.(Resource.PAGE, Permission.EDIT) && pageData?.PageID > 0;
 
   useEffect(() => {
     if (text) {
       setTitleText(text);
-    } else if (pageData) {
+    } else if (pageData?.PageTitle) {
       setTitleText(pageData.PageTitle);
-    } else if (currentPage) {
+    } else if (currentPage?.PageTitle) {
       setTitleText(currentPage.PageTitle);
+    } else {
+      setTitleText(null);
     }
   }, [pageData, currentPage, setTitleText, text]);
 
@@ -71,24 +72,27 @@ export default function PageTitle({text, alwaysShow}) {
       data-testid="PageTitle"
       ref={titleRef}
     >
-      {titleText ? titleText : (<>&nbsp;</>)}
+      {titleText}
     </h1>
   )
 
   return (<>
-    {canEdit ?
-      <EditableField
-        field={title}
-        fieldRef={titleRef}
-        callback={onTitleChanged}
-        textContent={titleText}
-        textAlign={pageData?.PageTitleAlign}
-        showEditButton={true}
-        editTooltip={'Edit page title'}
-        alwaysShow={alwaysShow === true}
-        canEdit={canEdit}
-      />
-      : (<>{title}</>)
+    {canEdit && titleText ?
+      <Suspense>
+        <EditableField
+          field={title}
+          fieldRef={titleRef}
+          callback={onTitleChanged}
+          textContent={titleText}
+          textAlign={pageData?.PageTitleAlign}
+          showEditButton={true}
+          editTooltip={'Edit page title'}
+          alwaysShow={alwaysShow === true}
+          canEdit={canEdit}
+        />
+      </Suspense>
+      :
+      <>{title}</>
     }
   </>)
 }

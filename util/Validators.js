@@ -10,6 +10,18 @@ export function isValidEmail(email) {
 }
 
 /**
+ * Is the provided string a valid phone number? (including country code)
+ *
+ * @param phone {string}  Email to test.
+ *
+ * @returns {boolean} Is a valid phone number?
+ */
+export function isValidPhoneNumber(phone) {
+  const number = phone?.replaceAll(/[^0-9+]/g, "");
+  return (number?.length === 12 && number.startsWith('+1'));
+}
+
+/**
  * Is the provided string a valid URL?
  * (Includes IP addresses and localhost URLs)
  *
@@ -54,7 +66,7 @@ export function isValidYouTubeUrl(url) {
 }
 
 export function isValidRoute(pageData, outlineData) {
-  if (!pageData.PageRoute || pageData.PageRoute.charAt(0) !== '/' || pageData.PageRoute.match(/^\/[a-z0-9]+$/) === null) {
+  if (!pageData.PageRoute || pageData.PageRoute.charAt(0) !== '/' || pageData.PageRoute.match(/^\/[a-z0-9/]+$/) === null) {
     return false;
   }
   for (const page of outlineData) {

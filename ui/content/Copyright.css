@@ -1,0 +1,11 @@
+/* Copyright notice, can be placed inside or outside page content */
+div.Copyright {
+  margin: 0 0 10px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  text-align: center;
+  font-size: 0.8rem;
+  line-height: 120%;
+  color: var(--bs-secondary);
+}

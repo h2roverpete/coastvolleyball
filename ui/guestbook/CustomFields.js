@@ -1,5 +1,6 @@
 import DatePicker from "react-datepicker";
 import {Col, Form, Row} from "react-bootstrap";
+import {useFormData} from "../editor/FormEditor";
 
 /**
  * Guest Book custom fields.
@@ -11,7 +12,10 @@ import {Col, Form, Row} from "react-bootstrap";
  * @returns {JSX.Element}
  * @constructor
  */
-function CustomFields({guestBookConfig, feedbackData, onChange, labelCols}) {
+function CustomFields({guestBookConfig, feedbackData, labelCols}) {
+
+  const formData = useFormData();
+
   if (!labelCols) {
     labelCols = 2;
   }
@@ -34,9 +38,7 @@ function CustomFields({guestBookConfig, feedbackData, onChange, labelCols}) {
               {((guestBookConfig[`Custom${i}Type`] === "text" && guestBookConfig[`Custom${i}Options`]?.length > 0) || guestBookConfig[`Custom${i}Type`] === "popup") && (
                 <Form.Select
                   id={`Custom${i}`}
-                  onChange={(e) => {
-                    onChange({name: `Custom${i}`, value: e.target.value})
-                  }}
+                  onChange={(e) => formData.onDataChanged({name: `Custom${i}`, value: e.target.value})}
                   value={feedbackData?.[`Custom${i}`] || ''}
                 >
                   {guestBookConfig[`Custom${i}EmptyLabel`]?.length > 0 && (
@@ -50,9 +52,7 @@ function CustomFields({guestBookConfig, feedbackData, onChange, labelCols}) {
               {(guestBookConfig[`Custom${i}Type`] === 'text' && !guestBookConfig[`Custom${i}Options`]) && (
                 <Form.Control
                   name={`Custom${i}`}
-                  onChange={(e) => {
-                    onChange({name: `Custom${i}`, value: e.target.value})
-                  }}
+                  onChange={(e) => formData.onDataChanged({name: `Custom${i}`, value: e.target.value})}
                   value={feedbackData?.[`Custom${i}`] || ''}
                 />
               )}
@@ -60,7 +60,7 @@ function CustomFields({guestBookConfig, feedbackData, onChange, labelCols}) {
                 <DatePicker
                   selected={feedbackData?.[`Custom${i}`]}
                   onChange={(date) => {
-                    onChange?.({
+                    formData.onDataChanged({
                       name: `Custom${i}`,
                       value: date.toISOString()
                     })
@@ -82,7 +82,7 @@ function CustomFields({guestBookConfig, feedbackData, onChange, labelCols}) {
                     value={option.trim()}
                     checked={feedbackData?.[`Custom${i}`] === option.trim()}
                     onChange={() => {
-                      onChange({name: `Custom${i}`, value: option.trim()})
+                      formData.onDataChanged({name: `Custom${i}`, value: option.trim()})
                     }}
                     inline
                   />
@@ -102,7 +102,7 @@ function CustomFields({guestBookConfig, feedbackData, onChange, labelCols}) {
                       } else if (!e.target.checked && value.includes(option.trim())) {
                         value.splice(value.indexOf(option.trim()), 1);
                       }
-                      onChange({name: `Custom${i}`, value: value.toString()})
+                      formData.onDataChanged({name: `Custom${i}`, value: value.toString()})
                     }}
                     inline
                   />

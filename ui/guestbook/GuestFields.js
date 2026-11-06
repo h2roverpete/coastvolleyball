@@ -2,20 +2,21 @@ import AddressFields from "../forms/AddressFields";
 import PhoneNumberField from "../forms/PhoneNumberField";
 import EmailField from "../forms/EmailField";
 import {Col, Row, Form} from "react-bootstrap";
+import {useFormData} from "../editor/FormEditor";
 
 /**
  * Display guest fields from the guest book database.
  *
  * @param guestBookConfig {GuestBookConfig}
- * @param guestData {GuestData}
- * @param onChange {DataCallback}
  * @param labelCols {Number}
  * @constructor
  */
-function GuestFields({guestBookConfig, guestData, onChange, labelCols}) {
+function GuestFields({guestBookConfig, labelCols}) {
   if (!labelCols) {
     labelCols = 2;
   }
+  const formData = useFormData();
+
   return (
     <>
       {guestBookConfig?.ShowName && (<>
@@ -24,16 +25,12 @@ function GuestFields({guestBookConfig, guestData, onChange, labelCols}) {
             <Form.Label htmlFor="FirstName" className={'required text-nowrap'} column={true} sm={labelCols}>First
               Name</Form.Label>
             <Form.Control
-              isValid={guestData.FirstName != null && guestData.FirstName?.length > 0}
-              isInvalid={guestData.FirstName?.length === 0}
+              isValid={formData.edits.FirstName != null && formData.edits.FirstName?.length > 0}
+              isInvalid={formData.edits.FirstName?.length === 0}
               id="FirstName"
               size="20"
-              value={guestData.FirstName || ''}
-              onChange={e => onChange({
-                name: 'FirstName',
-                value: e.target.value
-              })}
-              onBlur={e => onChange({
+              value={formData.edits.FirstName || ''}
+              onChange={e => formData.onDataChanged({
                 name: 'FirstName',
                 value: e.target.value
               })}
@@ -43,16 +40,12 @@ function GuestFields({guestBookConfig, guestData, onChange, labelCols}) {
             <Form.Label htmlFor="LastName" className={'required text-nowrap'} sm={labelCols} column={true}>Last
               Name</Form.Label>
             <Form.Control
-              isValid={guestData.LastName != null && guestData.LastName?.length > 0}
-              isInvalid={guestData.LastName?.length === 0}
+              isValid={formData.edits.LastName != null && formData.edits.LastName?.length > 0}
+              isInvalid={formData.edits.LastName?.length === 0}
               id="LastName"
               size="20"
-              value={guestData.LastName || ''}
-              onChange={e => onChange({
-                name: 'LastName',
-                value: e.target.value
-              })}
-              onBlur={e => onChange({
+              value={formData.edits.LastName || ''}
+              onChange={e => formData.onDataChanged({
                 name: 'LastName',
                 value: e.target.value
               })}
@@ -61,7 +54,7 @@ function GuestFields({guestBookConfig, guestData, onChange, labelCols}) {
         </Row>
       </>)}
       {guestBookConfig?.ShowAddress && (
-          <AddressFields address={guestData} onChange={(data) => onChange(data)}/>
+        <AddressFields address={formData.edits} onChange={(data) => formData.onDataChanged(data)}/>
       )}
       {guestBookConfig?.ShowDayPhone && (
         <Row className={"mt-2"}>
@@ -70,8 +63,8 @@ function GuestFields({guestBookConfig, guestData, onChange, labelCols}) {
             <PhoneNumberField
               name="DayPhone"
               id="DayPhone"
-              value={guestData.DayPhone || ''}
-              onChange={onChange}
+              value={formData.edits.DayPhone || ''}
+              onChange={(data)=>formData.onDataChanged(data)}
             />
           </Col>
         </Row>
@@ -83,8 +76,8 @@ function GuestFields({guestBookConfig, guestData, onChange, labelCols}) {
             <PhoneNumberField
               name="EveningPhone"
               id="EveningPhone"
-              value={guestData.EveningPhone || ''}
-              onChange={onChange}
+              value={formData.edits.EveningPhone || ''}
+              onChange={(data)=>formData.onDataChanged(data)}
             />
           </Col>
         </Row>
@@ -96,8 +89,8 @@ function GuestFields({guestBookConfig, guestData, onChange, labelCols}) {
             <PhoneNumberField
               name="Fax"
               id="Fax"
-              value={guestData.Fax || ''}
-              onChange={onChange}
+              value={formData.edits.Fax || ''}
+              onChange={(data)=>formData.onDataChanged(data)}
             />
           </Col>
         </Row>
@@ -110,9 +103,7 @@ function GuestFields({guestBookConfig, guestData, onChange, labelCols}) {
               name="Email"
               id="Email"
               size="30"
-              value={guestData.Email}
-              onChange={(e) => onChange({name: 'Email', value: e.target.value})}
-              onBlur={(e) => onChange({name: 'Email', value: e.target.value})}
+              value={formData.edits.Email}
               maxLength="50"
               required={true}
             />
@@ -125,8 +116,8 @@ function GuestFields({guestBookConfig, guestData, onChange, labelCols}) {
           <Col sm={3}>
             <Form.Select
               id="ContactMethod"
-              value={guestData?.ContactMethod || ''}
-              onChange={(e) => onChange({name: 'ContactMethod', value: e.target.value})}
+              value={formData.edits?.ContactMethod || ''}
+              onChange={(e) => formData.onDataChanged({name: 'ContactMethod', value: e.target.value})}
             >
               {guestBookConfig?.ShowEmail && (<option>Email</option>)}
               {guestBookConfig?.ShowDayPhone && (<option>Phone</option>)}
@@ -144,8 +135,8 @@ function GuestFields({guestBookConfig, guestData, onChange, labelCols}) {
               id="mailinglist"
               value="1"
               label={"Add me to the mailing list"}
-              checked={guestData.MailingList ? guestData.MailingList : guestBookConfig.MailingListDefault}
-              onChange={e => onChange({name: 'MailingList', value: e.target.checked})}
+              checked={formData.edits.MailingList ? formData.edits.MailingList : guestBookConfig.MailingListDefault}
+              onChange={e => formData.onDataChanged({name: 'MailingList', value: e.target.checked})}
             />
           </Col>
         </Row>

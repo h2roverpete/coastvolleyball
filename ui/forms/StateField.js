@@ -1,5 +1,6 @@
 import stateList from 'states-us';
 import Form from 'react-bootstrap/Form';
+import {useFormData} from "../editor/FormEditor";
 
 /**
  * @typedef StateFieldProps
@@ -9,9 +10,7 @@ import Form from 'react-bootstrap/Form';
  * @property {string} className          One or more additional class names for field.
  * @property {boolean} required          Is required?
  * @property {string} prompt             Prompt string when nothing is selected.
- * @property {DataCallback} onChange     Standard data callback receiving {name, value} when field contents change
  */
-
 
 /**
  * Form field with list of states.
@@ -20,9 +19,11 @@ import Form from 'react-bootstrap/Form';
  * @constructor
  */
 function StateField(props) {
+  const formData = useFormData();
   return (
     <Form.Select
       {...props}
+      onChange={e => formData.onDataChanged({name: props.name, value: e.target.value})}
     >
       <option key={'-'}>(Select)</option>
       {stateList.map(elem => (

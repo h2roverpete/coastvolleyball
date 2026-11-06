@@ -1,3 +1,5 @@
+import {useFormData} from "../editor/FormEditor";
+
 /**
  * @class Option
  * @property value {string}
@@ -11,7 +13,6 @@
  * @property {string} className          One or more additional class names for field.
  * @property {boolean} required          Is required?
  * @property {string} prompt             Prompt string when nothing is selected.
- * @property {DataCallback} onChange     Standard data callback receiving {name, value} when field contents change
  * @property {[Option]} options          Options list.
  */
 
@@ -22,17 +23,18 @@
  * @returns {JSX.Element}
  * @constructor
  */
-function SelectField(props) {
+export default function SelectField(props) {
+  const formData = useFormData();
   let emptyKeyIndex = 1;
   return (
     <select
       className={`form-control${props.className ? ' ' + props.className : ''}`}
       name={props.name}
       key={props.name}
-      value={props.value}
+      value={props.value || ''}
       required={props.required}
       onChange={e => {
-        props.onChange?.({name: props.name, value: e.target.value})
+        formData.onDataChanged({name: props.name, value: e.target.value})
       }}
     >
       <option key="-" value="">{prompt && prompt.length ? prompt : `(Select)`}</option>
@@ -48,5 +50,3 @@ function SelectField(props) {
     </select>
   )
 }
-
-export default SelectField;

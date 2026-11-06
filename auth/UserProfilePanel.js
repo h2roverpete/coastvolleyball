@@ -1,13 +1,11 @@
 import {useAuth} from "./AuthProvider";
-import RestrictedContent from "./RestrictedContent";
-import PageTitle from "../ui/content/PageTitle";
 import FormEditor from "../ui/editor/FormEditor";
-import UserFields from "./UserFields";
-import EditorButtons from "../ui/editor/EditorButtons";
 import {useRestApi} from "../api/RestApi";
-import {useSiteContext} from "../ui/content/Site";
-import {isValidEmail, isValidPassword} from "../util/Validators"
 import {Container} from "react-bootstrap";
+import {lazy, Suspense, useEffect, useState} from "react";
+
+const UserFields = lazy(() => import("./UserFields"));
+const RestrictedContent = lazy(() => import("./RestrictedContent"));
 
 /**
  * Display message that the user doesn't have permission to view the content.
@@ -17,33 +15,28 @@ import {Container} from "react-bootstrap";
  */
 export default function UserProfilePanel() {
 
-  const {isAuthenticated} = useAuth();
+  const {isAuthenticated, currentUser} = useAuth();
+  const [user, setUser] = useState(null);
   const {Users} = useRestApi();
-  const {showErrorAlert} = useSiteContext();
 
-  function handleUpdate(data) {
-    Users.insertOrUpdateUser(data).then(() => {
-      console.debug("User updated successfully.");
-    }).catch(err => showErrorAlert(err));
-  }
-
-  function isDataValid(data) {
-    return data.UserName?.length > 0
-      && isValidEmail(data.UserEmail)
-      && (isValidPassword(data.Password) || !data.Password)
-  }
+  useEffect(() => {
+    if (!user && currentUser) {
+      // always load user data from database, don't use token
+      Users.getUser(currentUser.UserID).then((result) => {
+        setUser(result);
+      });
+    }
+  }, [user, currentUser, Users])
 
   return (<>
-    {isAuthenticated ? (
-      <Container fluid className="PageContent">
-        <PageTitle text={"User Profile"}/>
-        <FormEditor>
-          <form>
-            <UserFields/>
-            <EditorButtons onUpdate={handleUpdate} isDataValid={isDataValid}/>
-          </form>
-        </FormEditor>
-      </Container>
-    ) : <RestrictedContent/>}
+    {isAuthenticated ? <Suspense>
+      {user &&
+        <Container className="PageSection">
+          <FormEditor>
+            <UserFields data={user}/>
+          </FormEditor>
+        </Container>
+      }
+    </Suspense> : <RestrictedContent/>}
   </>);
 }

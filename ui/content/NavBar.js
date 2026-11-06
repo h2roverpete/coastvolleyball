@@ -1,7 +1,7 @@
 import {useEffect, useRef, useState} from "react";
 import {useSiteContext} from "./Site";
 import Navbar from 'react-bootstrap/Navbar';
-  import {Nav, NavDropdown} from "react-bootstrap";
+import {Nav, NavDropdown} from "react-bootstrap";
 import {useNavigate} from "react-router";
 import {useAuth} from "../../auth/AuthProvider";
 import {useRestApi} from "../../api/RestApi";
@@ -10,6 +10,8 @@ import {useTouchContext} from "../../util/TouchProvider";
 import AddPageButton from "../editor/AddPageButton";
 import {Resource, Permission} from "../../auth/Permissions";
 import UserMenu from "./UserMenu";
+import Collapse from 'bootstrap/js/dist/collapse';
+import './NavBar.css';
 
 /**
  * @typedef NavBarProps
@@ -34,7 +36,7 @@ export default function NavBar(props) {
   // imports
   const {siteData, getChildren, Outline, currentPage, breadcrumbs} = useSiteContext();
   const navigate = useNavigate();
-  const {hasPermission} = useAuth();
+  const {hasPermission, isAuthenticated} = useAuth();
   const {Pages} = useRestApi();
   const {supportsHover} = useTouchContext();
 
@@ -44,6 +46,7 @@ export default function NavBar(props) {
   // refs
   const editButtonRef = useRef(null);
   const toggleRef = useRef(null);
+  const collapseRef = useRef(null);
 
   useEffect(() => {
     setCanEdit(hasPermission?.(Resource.SITE, Permission.EDIT));
@@ -249,16 +252,24 @@ export default function NavBar(props) {
     }
   }
 
+  function handleUserMenuClose() {
+    if (collapseRef.current?.classList.contains('show')) {
+      // javascript to collapse the navigation bar when a user menu item is selected
+      const bsCollapse = new Collapse(collapseRef.current, {toggle: false});
+      bsCollapse.toggle();
+    }
+  }
+
   return (
     <Navbar
       expand={props.expand ? props.expand : 'sm'}
-      className={`NavBar ${!props.expand ? 'navbar-expand' : ''} bg-primary navbar-dark`}
-      fixed={props.fixed ? props.fixed : undefined}
+      className={`NavBar ${!props.expand ? 'navbar-expand' : ''} bg-primary`}
+      fixed={props.fixed !== null ? props.fixed : true}
       data-testid="NavBar"
+      variant={siteData?.SiteTheme}
     >
       <div
-        className="NavBarContents
-        container-fluid"
+        className="NavBarContents container-fluid"
         data-testid="NavBarContents"
       >
         <>{(props.brand || props.icon) && (
@@ -274,7 +285,6 @@ export default function NavBar(props) {
                     className="NavBarBrandIcon"
                     src={props.icon}
                     alt={props.brand?.length ? props.brand : siteData?.SiteName}
-                    height={45}
                     onClick={() => {
                       navigateTo('/')
                     }}
@@ -314,6 +324,7 @@ export default function NavBar(props) {
           className="NavbarCollapse"
           id="MainNavigation"
           style={{position: 'relative'}}
+          ref={collapseRef}
           onMouseOver={() => {
             if (canEdit && supportsHover && editButtonRef.current) editButtonRef.current.hidden = false
           }}
@@ -353,9 +364,10 @@ export default function NavBar(props) {
               <AddPageButton ref={editButtonRef}/>
             )}
           </Nav>
-          <>{props.showLogin === true && (
-            <div className="flex-grow-1 d-flex justify-content-start justify-content-sm-end">
-              <UserMenu/>
+          <>{(props.showLogin === true || isAuthenticated) && (
+            <div
+              className={`UserMenuContainer flex-grow-1 d-flex justify-content-start justify-content-${props.expand}-end`}>
+              <UserMenu onClose={handleUserMenuClose}/>
             </div>
           )}</>
         </Navbar.Collapse>

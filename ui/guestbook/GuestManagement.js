@@ -12,7 +12,6 @@ import {
   Spinner
 } from "react-bootstrap";
 import {useCallback, useEffect, useState} from "react";
-import {usePageContext} from "../content/Page";
 import {Permission, Resource} from "../../auth/Permissions";
 import {useAuth} from "../../auth/AuthProvider";
 import {useRestApi} from "../../api/RestApi";
@@ -20,10 +19,9 @@ import {useSiteContext} from "../content/Site";
 import {BsSortDown, BsSortUp, BsEnvelope} from "react-icons/bs";
 import "./GuestManagement.css";
 
-export default function GuestManagement({pageId, guestBookId}) {
+export default function GuestManagement({guestBookId, data}) {
 
   // imports
-  const {pageData} = usePageContext();
   const {hasPermission} = useAuth();
   const {GuestBooks} = useRestApi();
   const {showErrorAlert} = useSiteContext();
@@ -60,7 +58,10 @@ export default function GuestManagement({pageId, guestBookId}) {
   }, [setCanEdit, hasPermission]);
 
   useEffect(() => {
-    if (guestBookId) {
+    if (data) {
+      setGuestBookData(data);
+      setGuestIndex(-1);
+    } else if (guestBookId) {
       GuestBooks.getGuestBook(guestBookId)
         .then(result => {
           setGuestBookData(result);
@@ -68,7 +69,7 @@ export default function GuestManagement({pageId, guestBookId}) {
         })
         .catch(err => showErrorAlert(`Error getting guest book details.`, err));
     }
-  }, [guestBookId, setGuestBookData, GuestBooks, showErrorAlert]);
+  }, [data, guestBookId, setGuestBookData, GuestBooks, showErrorAlert]);
 
   useEffect(() => {
     if (guestIndex >= 0) {
@@ -92,7 +93,7 @@ export default function GuestManagement({pageId, guestBookId}) {
   function onSearch() {
     setSearching(true);
     setSearchResults([]);
-    GuestBooks.searchGuestBook(guestBookId, searchText)
+    GuestBooks.searchGuestBook(guestBookData.GuestBookID, searchText)
       .then(result => {
         result.sort(sortFunction);
         setSearchResults(result);
@@ -139,17 +140,17 @@ export default function GuestManagement({pageId, guestBookId}) {
   }
 
   return <>
-    {pageId === pageData.PageID && guestBookId > 0 && canEdit && (<>
+    {guestBookData && canEdit && (<>
       <Row className="mt-2">
         <Form.Label
           column={'sm'}
-          xs={2}
+          sm={2}
           htmlFor="SearchText"
           className="text-nowrap"
         >
           Search For
         </Form.Label>
-        <Col>
+        <Col className="mt-2 mt-sm-0">
           <Form.Control
             type="search"
             name={"SearchText"}
@@ -159,12 +160,12 @@ export default function GuestManagement({pageId, guestBookId}) {
             onChange={(e) => setSearchText(e.target.value)}
           />
         </Col>
-        <Col xs={'auto'}>
+        <Col sm={'auto'} className="mt-3 mt-sm-0">
           <Button
             variant="primary"
             size="sm"
             onClick={onSearch}
-            style={{width: '60px'}}
+            style={{width: '80px'}}
             disabled={searching}
           >
             {searching ? <Spinner size={'sm'}/> : <>Search</>}
@@ -254,14 +255,12 @@ export default function GuestManagement({pageId, guestBookId}) {
           </tbody>
         </Table>
         <Modal show={guestData} onHide={() => setGuestIndex(-1)}>
-          <ModalHeader closeButton>
-            <h5>Guest Feedback</h5>
-          </ModalHeader>
           <ModalBody>
+            <h5>Guest Feedback</h5>
             <div
               style={{
                 height: '70dvh',
-                overflowY: 'scroll',
+                overflowY: 'auto',
               }}
             >
               {guestData && guestBookData && (<Container>
@@ -281,8 +280,6 @@ export default function GuestManagement({pageId, guestBookId}) {
 
               </Container>)}
             </div>
-          </ModalBody>
-          <ModalFooter>
             <Row className="container-fluid m-0 p-0">
               <Col className="d-flex justify-content-start m-0 p-0">
                 <Button
@@ -321,7 +318,7 @@ export default function GuestManagement({pageId, guestBookId}) {
                 </Button>
               </Col>
             </Row>
-          </ModalFooter>
+          </ModalBody>
         </Modal>
       </>)}
     </>)}
