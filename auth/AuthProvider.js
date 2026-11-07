@@ -13,6 +13,8 @@ export default function AuthProvider(props) {
   const [currentUser, setCurrentUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const {Auth} = useRestApi();
+  const runMutex = useConcurrentMutex();
+
   const siteId = parseInt(process.env.REACT_APP_SITE_ID);
 
   useEffect(() => {
@@ -21,7 +23,7 @@ export default function AuthProvider(props) {
       setIsAuthenticated(true);
       setCurrentUser(jwtDecode(cookies.token.access_token));
     }
-  },[]);
+  },[cookies.token, currentUser]);
 
   useImperativeHandle(Auth.refreshAuthTokenRef, () => {
     return {
@@ -51,7 +53,7 @@ export default function AuthProvider(props) {
     } else {
       return false;
     }
-  }, [currentUser, siteId]);
+  }, [currentUser, siteId, cookies.token]);
 
   const setToken = useCallback((newToken) => {
     // update token value
@@ -64,9 +66,8 @@ export default function AuthProvider(props) {
       setCurrentUser(null);
       setIsAuthenticated(false);
     }
-  }, [setCookie, setCurrentUser]);
+  }, [setCookie, setCurrentUser, removeCookie]);
 
-  const runMutex = useConcurrentMutex();
 
   /**
    * Refresh expired auth token.
@@ -83,7 +84,7 @@ export default function AuthProvider(props) {
     } else {
       return null;
     }
-  }, [Auth, setToken, cookies.token?.refresh_token]);
+  }, [Auth, setToken, cookies.token?.refresh_token, runMutex]);
 
   const validateToken = useCallback(async () => {
     try {
