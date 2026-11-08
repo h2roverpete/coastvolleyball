@@ -44,7 +44,7 @@ export default function SmsMessagePanel({campaign, message, onDelete}) {
         setSubscribers(result);
       }).catch((err) => showErrorAlert(err));
     }
-  }, [message, SMS, subscribers, setSubscribers, showErrorAlert])
+  }, [message, SMS, subscribers, setSubscribers, showErrorAlert, hasAdminPermission]);
 
   function resendMessage() {
     if (checkedSubscribers.length > 0) {

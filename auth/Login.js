@@ -65,7 +65,7 @@ export default function Login() {
         );
       }
     }
-  }, [Auth, cookies.loginState, navigate, searchParams, setCookie, showErrorAlert, setToken, isAuthenticated]);
+  }, [Auth, cookies.loginState, navigate, searchParams, setCookie, showErrorAlert, setToken, isAuthenticated, removeCookie]);
 
   return (
     <>

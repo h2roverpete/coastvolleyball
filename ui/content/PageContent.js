@@ -1,4 +1,4 @@
-import React, {lazy, Suspense, useEffect, useRef, useState} from "react";
+import React, {lazy, Suspense, useCallback, useEffect, useRef, useState} from "react";
 import {Permission, Resource} from "../../auth/Permissions";
 import {useAuth} from "../../auth/AuthProvider";
 import {usePageContext} from "./Page";
@@ -32,7 +32,7 @@ export default function PageContent({children}) {
   const [cookies, setCookie, removeCookie] = useCookies();
   const canEdit = hasPermission(Resource.PAGE, Permission.EDIT);
 
-  async function checkPassword(pageId) {
+  const checkPassword = useCallback(async (pageId) => {
     if (pageId && cookies && Pages) {
       const token = cookies[`page${pageId}token`];
       if (token) {
@@ -60,7 +60,7 @@ export default function PageContent({children}) {
       }
     }
     return false;
-  }
+  },[cookies, Pages, setCookie, removeCookie]);
 
   useEffect(() => {
     if (!canView && pageData && hasPermission) {
@@ -82,7 +82,7 @@ export default function PageContent({children}) {
         setCanView(true);
       }
     }
-  }, [pageData, hasPermission, setCanView, canView]);
+  }, [pageData, hasPermission, setCanView, canView, checkPassword]);
 
   function addPageSection() {
     setBusy(true);

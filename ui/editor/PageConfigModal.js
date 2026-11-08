@@ -1,6 +1,5 @@
 import {Modal} from "react-bootstrap";
-import {useEffect} from "react";
-import FormEditor, {useFormData} from "./FormEditor";
+import FormEditor from "./FormEditor";
 import PageFields from "./PageFields";
 
 export default function PageConfigModal(props) {

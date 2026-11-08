@@ -65,7 +65,7 @@ export default function SmsCampaignList({siteId, pageId}) {
         })
       }
     }
-  }, [SMS, listItems, setListItems, sortFunction]);
+  }, [SMS, listItems, setListItems, sortFunction, canSend, siteId]);
 
   useEffect(() => {
     if (listItems) {

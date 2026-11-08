@@ -264,7 +264,7 @@ export default function NavBar(props) {
     <Navbar
       expand={props.expand ? props.expand : 'sm'}
       className={`NavBar ${!props.expand ? 'navbar-expand' : ''} bg-primary`}
-      fixed={props.fixed !== null ? props.fixed : true}
+      fixed={props.fixed ? props.fixed : 'top'}
       data-testid="NavBar"
       variant={siteData?.SiteTheme}
     >

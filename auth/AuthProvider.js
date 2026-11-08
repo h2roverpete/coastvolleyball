@@ -86,24 +86,24 @@ export default function AuthProvider(props) {
     }
   }, [Auth, setToken, cookies.token?.refresh_token, runMutex]);
 
-  const validateToken = useCallback(async () => {
-    try {
-      await Auth.checkToken();
-      const decoded = jwtDecode(cookies.token.access_token);
-      setCurrentUser(decoded);
-    } catch (error) {
-      if (error.status === 401) {
+  const validateAuthToken = useCallback(async () => {
+    if (cookies.token?.access_token) {
+      // use a concurrent mutex to return the same result to concurrent refresh calls
+      return await runMutex(async () => {
         try {
-          // token refused, try refreshing
-          await refreshAuthToken()
-        } catch (error) {
-          console.error(`Error refreshing token: ${JSON.stringify(error)}`);
+          await Auth.checkToken();
+          // token was verified
+          return true;
+        } catch (err) {
+          // token error
+          return false;
         }
-      } else {
-        console.error(`Unknown error checking token: ${JSON.stringify(error)}`);
-      }
+      });
+    } else {
+      // no current token
+      return false;
     }
-  }, [Auth, setCurrentUser, refreshAuthToken, cookies.token?.access_token]);
+  }, [Auth, cookies.token?.access_token, runMutex]);
 
   return (
     <AuthContext
@@ -113,6 +113,7 @@ export default function AuthProvider(props) {
         hasPermission: hasPermission,
         isAuthenticated: isAuthenticated,
         refreshAuthToken: refreshAuthToken,
+        validateAuthToken: validateAuthToken,
         currentUser: currentUser,
       }}>
       {props.children}

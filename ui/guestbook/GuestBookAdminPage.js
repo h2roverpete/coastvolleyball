@@ -1,5 +1,5 @@
 import {useLocation} from "react-router";
-import {lazy, Suspense, useEffect, useMemo, useState} from "react";
+import {lazy, Suspense, useMemo} from "react";
 import {useSiteContext} from "../content/Site";
 import {Resource, Permission} from "../../auth/Permissions";
 import {useAuth} from "../../auth/AuthProvider";
@@ -14,7 +14,7 @@ export default function GuestBookAdminPage() {
   const {siteData} = useSiteContext();
   const {hasPermission} = useAuth();
 
-  const canView = useMemo(() => hasPermission(Resource.GUESTBOOK, Permission.ADMIN), []);
+  const canView = hasPermission(Resource.GUESTBOOK, Permission.ADMIN);
   const guestBookId = useMemo(() => {
     const params = new URLSearchParams(location.search)
     if (params.has('guestBookId')) {
