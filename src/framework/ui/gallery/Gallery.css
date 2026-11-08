@@ -8,6 +8,7 @@ div.image-gallery-slide {
   display: flex;
   justify-content: center;
   align-items: center;
+  background: black;
 }
 
 .image-grid-container {

@@ -68,7 +68,7 @@ export default function LivestreamList({siteId, pageId}) {
         })
       }
     }
-  }, [Livestreams, siteId, listItems, setListItems, sortFunction, canEdit, showErrorAlert]);
+  }, [Livestreams, siteId, listItems, setListItems, sortFunction, canEdit, canView, showErrorAlert]);
 
   useEffect(() => {
     if (listItems) {

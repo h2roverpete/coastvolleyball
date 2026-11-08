@@ -14,7 +14,7 @@ export default function SmsAdminPage() {
 
   const {isAuthenticated} = useAuth();
 
-  return <>{isAuthenticated ? <div className={'PageContent'}>
+  return <>{isAuthenticated ? <div className={'PageSection'}>
       <Suspense><UserProfilePanel/></Suspense>
     </div>
     :

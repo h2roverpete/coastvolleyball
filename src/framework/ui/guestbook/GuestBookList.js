@@ -1,7 +1,7 @@
 import {useCallback, useEffect, useMemo, useState} from "react";
 import {useRestApi} from "framework/api/RestApi";
-import {BsPencil, BsSortDown, BsSortUp, BsX, BsXLg} from "react-icons/bs";
-import {Button, CloseButton, Col, OverlayTrigger, Row, Table, Tooltip} from "react-bootstrap";
+import {BsPencil, BsSortDown, BsSortUp, BsXLg} from "react-icons/bs";
+import {Button, Col, OverlayTrigger, Row, Table, Tooltip} from "react-bootstrap";
 import FormEditor from "framework/ui/editor/FormEditor";
 import {useAuth} from "framework/auth/AuthProvider";
 import {Permission, Resource} from "framework/auth/Permissions";

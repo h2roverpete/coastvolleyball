@@ -1,4 +1,4 @@
-import React, {createContext, lazy, Suspense, useContext, useEffect, useState} from "react";
+import React, {createContext, lazy, Suspense, useContext} from "react";
 import {useAuth} from "../../auth/AuthProvider";
 import {Permission, Resource} from "../../auth/Permissions";
 import {useRestApi} from "../../api/RestApi";

@@ -6,8 +6,6 @@ import {
   Table,
   Modal,
   ModalBody,
-  ModalFooter,
-  ModalHeader,
   Container,
   Spinner
 } from "react-bootstrap";

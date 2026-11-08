@@ -20,7 +20,6 @@ export default function InstagramExtraFields() {
           isValid={formData.isTouched('InstagramHandle') && isValidInstagramHandle(formData.edits?.InstagramHandle)}
           isInvalid={formData.isTouched('InstagramHandle') && !isValidInstagramHandle(formData.edits?.InstagramHandle)}
           value={formData.edits?.InstagramHandle || ''}
-          defaultValue={'@myhandle'}
           onChange={(e) => formData.onDataChanged({name: 'InstagramHandle', value: e.target.value})}
         />
       </Col>

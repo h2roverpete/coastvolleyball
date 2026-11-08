@@ -4,7 +4,7 @@ import React, {useEffect, useState} from "react";
 import {useSiteContext} from "../content/Site";
 import {useRestApi} from "../../api/RestApi";
 import {useFormData} from "./FormEditor";
-import {Button, Col, Form, Modal, Row} from "react-bootstrap";
+import {Col, Form, Modal, Row} from "react-bootstrap";
 import {Permission, Resource} from "../../auth/Permissions";
 import {useAuth} from "../../auth/AuthProvider";
 import CrudButtons from "./CrudButtons";

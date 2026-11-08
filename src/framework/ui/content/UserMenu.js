@@ -75,7 +75,7 @@ export default function UserMenu({buttonRef, onClose}) {
         className={`NavLink d-flex align-items-center`}
         data-bs-toggle="dropdown"
       >
-        <div className={`pe-2`}>{currentUser?.UserName}</div>
+        <div className={`UserName pe-2`}>{currentUser?.UserName}</div>
         <BsPersonCircle size="20"/>
       </Nav.Link>
       <div className="dropdown-menu dropdown-menu-end" style={{cursor: 'pointer', zIndex: 100}}>

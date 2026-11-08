@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import {useRestApi} from "../../api/RestApi";
 import {useSiteContext} from "../content/Site";
-import {Col, Form, Modal, ModalBody, Row, Button, Spinner} from "react-bootstrap";
+import {Col, Form, Modal, ModalBody, Row, Button} from "react-bootstrap";
 import {useFormData} from "../editor/FormEditor";
 import CrudButtons from "../editor/CrudButtons";
 import '../editor/Editor.css';

@@ -72,7 +72,7 @@ export default function Page({children, pageId}) {
         }
       }
     }
-  }, [pageId, pageData, metaPages, outlineData]);
+  }, [pageId, pageData, metaPages, outlineData, Extras, Pages]);
 
   const addPageSection = useCallback((newData) => {
     /** @type {PageSectionData[]} */
