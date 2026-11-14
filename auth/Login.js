@@ -7,7 +7,7 @@ import {useNavigate} from "react-router";
 import {useAuth} from "./AuthProvider";
 import {useCookies} from "react-cookie";
 import {useRestApi} from "../api/RestApi";
-import {Button, Col, Form, Row} from "react-bootstrap";
+import {Button, Col, Form, Row, Spinner} from "react-bootstrap";
 import {isValidEmail, isValidPassword} from "../util/Validators";
 
 /**
@@ -29,6 +29,7 @@ export default function Login() {
   const {isAuthenticated, setToken} = useAuth();
   const navigate = useNavigate();
   const [cookies, setCookie, removeCookie] = useCookies();
+  const [busy, setBusy] = useState(false);
   const state = useMemo(() => generateState(),[]);
 
   useEffect(() => {
@@ -79,7 +80,8 @@ export default function Login() {
             method="POST"
             action={`${process.env.REACT_APP_BACKEND_HOST}/oauth/login`}
             onSubmit={(e) => {
-              setCookie('loginState', state)
+              setCookie('loginState', state);
+              setBusy(true);
             }}
           >
             <input type="hidden" name="response_type" value="code"/>
@@ -121,7 +123,15 @@ export default function Login() {
             </Row>
 
             <div className="form-group mt-4">
-              <Button type="submit" variant="primary" disabled={!email || !password}>Log In</Button>
+              <Button type="submit" variant="primary" disabled={busy || !email || !password}>
+                <div style={{display: 'grid', placeItems: 'center'}}>
+                  <div style={{
+                    gridArea: '1/1',
+                    visibility: !busy ? 'visible' : 'hidden'
+                  }}>Log In</div>
+                  <Spinner size="sm" style={{gridArea: '1/1', visibility: busy ? 'visible' : 'hidden'}}/>
+                </div>
+              </Button>
             </div>
           </form>
         </div>
