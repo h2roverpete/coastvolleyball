@@ -25,9 +25,9 @@ export default function PageContent({children}) {
   const {hasPermission} = useAuth();
   const {siteData, showErrorAlert} = useSiteContext();
   const {pageData, sectionData, setSectionData} = usePageContext();
-  const passwordApi = useRef(null);
   const [canView, setCanView] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [refreshingToken, setRefreshingToken] = useState(false);
   const {PageSections, Pages} = useRestApi();
   const [cookies, setCookie, removeCookie] = useCookies();
   const canEdit = hasPermission(Resource.PAGE, Permission.EDIT);
@@ -45,14 +45,17 @@ export default function PageContent({children}) {
             return decoded.PageID === pageId
           } else {
             console.warn(`Expired page token, refreshing...`);
+            setRefreshingToken(true);
             try {
               const newToken = await Pages.refreshPageToken(pageId, token.refresh_token);
               console.debug(`Page token refreshed successfully.`);
               setCookie(`page${pageId}token`, newToken);
+              setRefreshingToken(false);
               return true;
             } catch (err) {
               console.error(`Error refreshing page token.`);
               removeCookie(`page${pageId}token`);
+              setRefreshingToken(false);
               return false;
             }
           }
@@ -60,7 +63,7 @@ export default function PageContent({children}) {
       }
     }
     return false;
-  },[cookies, Pages, setCookie, removeCookie]);
+  }, [cookies, Pages, setCookie, removeCookie]);
 
   useEffect(() => {
     if (!canView && pageData && hasPermission) {
@@ -119,8 +122,13 @@ export default function PageContent({children}) {
         </div>
         :
         pageData?.RequiresPassword ?
-          <Suspense><PagePassword onSuccess={() => setCanView(true)} pageData={pageData}
-                                  apiRef={passwordApi}/></Suspense>
+          <Suspense>
+            <PagePassword
+              onSuccess={() => setCanView(true)}
+              pageData={pageData}
+              refreshingToken={refreshingToken}
+            />
+          </Suspense>
           : pageData?.RequiresLogin && <div className={'PageContent container-fluid'}>
           <h1>Restricted Content</h1>
           <Suspense><RestrictedContent/></Suspense>
