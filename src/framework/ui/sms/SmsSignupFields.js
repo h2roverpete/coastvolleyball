@@ -15,7 +15,7 @@ const EmailField = lazy(() => import("../forms/EmailField"));
  * @returns {JSX.Element}
  * @constructor
  */
-export default function SmsSignupFields({campaign, smsCampaignId}) {
+export default function SmsSignupFields({campaign, smsCampaignId, onSubmit, extraData, onCancel}) {
 
   const {SMS} = useRestApi();
   const {showErrorAlert} = useSiteContext();
@@ -60,7 +60,7 @@ export default function SmsSignupFields({campaign, smsCampaignId}) {
 
   function handleSubmit() {
     setSubmitting(true);
-    const data = {
+    let data = {
       SMSCampaignID: parseInt(smsCampaignConfig.SMSCampaignID),
       SubscriberName: formData.edits.SubscriberName,
     }
@@ -69,10 +69,14 @@ export default function SmsSignupFields({campaign, smsCampaignId}) {
     } else {
       data.SubscriberEmail = formData.edits.SubscriberEmail;
     }
+    if (extraData) {
+      data = {...data, ...extraData};
+    }
     SMS.insertOrUpdateSmsSubscriber(data).then((response) => {
       formData.setData(response)
       setSubmitted(true);
       setSubmitting(false);
+      onSubmit?.();
     }).catch((err) => {
       showErrorAlert(err);
       setSubmitting(false);
@@ -255,6 +259,7 @@ export default function SmsSignupFields({campaign, smsCampaignId}) {
               }
             </Button>
           </Col>
+          {onCancel && <Col className={'d-flex justify-content-end'}><Button variant={'secondary'} onClick={onCancel}>Cancel</Button></Col>}
         </Row>
       </Suspense>}
   </div>;

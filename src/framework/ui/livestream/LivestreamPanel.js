@@ -14,18 +14,21 @@ import {useRestApi} from "../../api/RestApi";
 import {useSiteContext} from "../content/Site";
 import {useAuth} from "../../auth/AuthProvider";
 import {Resource, Permission} from "../../auth/Permissions";
+import NotificationSignupModal from "./NotificationSignupModal";
 
 export default function LivestreamPanel({data, livestreamId, menuItems}) {
 
-  const {Livestreams} = useRestApi();
-  const {showErrorAlert} = useSiteContext();
+  const {Livestreams, SMS} = useRestApi();
+  const {showErrorAlert, siteData} = useSiteContext();
   const {hasPermission} = useAuth();
 
   const [copyIngestUrlTooltip, setCopyIngestUrlTooltip] = useState('Copy URL to clipboard.');
   const [copyKeyTooltip, setCopyKeyTooltip] = useState('Copy key to clipboard.');
   const [livestreamData, setLivestreamData] = useState(data);
+  const [smsCampaigns, setSmsCampaigns] = useState(null);
 
   const canBroadcast = hasPermission(Resource.LIVESTREAM, Permission.BROADCAST);
+  const canAdmin = hasPermission(Resource.LIVESTREAM, Permission.ADMIN);
   const canEdit = hasPermission(Resource.PAGE, Permission.ADMIN);
 
   useEffect(() => {
@@ -37,6 +40,14 @@ export default function LivestreamPanel({data, livestreamId, menuItems}) {
       })
     }
   }, [data, livestreamData, livestreamId, Livestreams, showErrorAlert]);
+
+  useEffect(() => {
+    if (!smsCampaigns && canAdmin) {
+      SMS.getSmsCampaignsForSite(siteData.SiteID).then(result => {
+        setSmsCampaigns(result);
+      })
+    }
+  }, [smsCampaigns, setSmsCampaigns, SMS]);
 
   function downloadConfigFile() {
     Livestreams.getConfigurationXml(livestreamData.LivestreamID).then((xml) => {
@@ -54,9 +65,25 @@ export default function LivestreamPanel({data, livestreamId, menuItems}) {
     })
   }
 
+  function setNotificationCampaign(smsCampaignId) {
+    const newData = {...livestreamData, SMSCampaignID: smsCampaignId};
+    setLivestreamData(newData);
+    Livestreams.insertOrUpdateLivestream(newData).then(result => {
+      setLivestreamData(result);
+    }).catch(error => {
+      showErrorAlert(error);
+    })
+  }
+
   return <>
     {livestreamData && <>
       <IVSPlayer data={livestreamData}/>
+      {livestreamData.SMSCampaignID > 0 && <>
+        <NotificationSignupModal
+          smsCampaignId={livestreamData.SMSCampaignID}
+          livestreamId={livestreamData.LivestreamID}
+        />
+      </>}
       {canBroadcast &&
         <EditorPanel hideButtons={!canEdit} menuItems={menuItems}>
           <h5>Stream Settings</h5>
@@ -135,6 +162,22 @@ export default function LivestreamPanel({data, livestreamId, menuItems}) {
             </Col>
             <Col xs={1}></Col>
           </Row>
+          {canAdmin && <Row className={'mt-2'}>
+            <Form.Label column={'sm'} htmlFor={'SmsCampaignID'}>Notification Campaign</Form.Label>
+            <Col xs={8}>
+              <Form.Select
+                name={'SmsCampaignID'}
+                value={livestreamData?.SMSCampaignID || 0}
+                size={'sm'}
+                onChange={(e) => setNotificationCampaign(parseInt(e.target.value))}
+              >
+                <option value={'0'}>(none)</option>
+                {smsCampaigns?.map((campaign) => <option key={campaign.SMSCampaignID}
+                                                         value={campaign.SMSCampaignID}>{campaign.CampaignName}</option>)}
+              </Form.Select>
+            </Col>
+            <Col xs={1}></Col>
+          </Row>}
         </EditorPanel>
       }
     </>}

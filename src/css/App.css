@@ -25,6 +25,14 @@ ol.breadcrumb {
   font-size: var(--bs-body-font-size) !important;
 }
 
+.PageContent h3 {
+  font-size: calc(var(--bs-body-font-size)*1.3) !important;
+}
+
+.PageContent h4 {
+  font-size: calc(var(--bs-body-font-size)*1.2) !important;
+}
+
 /* bootstrap sm width */
 @media (min-width: 576px) {
 
