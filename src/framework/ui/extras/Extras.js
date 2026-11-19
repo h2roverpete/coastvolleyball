@@ -29,7 +29,7 @@ export default function Extras({extras}) {
   const {moveExtraUp, moveExtraDown, removeExtraFromPage} = usePageContext();
   const {showErrorAlert} = useSiteContext();
 
-  const canEdit= hasPermission?.(Resource.PAGE, Permission.EDIT);
+  const canEdit = hasPermission?.(Resource.PAGE, Permission.EDIT);
 
   function handleMoveUp(extraData) {
     Extras.moveUp(extraData.ExtraID)

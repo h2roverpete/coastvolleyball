@@ -5,9 +5,9 @@ import {useRestApi} from "../../api/RestApi"
 import {useSiteContext} from "../content/Site";
 import './SmsSignupFields.css';
 import {isValidEmail} from "../../util/Validators";
+import EmailField from "../forms/EmailField";
 
 const PhoneNumberField = lazy(() => import("../forms/PhoneNumberField"));
-const EmailField = lazy(() => import("../forms/EmailField"));
 
 /**
  * Fields for SMS campaign signup.
