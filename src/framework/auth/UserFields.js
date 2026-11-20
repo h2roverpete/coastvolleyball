@@ -20,10 +20,11 @@ const PhoneNumberField = lazy(() => import("../ui/forms/PhoneNumberField"));
  * @param {function({NewUserData})} [onDelete]    Callback when user is deleted
  * @param {function({NewUserData})} [onUpdate]    Callback when user is updated
  * @param {'sm'|'lg'} [size]                      Control size
+ * @param {Boolean} [resetPassword]               Prompt user to reset password
  * @returns {JSX.Element}
  * @constructor
  */
-export default function UserFields({data, siteId, onCancel, onDelete, onUpdate, size}) {
+export default function UserFields({data, siteId, onCancel, onDelete, onUpdate, size, resetPassword}) {
 
   const formData = useFormData();
   const {showErrorAlert} = useSiteContext();
@@ -105,6 +106,13 @@ export default function UserFields({data, siteId, onCancel, onDelete, onUpdate, 
   const labelCols = 3;
   return (<Suspense>
     <div className={'UserFields'}>
+      {resetPassword && <Row className={'mt-4'}>
+        <Col className={'mt-1 text-danger'}>
+          Please enter a new password below.
+          Passwords must be 8 characters or longer, and contain an uppercase letter, a lowercase letter, a number and
+          a symbol.
+        </Col>
+      </Row>}
       <Row className={'mt-4'}>
         <Form.Label
           column={size?.length ? size : true}
@@ -154,7 +162,7 @@ export default function UserFields({data, siteId, onCancel, onDelete, onUpdate, 
         >
           {formData.edits.UserID ? 'Change ' : ''}Password
         </Form.Label>
-        <Col className={'d-flex align-items-center justify-content-center'}>
+        <Col className={'d-flex flex-column align-items-start justify-content-center'}>
           <Form.Control
             size={size}
             id={'Password'}
@@ -162,11 +170,25 @@ export default function UserFields({data, siteId, onCancel, onDelete, onUpdate, 
             autoComplete={'new-password'}
             isValid={formData.isTouched('Password') && isValidPassword(formData.edits.Password)}
             isInvalid={formData.isTouched('Password') && !isValidPassword(formData.edits.Password)}
+            disabled={formData.edits.MagicLink === true}
             value={formData.edits?.Password || ''}
             onChange={(e) => formData.onDataChanged({name: 'Password', value: e.target.value})}
           />
         </Col>
       </Row>
+      {canAdmin &&
+        <Row className={'mt-2'}>
+          <Col sm={labelCols}/>
+          <Col className={'d-flex align-items-center justify-content-start'}>
+            <Form.Check
+              id={'MagicLink'}
+              label={'Send Magic Link'}
+              checked={formData.edits.MagicLink === true}
+              onChange={(e) => formData.onDataChanged({name: 'MagicLink', value: e.target.checked})}
+            />
+          </Col>
+        </Row>
+      }
       <Row className={'mt-2'}>
         <Form.Label
           column={size?.length ? size : true}

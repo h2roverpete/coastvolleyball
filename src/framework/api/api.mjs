@@ -7,6 +7,7 @@ import axios from "axios";
  * @property {Number} SiteID            Unique Site ID.
  * @property {String} SiteName          Name of the site. Used for brand, breadcrumbs and copyright.
  * @property {String} SiteRootUrl       Root URL of the site.
+ * @property {String} SiteAdminEmail    Email address of site admin.
  * @property {String} SiteTheme         Site theme 'light' or 'dark' variant of the selected style.
  * @property {String} SiteStyle         CSS style sheet for the site at https://resources.h2rover.net/css/
  * @property {String} SiteBucketName    S3 bucket name for deploying site files.

@@ -4,7 +4,7 @@ import {useRestApi} from "../../api/RestApi";
 import {useFormData} from "./FormEditor";
 import {useEffect, useState} from "react";
 import CrudButtons from "./CrudButtons";
-import {isValidUrl, isValidBucketName} from "../../util/Validators";
+import {isValidUrl, isValidBucketName, isValidEmail} from "../../util/Validators";
 
 /**
  * @typedef SiteConfigProps
@@ -111,6 +111,19 @@ export default function SiteFields(props) {
               isInvalid={formData.isTouched('SiteRootUrl') && formData.edits.SiteRootUrl?.length && !isValidUrl(formData.edits?.SiteRootUrl)}
               value={formData.edits?.SiteRootUrl || ''}
               onChange={(e) => formData.onDataChanged({name: 'SiteRootUrl', value: e.target.value})}
+            />
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <Form.Label column={'sm'} htmlFor={'SiteAdminEmail'}>Admin Email</Form.Label>
+            <Form.Control
+              size={'sm'}
+              id={'SiteAdminEmail'}
+              isValid={formData.isTouched('SiteAdminEmail') && isValidUrl(formData.edits?.SiteAdminEmail)}
+              isInvalid={formData.isTouched('SiteAdminEmail') && formData.edits.SiteAdminEmail?.length && !isValidEmail(formData.edits?.SiteAdminEmail)}
+              value={formData.edits?.SiteAdminEmail || ''}
+              onChange={(e) => formData.onDataChanged({name: 'SiteAdminEmail', value: e.target.value})}
             />
           </Col>
         </Row>

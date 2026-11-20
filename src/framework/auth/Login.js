@@ -26,7 +26,7 @@ export default function Login() {
   const {Auth} = useRestApi();
   const {showErrorAlert} = useSiteContext();
   const [searchParams] = useSearchParams();
-  const {isAuthenticated, setToken} = useAuth();
+  const {isAuthenticated, setToken, currentUser} = useAuth();
   const navigate = useNavigate();
   const [cookies, setCookie, removeCookie] = useCookies();
   const [busy, setBusy] = useState(false);
@@ -35,7 +35,13 @@ export default function Login() {
   useEffect(() => {
     if (isAuthenticated) {
       // token already set
-      navigate('/');
+      if (currentUser.MagicLink) {
+        // user needs to reset password
+        navigate('/admin/user');
+      } else {
+        // go to home page
+        navigate('/');
+      }
     }
   }, [isAuthenticated, navigate])
 
@@ -46,9 +52,7 @@ export default function Login() {
       fetchingToken.current = true;
       // check received state against state originally sent
       const state = searchParams.get('state');
-      if (cookies.loginState !== state) {
-        showErrorAlert("Couldn't verify login state.");
-      } else {
+      if (state === 'link' || cookies.loginState === state) {
         Auth.getAuthToken(
           window.location.host,
           `${window.location.protocol}//${window.location.host}/login`,
@@ -64,6 +68,9 @@ export default function Login() {
             removeCookie("loginState");
           }
         );
+      } else {
+        showErrorAlert(`Couldn't verify login state.`);
+        removeCookie("loginState");
       }
     }
   }, [Auth, cookies.loginState, navigate, searchParams, setCookie, showErrorAlert, setToken, isAuthenticated, removeCookie]);
